@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "Viewport.hpp"
 #include <Core/Log.hpp>
+#include <Renderer/Viewport.hpp>
 #include <Layer/LayerStack.hpp>
 #include <Util/Version.hpp>
 
@@ -13,18 +13,22 @@
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
+#include <filesystem>
+
 namespace Engine
 {
     class Window;
 
     struct ApplicationSpec {
-        std::string ApplicationName;
-        std::string WorkingDirectory;
+        std::string_view ApplicationName;
+        std::filesystem::path WorkingDirectory;
         Engine::Version AppVersion;
+        uint32_t width;
+        uint32_t height;
     };
 
     struct WindowSpec {
-        std::string title;
+        std::string_view title;
         uint32_t width;
         uint32_t height;
     };
@@ -33,70 +37,46 @@ namespace Engine
     {
     public:
         Window() = default;
-        Window(WindowSpec& spec);
-
         ~Window() = default;
 
-        static std::shared_ptr<Window> Create(WindowSpec spec) { return std::make_shared<Window>(spec); }
-
     public:
+        void Create(WindowSpec spec);
+
+        void Destroy();
+
         void Update();
 
-        bool ShouldClose() { return glfwWindowShouldClose(s_Window); }
-
-        double GetDeltaTime() const;
-        void SetDeltaTime(double value);
-
-        GLFWwindow* GetHandle() { return s_Window; }
-
-        bool Good();
+        bool IsValid();
 
         void Close();
 
-        void Clear(float r = 0.2f, float g = 0.3f, float b = 0.4f, float a = 1.0f);
+        bool ShouldClose();
 
-        WindowSpec& GetSpec() { return spec; }
+        double BeginFrameTime() const;
+        double* BeginFrameTime();
+        double EndFrameTime() const;
+        double* EndFrameTime();
+        double DeltaFrameTime() const;
 
-        const WindowSpec& GetSpec() const { return spec; }
+        GLFWwindow* GetRawHandler();
+
+        WindowSpec* GetSpec();
+        const WindowSpec* GetSpec() const;
 
     public:
         static inline ViewportSize s_ViewportSize{};
 
-    public:
-        operator bool();
+    private:
+        static void _CloseCallback(GLFWwindow* window);
+        static void _WindowSizeCallback(GLFWwindow* window, int width, int height);
+        static void _WindowKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+        static void _WindowMouseMoveCallback(GLFWwindow* window, double x, double y);
 
     private:
-        static void closeCallback(GLFWwindow* window)
-        {
+        static inline GLFWwindow* s_WindowPtr = nullptr;
 
-            for (auto& layer: LayerStack::data())
-            {
-                layer->OnWindowShouldCloseEvent();
-                layer->SetShouldExit(true);
-            }
-        }
-
-        static void windowSizeCallback(GLFWwindow* window, int width, int height)
-        {
-            s_ViewportSize.width = width;
-            s_ViewportSize.height = height;
-            for (auto& layer: LayerStack::data()) { layer->OnWindowResizeEvent(width, height); }
-        }
-
-        static void windowKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
-        {
-            for (auto& layer: LayerStack::data()) { layer->OnKeyboardEvent(action, key); }
-        }
-
-        static void windowMouseMoveCallback(GLFWwindow* window, double x, double y)
-        {
-            for (auto& layer: LayerStack::data()) { layer->OnMouseMoveEvent((int) x, (int) y); }
-        }
-
-    private:
-        static inline GLFWwindow* s_Window = nullptr;
-
-        WindowSpec spec;
-        double m_Timestep{};
+        WindowSpec m_WindowSpec{};
+        double m_BeginFrameTime{};
+        double m_EndFrameTime{};
     };
 }// namespace Engine

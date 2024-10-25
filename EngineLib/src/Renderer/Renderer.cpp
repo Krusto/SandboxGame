@@ -17,7 +17,7 @@ namespace Engine
 
     RendererAPI* Renderer::GetAPIInstance() { return s_RendererAPI; }
 
-    void Renderer::Init(RendererSpec& rendererSpec, ApplicationSpec applicationSpec)
+    void Renderer::Init(RendererSpec rendererSpec, ApplicationSpec applicationSpec)
     {
         s_RendererAPI = CreateRendererAPIInstance();
 

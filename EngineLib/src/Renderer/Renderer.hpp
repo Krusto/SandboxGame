@@ -30,7 +30,7 @@ namespace Engine
     public:
         using FunctionContainer_t = std::vector<std::function<void(void)>>;
         Renderer() = default;
-        static void Init(RendererSpec& rendererSpec, ApplicationSpec applicationSpec);
+        static void Init(RendererSpec rendererSpec, ApplicationSpec applicationSpec);
         static void InitImGUI(std::weak_ptr<Window> window);
         static void Shutdown();
         static void BeginFrame(){};

@@ -18,13 +18,13 @@ namespace Engine
         void Run();
         void Init(const ApplicationSpec& spec);
 
-        uint32_t GetWidth() { return m_Window->GetSpec().width; }
+        uint32_t GetWidth() { return m_Window->GetSpec()->width; }
 
-        uint32_t GetWidth() const { return m_Window->GetSpec().width; }
+        uint32_t GetWidth() const { return m_Window->GetSpec()->width; }
 
-        uint32_t GetHeight() { return m_Window->GetSpec().height; }
+        uint32_t GetHeight() { return m_Window->GetSpec()->height; }
 
-        uint32_t GetHeight() const { return m_Window->GetSpec().height; }
+        uint32_t GetHeight() const { return m_Window->GetSpec()->height; }
 
         auto& Spec() { return m_ApplicationSpec; }
 

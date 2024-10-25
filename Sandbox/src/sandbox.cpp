@@ -1,3 +1,5 @@
+
+#define GLFW_INCLUDE_NONE
 #include <Engine.hpp>
 #include "SandboxLayer.hpp"
 using namespace Engine;
@@ -12,7 +14,7 @@ public:
 
 int main()
 {
-    auto spec = Engine::ApplicationSpec{"Sandbox", "./", Engine::Version{1, 0, 0}};
+    auto spec = Engine::ApplicationSpec{"Sandbox", "./", Engine::Version{1, 0, 0}, 1280, 720};
     auto* sandbox = new Sandbox(spec);
     sandbox->Init(spec);
     sandbox->Run();
