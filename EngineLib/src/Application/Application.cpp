@@ -32,14 +32,13 @@ void Engine::Application::Run()
 void Engine::Application::Init(const Engine::ApplicationSpec& spec)
 {
     m_ApplicationSpec = spec;
-    m_ApplicationSpec.WorkingDirectory = std::filesystem::absolute(spec.WorkingDirectory).string();
+    m_ApplicationSpec.WorkingDirectory = std::filesystem::absolute(spec.WorkingDirectory);
     Logger::Create();
 
-    m_Window = Window::Create({m_ApplicationSpec.ApplicationName, 1280, 720});
+    m_Window = std::make_shared<Window>();
+    m_Window->Create(WindowSpec{m_ApplicationSpec.ApplicationName, m_ApplicationSpec.width, m_ApplicationSpec.height});
 
-    RendererSpec rendererSpec;
-    rendererSpec.SurfaceSize = {1280, 720};
-
+    RendererSpec rendererSpec = {.SurfaceSize = {m_ApplicationSpec.width, m_ApplicationSpec.height}};
     Renderer::Init(rendererSpec, m_ApplicationSpec);
 }
 
@@ -52,6 +51,6 @@ void Engine::Application::Destroy()
 
     Renderer::Shutdown();
 
-    glfwDestroyWindow(m_Window->GetHandle());
+    m_Window->Destroy();
     glfwTerminate();
 }

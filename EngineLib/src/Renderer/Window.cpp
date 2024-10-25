@@ -3,6 +3,8 @@
 #include "GraphicsContext.hpp"
 #include "Renderer.hpp"
 
+#include <Core/Log.hpp>
+
 void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
                                 const GLchar* message, const void* userParam)
 {
@@ -18,65 +20,104 @@ void ErrorCallback(int code, const char* err_str)
 
 namespace Engine
 {
-    Window::Window(WindowSpec& spec)
+    void Window::Create(WindowSpec spec)
     {
-        this->spec = spec;
+        this->m_WindowSpec = spec;
 
         if (!glfwInit())
         {
-            LOG_ERROR("GLFW CAN NOT INITIALIZE!!!");
+            LOG_ERROR("GLFW initialization failed!");
             exit(-1);
         }
 
         glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
         int major, minor, rev;
         glfwGetVersion(&major, &minor, &rev);
 
         LOG_INFO("GLFW VERSION: " + std::to_string(major) + "." + std::to_string(minor) + "." + std::to_string(rev));
 
-        s_Window = glfwCreateWindow(spec.width, spec.height, spec.title.c_str(), nullptr, nullptr);
-        if (this->Good())
+        s_WindowPtr = glfwCreateWindow(this->m_WindowSpec.width, this->m_WindowSpec.height,
+                                       this->m_WindowSpec.title.data(), nullptr, nullptr);
+        if (!IsValid())
         {
-            LOG_ERROR("Failed to create GLFW window");
+            LOG_ERROR("Failed to create GLFW window!");
             glfwTerminate();
             exit(-1);
         }
 
-        glfwMakeContextCurrent(s_Window);
+        glfwMakeContextCurrent(s_WindowPtr);
 
-        GraphicsContext::s_Context = GraphicsContext::Create(s_Window);
+        GraphicsContext::s_Context = GraphicsContext::Create(s_WindowPtr);
         GraphicsContext::s_Context->Init();
 
         glEnable(GL_DEBUG_OUTPUT);
         glDebugMessageCallback(MessageCallback, 0);
         glfwSetErrorCallback(ErrorCallback);
-        glfwSetWindowCloseCallback(this->s_Window, closeCallback);
-        glfwSetWindowSizeCallback(this->s_Window, windowSizeCallback);
-        glfwSetKeyCallback(this->s_Window, windowKeyCallback);
-        glfwSetCursorPosCallback(this->s_Window, windowMouseMoveCallback);
-        //    glfwSetInputMode(this->s_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetWindowCloseCallback(this->s_WindowPtr, _CloseCallback);
+        glfwSetWindowSizeCallback(this->s_WindowPtr, _WindowSizeCallback);
+        glfwSetKeyCallback(this->s_WindowPtr, _WindowKeyCallback);
+        glfwSetCursorPosCallback(this->s_WindowPtr, _WindowMouseMoveCallback);
     }
+
+    void Window::Destroy() { glfwDestroyWindow(s_WindowPtr); }
 
     void Window::Update()
     {
         GraphicsContext::s_Context->SwapBuffers();
-        this->spec.width = s_ViewportSize.width;
-        this->spec.height = s_ViewportSize.height;
+        m_WindowSpec.width = s_ViewportSize.width;
+        m_WindowSpec.height = s_ViewportSize.height;
     }
 
-    void Window::Clear(float r, float g, float b, float a) { Renderer::ClearColor(glm::vec4{r, g, b, a}); }
+    bool Window::IsValid() { return (s_WindowPtr != nullptr); }
 
-    double Window::GetDeltaTime() const { return 1.0 / m_Timestep; }
+    void Window::Close() { glfwSetWindowShouldClose(s_WindowPtr, GLFW_TRUE); }
 
-    void Window::SetDeltaTime(double value) { m_Timestep = value; }
+    bool Window::ShouldClose() { return glfwWindowShouldClose(s_WindowPtr); }
 
-    bool Window::Good() { return (s_Window == nullptr); }
+    double Window::BeginFrameTime() const { return m_BeginFrameTime; }
 
-    void Window::Close() { glfwSetWindowShouldClose(s_Window, GLFW_TRUE); }
+    double* Window::BeginFrameTime() { return &m_BeginFrameTime; }
 
-    Window::operator bool() { return false; }
+    double Window::EndFrameTime() const { return m_EndFrameTime; }
+
+    double* Window::EndFrameTime() { return &m_EndFrameTime; }
+
+    double Window::DeltaFrameTime() const { return (m_EndFrameTime - m_BeginFrameTime); }
+
+    GLFWwindow* Window::GetRawHandler() { return s_WindowPtr; }
+
+    WindowSpec* Window::GetSpec() { return &m_WindowSpec; }
+
+    const WindowSpec* Window::GetSpec() const { return &m_WindowSpec; }
+
+    void Window::_CloseCallback(GLFWwindow* window)
+    {
+        for (auto& layer: LayerStack::data())
+        {
+            layer->OnWindowShouldCloseEvent();
+            layer->SetShouldExit(true);
+        }
+    }
+
+    void Window::_WindowSizeCallback(GLFWwindow* window, int width, int height)
+    {
+        s_ViewportSize.width = width;
+        s_ViewportSize.height = height;
+        for (auto& layer: LayerStack::data()) { layer->OnWindowResizeEvent(width, height); }
+    }
+
+    void Window::_WindowKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+    {
+        for (auto& layer: LayerStack::data()) { layer->OnKeyboardEvent(action, key); }
+    }
+
+    void Window::_WindowMouseMoveCallback(GLFWwindow* window, double x, double y)
+    {
+        for (auto& layer: LayerStack::data()) { layer->OnMouseMoveEvent((int) x, (int) y); }
+    }
+
 }// namespace Engine
