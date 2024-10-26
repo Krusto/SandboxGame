@@ -46,8 +46,8 @@ void Engine::Application::Destroy()
 {
     m_Window->Close();
 
-    LayerStack::DestroyLayers();
     LayerStack::PopLayers();
+    LayerStack::DestroyLayers();
 
     Renderer::Shutdown();
 

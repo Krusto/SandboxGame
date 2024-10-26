@@ -24,6 +24,11 @@ namespace Engine
         if (s_RendererAPI) s_RendererAPI->Init(rendererSpec, applicationSpec);
     }
 
+    void Renderer::Destroy()
+    {
+        if (s_RendererAPI) delete s_RendererAPI;
+    }
+
     void Renderer::InitImGUI(std::weak_ptr<Window> window) {}
 
     void Renderer::Shutdown()
