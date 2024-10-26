@@ -35,7 +35,6 @@ public:
     void End() override {}
 
 protected:
-    std::weak_ptr<Engine::Window> m_Window;
 
     ViewportSize m_ViewportSize;
 

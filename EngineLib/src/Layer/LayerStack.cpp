@@ -8,15 +8,12 @@ namespace Engine
         for (auto layer: m_Layers) { layer->Init(window); }
     }
 
-    void LayerStack::PushLayer(std::weak_ptr<Layer> layer)
+    void LayerStack::PushLayer(Layer* layer)
     {
-        if (layer.expired()) { return; }
-
-        auto layerPtr = layer.lock();
-        if (!LayerStack::ContainsLayer(layerPtr->GetName()))
+        if (!LayerStack::ContainsLayer(layer->GetName()))
         {
-            LayerStack::m_Layers.push_back(layerPtr);
-            layerPtr->OnAttach();
+            LayerStack::m_Layers.push_back(layer);
+            layer->OnAttach();
         }
     }
 
@@ -38,16 +35,21 @@ namespace Engine
     void LayerStack::DestroyLayers()
     {
         for (auto& layer: m_Layers) { layer->Destroy(); }
+        for (auto& layer : m_Layers)
+        {
+            delete layer;
+        }
+        
         m_Layers.clear();
     }
 
-    std::weak_ptr<Layer> LayerStack::GetLayer(std::string name) { return LayerStack::m_Layers[FindLayerIndex(name)]; }
+    Layer* LayerStack::GetLayer(std::string name) { return LayerStack::m_Layers[FindLayerIndex(name)]; }
 
     auto LayerStack::end() { return LayerStack::m_Layers.end(); }
 
     auto LayerStack::begin() { return LayerStack::m_Layers.begin(); }
 
-    std::vector<std::shared_ptr<Layer>>& LayerStack::data() { return LayerStack::m_Layers; }
+    std::vector<Layer*>& LayerStack::data() { return LayerStack::m_Layers; }
 
     uint32_t LayerStack::FindLayerIndex(std::string_view name)
     {

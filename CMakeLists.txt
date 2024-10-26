@@ -89,4 +89,5 @@ target_link_libraries(EngineLib PUBLIC EngineInterfaceLibrary)
 
 add_executable(Sandbox ${SANDBOX_HEADER_FILES} ${SANDBOX_SOURCE_FILES})
 target_include_directories(Sandbox PRIVATE "${CMAKE_SOURCE_DIR}/EngineLib/src")
+target_include_directories(Sandbox PRIVATE "${CMAKE_SOURCE_DIR}/Sandbox/src")
 target_link_libraries(Sandbox EngineLib)

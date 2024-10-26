@@ -1,7 +1,7 @@
 
 #define GLFW_INCLUDE_NONE
 #include <Engine.hpp>
-#include "SandboxLayer.hpp"
+#include <Layer/SandboxLayer.hpp>
 using namespace Engine;
 
 class Sandbox: public Engine::Application
