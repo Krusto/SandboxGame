@@ -7,13 +7,11 @@ class OpenGLContext: public GraphicsContext
 public:
     OpenGLContext() = default;
 
-    OpenGLContext(GLFWwindow* handle) : m_WindowHandle(handle) {}
+    OpenGLContext(GLFWwindow* handle) : GraphicsContext(handle) {}
 
     ~OpenGLContext() = default;
 
+public:
     virtual void Init() override;
     virtual void SwapBuffers() override;
-
-private:
-    GLFWwindow* m_WindowHandle{};
 };

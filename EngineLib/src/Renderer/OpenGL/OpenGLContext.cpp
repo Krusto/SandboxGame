@@ -8,7 +8,7 @@
 
 void OpenGLContext::Init()
 {
-    glfwMakeContextCurrent(m_WindowHandle);
+    glfwMakeContextCurrent(p_WindowPtr);
 
     if (!gladLoadGL())
     {
@@ -22,6 +22,6 @@ void OpenGLContext::Init()
 
 void OpenGLContext::SwapBuffers()
 {
-    glfwSwapBuffers(m_WindowHandle);
+    glfwSwapBuffers(p_WindowPtr);
     glfwPollEvents();
 }

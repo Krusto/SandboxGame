@@ -9,13 +9,14 @@ public:
 
     ~SandboxLayer() override {}
 
+public:
     void Init(std::weak_ptr<Engine::Window> window) override;
 
     void OnAttach() override;
 
-    void OnDetach() override;
-
     void OnUpdate(float dt) override;
+
+    void OnDetach() override;
 
     void Destroy() override;
 

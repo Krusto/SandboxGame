@@ -3,9 +3,66 @@
 
 namespace Engine
 {
-    void LayerStack::InitLayers(std::shared_ptr<Window> window)
+    void LayerStack::InitLayers(std::weak_ptr<Window> window)
     {
         for (auto layer: m_Layers) { layer->Init(window); }
+    }
+
+    void LayerStack::PushLayer(std::weak_ptr<Layer> layer)
+    {
+        if (layer.expired()) { return; }
+
+        auto layerPtr = layer.lock();
+        if (!LayerStack::ContainsLayer(layerPtr->GetName()))
+        {
+            LayerStack::m_Layers.push_back(layerPtr);
+            layerPtr->OnAttach();
+        }
+    }
+
+    void LayerStack::PopLayer(std::string name)
+    {
+        if (LayerStack::ContainsLayer(name))
+        {
+            LayerStack::m_Layers[FindLayerIndex(name)]->OnDetach();
+
+            LayerStack::m_Layers.erase(LayerStack::m_Layers.begin() + FindLayerIndex(name));
+        }
+    }
+
+    void LayerStack::PopLayers()
+    {
+        for (uint32_t index = 0; index < m_Layers.size(); ++index) { m_Layers[index]->OnDetach(); }
+    }
+
+    void LayerStack::DestroyLayers()
+    {
+        for (auto& layer: m_Layers) { layer->Destroy(); }
+        m_Layers.clear();
+    }
+
+    std::weak_ptr<Layer> LayerStack::GetLayer(std::string name) { return LayerStack::m_Layers[FindLayerIndex(name)]; }
+
+    auto LayerStack::end() { return LayerStack::m_Layers.end(); }
+
+    auto LayerStack::begin() { return LayerStack::m_Layers.begin(); }
+
+    std::vector<std::shared_ptr<Layer>>& LayerStack::data() { return LayerStack::m_Layers; }
+
+    uint32_t LayerStack::FindLayerIndex(std::string_view name)
+    {
+
+        for (uint32_t i = 0; i < m_Layers.size(); i++)
+        {
+            if (m_Layers[i]->GetName() == name) return i;
+        }
+        return LayerStack::m_Layers.size();
+    }
+
+    bool LayerStack::ContainsLayer(std::string_view name)
+    {
+        if (FindLayerIndex(name) != LayerStack::m_Layers.size()) { return true; }
+        return false;
     }
 
 }// namespace Engine

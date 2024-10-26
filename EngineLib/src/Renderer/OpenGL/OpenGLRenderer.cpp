@@ -11,4 +11,8 @@ namespace Engine
     }
 
     void OpenGLRenderer::Init(RendererSpec rendererSpec, ApplicationSpec applicationSpec) {}
+
+    void OpenGLRenderer::Shutdown(){};
+    void OpenGLRenderer::BeginFrame(){};
+    void OpenGLRenderer::EndFrame(){};
 }// namespace Engine
