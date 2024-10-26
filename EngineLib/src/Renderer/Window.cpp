@@ -5,19 +5,6 @@
 
 #include <Core/Log.hpp>
 
-void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
-                                const GLchar* message, const void* userParam)
-{
-    fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
-            (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
-}
-
-void ErrorCallback(int code, const char* err_str)
-{
-    if (std::string(err_str) != "Invalid window attribute 0x0002000D")
-        LOG_ERROR(std::to_string(code) + " GLFW Error: " + std::string(err_str));
-}
-
 namespace Engine
 {
     void Window::Create(WindowSpec spec)
@@ -55,8 +42,8 @@ namespace Engine
         GraphicsContext::s_Context->Init();
 
         glEnable(GL_DEBUG_OUTPUT);
-        glDebugMessageCallback(MessageCallback, 0);
-        glfwSetErrorCallback(ErrorCallback);
+        glDebugMessageCallback(_MessageCallback, 0);
+        glfwSetErrorCallback(_ErrorCallback);
         glfwSetWindowCloseCallback(this->s_WindowPtr, _CloseCallback);
         glfwSetWindowSizeCallback(this->s_WindowPtr, _WindowSizeCallback);
         glfwSetKeyCallback(this->s_WindowPtr, _WindowKeyCallback);
@@ -118,6 +105,19 @@ namespace Engine
     void Window::_WindowMouseMoveCallback(GLFWwindow* window, double x, double y)
     {
         for (auto& layer: LayerStack::data()) { layer->OnMouseMoveEvent((int) x, (int) y); }
+    }
+
+    void GLAPIENTRY Window::_MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
+                                             const GLchar* message, const void* userParam)
+    {
+        fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+                (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
+    }
+
+    void Window::_ErrorCallback(int code, const char* err_str)
+    {
+        if (std::string(err_str) != "Invalid window attribute 0x0002000D")
+            LOG_ERROR(std::to_string(code) + " GLFW Error: " + std::string(err_str));
     }
 
 }// namespace Engine

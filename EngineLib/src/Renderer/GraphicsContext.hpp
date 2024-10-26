@@ -6,14 +6,20 @@
 class GraphicsContext
 {
 public:
+    GraphicsContext(GLFWwindow* handle) : p_WindowPtr(handle) {}
+
+public:
     static GraphicsContext* Create(GLFWwindow* window);
 
-    virtual ~GraphicsContext(){};
+public:
+    virtual ~GraphicsContext() = default;
 
     virtual void Init() = 0;
     virtual void SwapBuffers() = 0;
 
-    GLFWwindow* window;
-
+public:
     static GraphicsContext* s_Context;
+
+protected:
+    GLFWwindow* p_WindowPtr;
 };

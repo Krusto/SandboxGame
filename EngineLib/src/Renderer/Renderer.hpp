@@ -28,34 +28,25 @@ namespace Engine
     class Renderer
     {
     public:
-        using FunctionContainer_t = std::vector<std::function<void(void)>>;
-        Renderer() = default;
         static void Init(RendererSpec rendererSpec, ApplicationSpec applicationSpec);
         static void InitImGUI(std::weak_ptr<Window> window);
         static void Shutdown();
-        static void BeginFrame(){};
-        static void EndFrame(){};
+        static void BeginFrame();
+        static void EndFrame();
         static void ClearColor(glm::vec4 color);
         static GraphicsContext* CreateGraphicsContext(GLFWwindow* handle);
         static RendererAPI* GetAPIInstance();
 
-        static void Submit(const std::function<void(void)>& func) { s_FunctionContainer.push_back(func); }
+        static void Submit(const std::function<void(void)>& func);
 
         template <typename T>
-        static void SubmitAndFlush(T func)
-        {
-            Submit(func);
-            Flush();
-        }
+        static void SubmitAndFlush(T func);
 
-        static void Flush()
-        {
-            for (auto& function: s_FunctionContainer) { function(); }
-            s_FunctionContainer.clear();
-        }
+        static void Flush();
 
-        static inline FunctionContainer_t s_FunctionContainer{};
-
-        inline static RendererSpec s_RendererSpec;
+        inline static std::vector<std::function<void(void)>> s_FunctionContainer{};
+        inline static RendererSpec s_RendererSpec{};
     };
 }// namespace Engine
+
+#include <Renderer/Renderer.impl>

@@ -48,6 +48,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_compile_options(EngineLib PRIVATE -static-libstdc++)
     target_compile_options(EngineLib PRIVATE -Wall)
     target_compile_options(EngineLib PRIVATE -pedantic)
+
 endif()
 
 target_compile_definitions(EngineLib PRIVATE GLFW_EXPOSE_NATIVE_WIN32)

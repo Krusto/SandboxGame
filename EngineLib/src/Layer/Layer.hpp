@@ -10,8 +10,9 @@ namespace Engine
     class Layer
     {
     public:
-        virtual ~Layer(){};
+        virtual ~Layer() = default;
 
+    public:
         virtual void Init(std::weak_ptr<Window> window) = 0;
 
         virtual void OnAttach() = 0;
@@ -36,16 +37,17 @@ namespace Engine
 
         virtual void End() = 0;
 
-        auto GetName() { return m_Name; }
+    public:
+        std::string_view GetName();
 
-        auto GetName() const { return m_Name; }
+        std::string_view GetName() const;
 
-        bool ShouldExit() { return shouldExit; }
+        bool ShouldExit();
 
-        void SetShouldExit(bool value) { shouldExit = value; }
+        void SetShouldExit(bool value);
 
     protected:
-        bool shouldExit{};
+        bool m_ShouldExit{};
         std::string_view m_Name{};
     };
 }// namespace Engine

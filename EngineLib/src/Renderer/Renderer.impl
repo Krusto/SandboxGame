@@ -1,0 +1,12 @@
+#include "Renderer.hpp"
+
+namespace Engine
+{
+    template <typename T>
+    void Renderer::SubmitAndFlush(T func)
+    {
+        Submit(func);
+        Flush();
+    }
+
+}// namespace Engine

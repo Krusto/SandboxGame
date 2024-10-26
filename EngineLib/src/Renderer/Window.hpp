@@ -72,9 +72,15 @@ namespace Engine
         static void _WindowKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
         static void _WindowMouseMoveCallback(GLFWwindow* window, double x, double y);
 
+        static void GLAPIENTRY _MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
+                                                const GLchar* message, const void* userParam);
+
+        static void _ErrorCallback(int code, const char* err_str);
+
     private:
         static inline GLFWwindow* s_WindowPtr = nullptr;
 
+    private:
         WindowSpec m_WindowSpec{};
         double m_BeginFrameTime{};
         double m_EndFrameTime{};

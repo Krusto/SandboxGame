@@ -425,3 +425,5 @@ cmake_install.cmake
 .cmake
 cmake-build-minsizerel
 cmake-build-relwithdebinfo
+.vscode/*
+.vscode/settings.json

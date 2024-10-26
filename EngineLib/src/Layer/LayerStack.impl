@@ -1,0 +1,11 @@
+#include "LayerStack.hpp"
+
+namespace Engine
+{
+    template <typename T, typename... Args>
+    void LayerStack::ConstructAndPushLayer(Args&&... args)
+    {
+        LayerStack::PushLayer(std::make_shared<T>(std::forward<Args>(args)...));
+    }
+
+}// namespace Engine
