@@ -1,6 +1,7 @@
 cmake-build-debug/*
 cmake-build-release/*
 .idea/*
+.vscode/*
 scripts/vcpkg-master/*
 scripts/vcpkg/*
 build/*
