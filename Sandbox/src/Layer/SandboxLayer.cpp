@@ -7,7 +7,7 @@ SandboxLayer::SandboxLayer(const Engine::ApplicationSpec& spec)
     m_AppSpec.WorkingDirectory = std::filesystem::absolute(spec.WorkingDirectory).string();
 }
 
-void SandboxLayer::Init(std::weak_ptr<Engine::Window> window) { m_Window = window; }
+void SandboxLayer::Init(std::weak_ptr<Engine::Window> window) { }
 
 void SandboxLayer::OnAttach() {}
 
@@ -19,7 +19,6 @@ void SandboxLayer::OnUpdate(float dt)
 {
 
     Engine::Renderer::BeginFrame();
-
 
     Engine::Renderer::ClearColor(glm::vec4{0.1, 0.2, 0.4, 1.0});
 

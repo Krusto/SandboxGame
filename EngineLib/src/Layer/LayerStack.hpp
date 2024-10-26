@@ -14,7 +14,7 @@ namespace Engine
 
         static void InitLayers(std::weak_ptr<Window> window);
 
-        static void PushLayer(std::weak_ptr<Layer> layer);
+        static void PushLayer(Layer* layer);
 
         template <typename T, typename... Args>
         static void ConstructAndPushLayer(Args&&... args);
@@ -25,16 +25,16 @@ namespace Engine
 
         static void DestroyLayers();
 
-        static std::weak_ptr<Layer> GetLayer(std::string name);
+        static Layer* GetLayer(std::string name);
 
         static auto end();
 
         static auto begin();
 
-        static std::vector<std::shared_ptr<Layer>>& data();
+        static std::vector<Layer*>& data();
 
     private:
-        inline static std::vector<std::shared_ptr<Layer>> m_Layers;
+        inline static std::vector<Layer*> m_Layers;
 
         static uint32_t FindLayerIndex(std::string_view name);
 

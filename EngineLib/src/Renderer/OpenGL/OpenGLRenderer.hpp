@@ -10,7 +10,7 @@ namespace Engine
     {
     public:
         OpenGLRenderer() = default;
-        ~OpenGLRenderer();
+        ~OpenGLRenderer() = default;
 
     public:
         virtual void Init(RendererSpec rendererSpec, ApplicationSpec applicationSpec) override;

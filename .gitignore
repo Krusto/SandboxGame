@@ -428,3 +428,4 @@ cmake-build-minsizerel
 cmake-build-relwithdebinfo
 .vscode/*
 .vscode/settings.json
+out/*
