@@ -12,8 +12,8 @@ message("${PROJECT_NAME}: Adding glfw...")
 add_subdirectory("${CMAKE_SOURCE_DIR}/Vendor/glfw-3.4")
 
 message("${PROJECT_NAME}: Adding source files")
-file(GLOB_RECURSE GLAD_SOURCE_FILES ./vendor/glad/src/*.c)
-file(GLOB_RECURSE GLAD_HEADER_FILES ./vendor/glad/src/*.h)
+file(GLOB_RECURSE GLAD_SOURCE_FILES ./Vendor/glad/src/*.c)
+file(GLOB_RECURSE GLAD_HEADER_FILES ./Vendor/glad/src/*.h)
 
 file(GLOB_RECURSE IMGUI_SOURCE_FILES imgui_impl_opengl3.cpp imgui_impl_glfw.cpp imgui.cpp imgui_draw.cpp imgui_tables.cpp imgui_widgets.cpp )
 file(GLOB_RECURSE IMGUI_HEADER_FILES imgui_impl_opengl3.h imgui_impl_glfw.h   imgui.h imconfig.h imgui_internal.h imstb_rectpack.h imstb_textedit.h imstb_truetype.h)
@@ -26,12 +26,12 @@ file(GLOB_RECURSE ENGINE_HEADER_FILES ./EngineLib/src/*.h ./EngineLib/src/*.hpp)
 
 add_compile_definitions(GLM_ENABLE_EXPERIMENTAL)
 
-set(GLAD_INCLDUE_DIR           "./vendor/glad/include")
-set(GLM_INCLDUE_DIR            "./vendor/glm")
-set(STB_INCLDUE_DIR            "./vendor/stb")
-set(IMGUI_INCLUDE_DIR          "./vendor/imgui")
-set(IMGUI_BACKENDS_INCLUDE_DIR "./vendor/imgui/backends")
-set(GLFW_INCLDUE_DIR           "./vendor/glfw-3.4/include")
+set(GLAD_INCLDUE_DIR           "./Vendor/glad/include")
+set(GLM_INCLDUE_DIR            "./Vendor/glm")
+set(STB_INCLDUE_DIR            "./Vendor/stb")
+set(IMGUI_INCLUDE_DIR          "./Vendor/imgui")
+set(IMGUI_BACKENDS_INCLUDE_DIR "./Vendor/imgui/backends")
+set(GLFW_INCLDUE_DIR           "./Vendor/glfw-3.4/include")
 
 message("${PROJECT_NAME}: Creating imgui lib")
 add_library(imgui STATIC ${IMGUI_SOURCE_FILES} ${IMGUI_HEADER_FILES})
@@ -50,8 +50,15 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_compile_options(EngineLib PRIVATE -pedantic)
 
 endif()
-
-target_compile_definitions(EngineLib PRIVATE GLFW_EXPOSE_NATIVE_WIN32)
+if (WIN32)
+    target_compile_definitions(EngineLib PRIVATE GLFW_EXPOSE_NATIVE_WIN32)
+    
+else ()
+    find_package(X11 REQUIRED)
+    link_libraries(${X11_LIBRARIES})
+    target_compile_definitions(EngineLib PRIVATE _LINUX)
+    target_compile_definitions(EngineLib PRIVATE GLFW_EXPOSE_NATIVE_X11)
+endif ()
 
 target_include_directories(glad PRIVATE ${GLAD_INCLDUE_DIR})
 
