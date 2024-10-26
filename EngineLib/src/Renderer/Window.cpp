@@ -31,8 +31,10 @@ namespace Engine
 
         LOG_INFO("GLFW VERSION: " + std::to_string(major) + "." + std::to_string(minor) + "." + std::to_string(rev));
 
+        GLFWmonitor* primary = glfwGetPrimaryMonitor();
+
         s_WindowPtr = glfwCreateWindow(this->m_WindowSpec.width, this->m_WindowSpec.height,
-                                       this->m_WindowSpec.title.data(), nullptr, nullptr);
+                                       this->m_WindowSpec.title.data(), primary, nullptr);
         if (!IsValid())
         {
             LOG_ERROR("Failed to create GLFW window!");

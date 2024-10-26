@@ -26,6 +26,7 @@ namespace Engine
 
     void Renderer::Destroy()
     {
+        LOG_ERROR("Destroying renderer\n");
         if (s_RendererAPI) delete s_RendererAPI;
     }
 

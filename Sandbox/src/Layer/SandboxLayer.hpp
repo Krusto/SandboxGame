@@ -7,7 +7,7 @@ class SandboxLayer: public Engine::Layer
 public:
     explicit SandboxLayer(const Engine::ApplicationSpec& spec);
 
-    ~SandboxLayer() override {}
+    ~SandboxLayer() override {LOG_ERROR("DESTROYING SANDBOX LAYER\n");}
 
 public:
     void Init(std::weak_ptr<Engine::Window> window) override;

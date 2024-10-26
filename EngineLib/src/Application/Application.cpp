@@ -50,6 +50,7 @@ void Engine::Application::Destroy()
     LayerStack::DestroyLayers();
 
     Renderer::Shutdown();
+    Renderer::Destroy();
 
     m_Window->Destroy();
     glfwTerminate();
