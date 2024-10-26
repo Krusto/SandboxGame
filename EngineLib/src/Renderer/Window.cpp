@@ -10,6 +10,7 @@ namespace Engine
     void Window::Create(WindowSpec spec)
     {
         this->m_WindowSpec = spec;
+        glfwSetErrorCallback(_ErrorCallback);
 
         if (!glfwInit())
         {
@@ -17,9 +18,12 @@ namespace Engine
             exit(-1);
         }
 
+        constexpr auto OPENGL_VERSION_MAJOR = 4;
+        constexpr auto OPENGL_VERSION_MINOR = 1;
+
         glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, OPENGL_VERSION_MAJOR);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, OPENGL_VERSION_MINOR);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
         int major, minor, rev;
@@ -41,9 +45,11 @@ namespace Engine
         GraphicsContext::s_Context = GraphicsContext::Create(s_WindowPtr);
         GraphicsContext::s_Context->Init();
 
-        glEnable(GL_DEBUG_OUTPUT);
-        glDebugMessageCallback(_MessageCallback, 0);
-        glfwSetErrorCallback(_ErrorCallback);
+        if constexpr(OPENGL_VERSION_MAJOR == 4 && OPENGL_VERSION_MINOR >=3)
+        {
+            glEnable(GL_DEBUG_OUTPUT);
+            glDebugMessageCallback(_MessageCallback, 0);
+        }
         glfwSetWindowCloseCallback(this->s_WindowPtr, _CloseCallback);
         glfwSetWindowSizeCallback(this->s_WindowPtr, _WindowSizeCallback);
         glfwSetKeyCallback(this->s_WindowPtr, _WindowKeyCallback);
