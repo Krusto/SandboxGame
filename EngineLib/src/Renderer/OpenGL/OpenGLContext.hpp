@@ -9,7 +9,7 @@ public:
 
     OpenGLContext(GLFWwindow* handle) : GraphicsContext(handle) {}
 
-    ~OpenGLContext() = default;
+    ~OpenGLContext(){LOG_ERROR("DESTROYING OPENGL CONTEXT\n");}
 
 public:
     virtual void Init() override;

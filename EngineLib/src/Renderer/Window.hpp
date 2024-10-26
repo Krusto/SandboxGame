@@ -37,7 +37,9 @@ namespace Engine
     {
     public:
         Window() = default;
-        ~Window() = default;
+        ~Window() {
+            LOG_ERROR("DESTROYING WINDOW");
+        }
 
     public:
         void Create(WindowSpec spec);

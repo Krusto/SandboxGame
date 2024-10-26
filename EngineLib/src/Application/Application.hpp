@@ -12,7 +12,7 @@ namespace Engine
     {
     public:
         Application() = default;
-        ~Application() = default;
+        ~Application() {LOG_ERROR("DESTRPYINH APPLICATION\n");};
 
         explicit Application(const ApplicationSpec& spec) { Init(spec); }
 

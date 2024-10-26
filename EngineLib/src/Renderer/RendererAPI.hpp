@@ -13,7 +13,7 @@ namespace Engine
     class RendererAPI
     {
     public:
-        ~RendererAPI() = default;
+        virtual ~RendererAPI() {LOG_ERROR("DESTROYING RENDERE RAPI\n")}
 
     public:
         virtual void Init(RendererSpec rendererSpec, ApplicationSpec applicationSpec) = 0;

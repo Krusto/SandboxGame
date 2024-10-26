@@ -12,7 +12,7 @@ void OpenGLContext::Init()
 
     if (!gladLoadGL())
     {
-        LOG_ERROR("Failed to initalize OpenGL context");
+        LOG_ERROR("Failed to initalize OpenGL context\n");
         exit(-1);
     }
     glEnable(GL_DEPTH_TEST);
