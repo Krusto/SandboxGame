@@ -29,7 +29,7 @@ namespace Engine
         int major, minor, rev;
         glfwGetVersion(&major, &minor, &rev);
 
-        LOG_INFO("GLFW VERSION: " + std::to_string(major) + "." + std::to_string(minor) + "." + std::to_string(rev));
+        LOG_INFO("GLFW VERSION: %i.%i.%i\n", major, minor, rev);
 
         s_WindowPtr = glfwCreateWindow(this->m_WindowSpec.width, this->m_WindowSpec.height,
                                        this->m_WindowSpec.title.data(), nullptr, nullptr);
@@ -123,7 +123,7 @@ namespace Engine
     void Window::_ErrorCallback(int code, const char* err_str)
     {
         if (std::string(err_str) != "Invalid window attribute 0x0002000D")
-            LOG_ERROR(std::to_string(code) + " GLFW Error: " + std::string(err_str));
+            LOG_ERROR("%i GLFW Error: %s", code, err_str);
     }
 
 }// namespace Engine

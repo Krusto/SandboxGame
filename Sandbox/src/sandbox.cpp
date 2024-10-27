@@ -11,7 +11,7 @@ public:
 
     explicit Sandbox(const ApplicationSpec& spec) { Engine::LayerStack::ConstructAndPushLayer<SandboxLayer>(spec); }
 
-    ~Sandbox(){LOG_ERROR("DESTROYING SANDBOX\n")}
+    ~Sandbox() { LOG_ERROR("DESTROYING SANDBOX\n"); }
 };
 
 int main()

@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <memory>
+#include <stdio.h>
 
 namespace Engine
 {
@@ -57,30 +58,35 @@ namespace Engine
     std::flush(std::cout);
 #else
 
-#define LOG_INFO(...)                                                                                                  \
-    {                                                                                                                  \
-        std::cout << (__VA_ARGS__) << '\n';                                                                            \
-        fflush(stdout);                                                                                                \
-    }
-#define LOG_ERROR(...)                                                                                                 \
-    {                                                                                                                  \
-        std::cout << (__VA_ARGS__) << '\n';                                                                            \
-        fflush(stdout);                                                                                                \
-    }
-#define LOG_DEBUG(...)                                                                                                 \
-    {                                                                                                                  \
-        std::cout << (__VA_ARGS__) << '\n';                                                                            \
-        fflush(stdout);                                                                                                \
-    }
-#define LOG(...)                                                                                                       \
-    {                                                                                                                  \
-        std::cout << (__VA_ARGS__) << '\n';                                                                            \
-        fflush(stdout);                                                                                                \
-    }
-#define LOG_WARNING(...)                                                                                               \
-    {                                                                                                                  \
-        std::cout << (__VA_ARGS__) << '\n';                                                                            \
-        fflush(stdout);                                                                                                \
-    }
+template <typename... Args>
+inline static void LOG(const char* format, Args... args)
+{
+    printf_s(format, args...);
+}
+
+template <typename... Args>
+inline static void LOG_INFO(const char* format, Args... args)
+{
+    LOG(format, args...);
+}
+
+template <typename... Args>
+inline static void LOG_DEBUG(const char* format, Args... args)
+{
+    LOG(format, args...);
+}
+
+template <typename... Args>
+inline static void LOG_ERROR(const char* format, Args... args)
+{
+    LOG(format, args...);
+}
+
+template <typename... Args>
+inline static void LOG_WARNING(const char* format, Args... args)
+{
+    LOG(format, args...);
+}
+
 
 #endif

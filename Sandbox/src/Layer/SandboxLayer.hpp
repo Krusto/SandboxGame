@@ -35,6 +35,8 @@ public:
     void End() override {}
 
 protected:
+    Engine::Shader* m_Shader;
+
     ViewportSize m_ViewportSize;
 
     Engine::ApplicationSpec m_AppSpec;

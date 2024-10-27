@@ -3,6 +3,9 @@
 //
 #pragma once
 
+#include <vector>
+#include <string_view>
+
 #include <Core/Core.hpp>
 #include "ShaderDataType.hpp"
 
@@ -22,7 +25,7 @@ namespace Engine
         VertexLayout(const VertexLayout&) = default;
         ~VertexLayout() = default;
 
-        explicit VertexLayout(std::initializer_list<VertexAttribute> attributes);
+        VertexLayout(std::initializer_list<VertexAttribute> attributes);
 
         std::vector<VertexAttribute> attributes;
         uint32_t stride{};
