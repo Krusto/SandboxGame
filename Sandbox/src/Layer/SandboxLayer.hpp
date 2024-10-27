@@ -7,10 +7,10 @@ class SandboxLayer: public Engine::Layer
 public:
     explicit SandboxLayer(const Engine::ApplicationSpec& spec);
 
-    ~SandboxLayer() override {LOG_ERROR("DESTROYING SANDBOX LAYER\n");}
+    ~SandboxLayer() override { LOG_ERROR("DESTROYING SANDBOX LAYER\n"); }
 
 public:
-    void Init(std::weak_ptr<Engine::Window> window) override;
+    void Init(Ref<Engine::Window> window) override;
 
     void OnAttach() override;
 
@@ -35,7 +35,6 @@ public:
     void End() override {}
 
 protected:
-
     ViewportSize m_ViewportSize;
 
     Engine::ApplicationSpec m_AppSpec;

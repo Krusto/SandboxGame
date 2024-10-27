@@ -3,7 +3,9 @@
 //
 #pragma once
 
+#include <Core/Ref.hpp>
 #include "../Engine.hpp"
+#include <Renderer/Window.hpp>
 
 namespace Engine
 {
@@ -12,7 +14,8 @@ namespace Engine
     {
     public:
         Application() = default;
-        ~Application() {LOG_ERROR("DESTRPYINH APPLICATION\n");};
+
+        ~Application() { LOG_ERROR("DESTRPYINH APPLICATION\n"); };
 
         explicit Application(const ApplicationSpec& spec) { Init(spec); }
 
@@ -31,14 +34,14 @@ namespace Engine
 
         static Application& Get() { return *Application::s_Application; }
 
-        std::shared_ptr<Window> WindowHandle() { return m_Window; }
+        Ref<Window> WindowHandle() { return m_Window; }
 
         void Destroy();
 
     protected:
         static Application* s_Application;
 
-        std::shared_ptr<Window> m_Window;
+        Ref<Window> m_Window;
         ApplicationSpec m_ApplicationSpec;
     };
 

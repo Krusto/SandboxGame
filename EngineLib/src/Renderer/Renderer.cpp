@@ -30,7 +30,7 @@ namespace Engine
         if (s_RendererAPI) delete s_RendererAPI;
     }
 
-    void Renderer::InitImGUI(std::weak_ptr<Window> window) {}
+    void Renderer::InitImGUI(Ref<Window> window) {}
 
     void Renderer::Shutdown()
     {

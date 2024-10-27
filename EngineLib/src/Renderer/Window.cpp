@@ -31,10 +31,8 @@ namespace Engine
 
         LOG_INFO("GLFW VERSION: " + std::to_string(major) + "." + std::to_string(minor) + "." + std::to_string(rev));
 
-        GLFWmonitor* primary = glfwGetPrimaryMonitor();
-
         s_WindowPtr = glfwCreateWindow(this->m_WindowSpec.width, this->m_WindowSpec.height,
-                                       this->m_WindowSpec.title.data(), primary, nullptr);
+                                       this->m_WindowSpec.title.data(), nullptr, nullptr);
         if (!IsValid())
         {
             LOG_ERROR("Failed to create GLFW window!");
@@ -47,7 +45,7 @@ namespace Engine
         GraphicsContext::s_Context = GraphicsContext::Create(s_WindowPtr);
         GraphicsContext::s_Context->Init();
 
-        if constexpr(OPENGL_VERSION_MAJOR == 4 && OPENGL_VERSION_MINOR >=3)
+        if constexpr (OPENGL_VERSION_MAJOR == 4 && OPENGL_VERSION_MINOR >= 3)
         {
             glEnable(GL_DEBUG_OUTPUT);
             glDebugMessageCallback(_MessageCallback, 0);
