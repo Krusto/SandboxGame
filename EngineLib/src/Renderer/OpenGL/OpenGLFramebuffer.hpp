@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <cstdint>
-#include "../Framebuffer.hpp"
+#include <Renderer/Framebuffer.hpp>
 
 namespace Engine
 {

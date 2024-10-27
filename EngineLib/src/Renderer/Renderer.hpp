@@ -11,6 +11,7 @@
 
 #include "Window.hpp"
 #include "Viewport.hpp"
+#include "Shader.hpp"
 
 #include <Renderer/GraphicsContext.hpp>
 

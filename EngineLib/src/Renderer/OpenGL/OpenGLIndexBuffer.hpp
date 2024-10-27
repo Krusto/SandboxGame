@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Renderer/VertexArray.h>
-#include <Renderer/IndexBuffer.h>
+#include <Renderer/VertexArray.hpp>
+#include <Renderer/IndexBuffer.hpp>
 #include <cstdint>
 
 namespace Engine

@@ -10,9 +10,8 @@ namespace Engine
     {
     public:
         OpenGLRenderer() = default;
-        ~OpenGLRenderer() {
-            LOG_ERROR("DESTROYING OPENGL  API\n")
-        }
+
+        ~OpenGLRenderer() { LOG_ERROR("DESTROYING OPENGL  API\n"); }
 
     public:
         virtual void Init(RendererSpec rendererSpec, ApplicationSpec applicationSpec) override;

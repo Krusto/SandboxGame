@@ -32,6 +32,7 @@ set(STB_INCLDUE_DIR            "./Vendor/stb")
 set(IMGUI_INCLUDE_DIR          "./Vendor/imgui")
 set(IMGUI_BACKENDS_INCLUDE_DIR "./Vendor/imgui/backends")
 set(GLFW_INCLDUE_DIR           "./Vendor/glfw-3.4/include")
+set(CUTILS_INCLDUE_DIR         "./Vendor/CUtils/include")
 
 message("${PROJECT_NAME}: Creating imgui lib")
 add_library(imgui STATIC ${IMGUI_SOURCE_FILES} ${IMGUI_HEADER_FILES})
@@ -72,7 +73,13 @@ target_include_directories(EngineLib PUBLIC ${IMGUI_INCLUDE_DIR})
 target_include_directories(EngineLib PUBLIC ${IMGUI_BACKENDS_INCLUDE_DIR})
 target_include_directories(EngineLib PUBLIC ${GLFW_INCLDUE_DIR})
 target_include_directories(EngineLib PUBLIC ${GLM_INCLDUE_DIR})
+target_include_directories(EngineLib PUBLIC ${CUTILS_INCLDUE_DIR})
+
 add_library(EngineInterfaceLibrary INTERFACE)
+
+add_library(CUtils INTERFACE)
+target_include_directories(CUtils INTERFACE ${CUTILS_INCLDUE_DIR})
+target_compile_options(CUtils INTERFACE -Wno-fPermissive)
 
 message("${PROJECT_NAME}: Linking libraries")
 
@@ -83,6 +90,7 @@ target_link_libraries(EngineInterfaceLibrary INTERFACE
         glfw
         imgui
         glad
+        CUtils
         )
 target_link_libraries(EngineLib PUBLIC EngineInterfaceLibrary)
 

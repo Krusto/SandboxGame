@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-#include <Renderer/VertexArray.h>
+#include <Renderer/VertexArray.hpp>
 
 namespace Engine
 {

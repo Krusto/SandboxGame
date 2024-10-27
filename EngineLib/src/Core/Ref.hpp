@@ -13,13 +13,13 @@ public:
     void IncRefCount() const
     {
         m_RefCount++;
-        LOG_INFO("IncRef " + std::to_string(m_RefCount) + "\n");
+        LOG_INFO("IncRef %u\n", GetRefCount());
     }
 
     void DecRefCount() const
     {
         m_RefCount--;
-        LOG_INFO("DecRef " + std::to_string(m_RefCount) + "\n");
+        LOG_INFO("DecRef %i\n", GetRefCount());
     }
 
     uint32_t GetRefCount() const { return m_RefCount.load(); }
@@ -38,9 +38,6 @@ namespace RefUtils
 
 inline static std::mutex m{};
 
-
-
-
 template <typename T>
 class Ref
 {
@@ -53,7 +50,7 @@ public:
     {
         static_assert(std::is_base_of<RefCounted, T>::value, "Class is not RefCounted!");
         std::lock_guard<std::mutex> lock(m);
-        LOG_INFO("Allocated " + std::to_string(sizeof(T)) + "B\n");
+        LOG_INFO("Allocated %iB\n", sizeof(T));
         IncRef();
     }
 
@@ -191,8 +188,7 @@ private:
                 delete m_Instance;
                 Engine::mem::memsize -= RefUtils::GetSizeFromLiveReferences((void*) m_Instance);
 
-                LOG_INFO("Deallocated " + std::to_string(RefUtils::GetSizeFromLiveReferences((void*) m_Instance)) +
-                         "B\n");
+                LOG_INFO("Deallocated %iB\n", RefUtils::GetSizeFromLiveReferences((void*) m_Instance));
                 RefUtils::RemoveFromLiveReferences((void*) m_Instance);
                 m_Instance = nullptr;
             }

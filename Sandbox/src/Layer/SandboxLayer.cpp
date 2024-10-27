@@ -7,7 +7,11 @@ SandboxLayer::SandboxLayer(const Engine::ApplicationSpec& spec)
     m_AppSpec.WorkingDirectory = std::filesystem::absolute(spec.WorkingDirectory).string();
 }
 
-void SandboxLayer::Init(Ref<Engine::Window> window) {}
+void SandboxLayer::Init(Ref<Engine::Window> window)
+{
+    std::string path = m_AppSpec.WorkingDirectory.string() + "/Shaders/Basic";
+    m_Shader = Engine::Shader::Load(path);
+}
 
 void SandboxLayer::OnAttach() {}
 
