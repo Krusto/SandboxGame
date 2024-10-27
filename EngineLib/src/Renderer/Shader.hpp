@@ -3,7 +3,10 @@
 #include <unordered_map>
 #include <cstdint>
 #include <vector>
+
 #include <glm/glm.hpp>
+
+#include <Core/Ref.hpp>
 #include <Renderer/ShaderUniform.hpp>
 #include "ShaderDataType.hpp"
 
@@ -18,7 +21,7 @@ namespace Engine
         Other
     };
 
-    class Shader
+    class Shader: public RefCounted
     {
     public:
         static Shader* Load(const std::string& path);

@@ -64,18 +64,18 @@ namespace Engine
             vertex = glCreateShader(GL_VERTEX_SHADER);
             glShaderSource(vertex, 1, &vShaderCode, nullptr);
             glCompileShader(vertex);
-            CheckShader(vertex, GL_COMPILE_STATUS, &result, "unable to compile the vertex shader!");
+            CheckShader(vertex, GL_COMPILE_STATUS, &result, "Unable to compile the vertex shader!");
 
             fragment = glCreateShader(GL_FRAGMENT_SHADER);
             glShaderSource(fragment, 1, &fShaderCode, nullptr);
             glCompileShader(fragment);
-            CheckShader(fragment, GL_COMPILE_STATUS, &result, "unable to compile the fragment shader!");
+            CheckShader(fragment, GL_COMPILE_STATUS, &result, "Unable to compile the fragment shader!");
 
             this->m_RendererID = glCreateProgram();
             glAttachShader(this->m_RendererID, vertex);
             glAttachShader(this->m_RendererID, fragment);
             glLinkProgram(this->m_RendererID);
-            CheckShader(this->m_RendererID, GL_LINK_STATUS, &result, "unable to link the program!");
+            CheckShader(this->m_RendererID, GL_LINK_STATUS, &result, "Unable to link the program!");
 
             glDeleteShader(vertex);
             glDeleteShader(fragment);
@@ -88,31 +88,22 @@ namespace Engine
         {
             case (GL_COMPILE_STATUS):
                 glGetShaderiv(id, type, ret);
-                if (*ret == false)
-                {
-                    int infologLength = 0;
-                    glGetShaderiv(id, GL_INFO_LOG_LENGTH, &infologLength);
-                    std::vector<GLchar> buffer(infologLength);
-                    GLsizei charsWritten = 0;
-                    std::cout << onfail << std::endl;
-                    glGetShaderInfoLog(id, infologLength, &charsWritten, buffer.data());
-                    std::cout << buffer.data() << std::endl;
-                }
                 break;
             case (GL_LINK_STATUS):
                 glGetProgramiv(id, type, ret);
-                if (*ret == false)
-                {
-                    int infologLength = 0;
-                    glGetProgramiv(id, GL_INFO_LOG_LENGTH, &infologLength);
-                    std::vector<GLchar> buffer(infologLength);
-                    GLsizei charsWritten = 0;
-                    std::cout << onfail << std::endl;
-                    glGetShaderInfoLog(id, infologLength, &charsWritten, buffer.data());
-                    std::cout << buffer.data() << std::endl;
-                }
                 break;
         };
+
+        if (*ret == false)
+        {
+            int infologLength = 0;
+            glGetProgramiv(id, GL_INFO_LOG_LENGTH, &infologLength);
+            std::vector<GLchar> buffer(infologLength);
+            GLsizei charsWritten = 0;
+            std::cout << onfail << std::endl;
+            glGetShaderInfoLog(id, infologLength, &charsWritten, buffer.data());
+            std::cout << buffer.data() << std::endl;
+        }
     }
 
     std::unordered_map<GLenum, std::string> OpenGLShader::PreProcess(const std::string& source)
@@ -137,7 +128,8 @@ namespace Engine
 
         try
         {
-            File file;
+            int8_t* buffer;
+            size_t bufferLen;
             std::string path;
             std::unordered_map<ShaderType, std::string> extensions;
 
@@ -147,8 +139,13 @@ namespace Engine
 
             path = filepath + extensions[shaderType];
 
-            file.Init(path.c_str(), FileFormat::Regular);
-            result = file.ReadTextData();
+            auto resultStatus = file_read_string((const int8_t*) path.c_str(), &bufferLen, &buffer);
+            if (resultStatus == FILE_READ_SUCCESFULLY)
+            {
+                result.resize(bufferLen);
+                result.assign((const char*) buffer, bufferLen);
+                free(buffer);
+            }
         }
         catch (std::ios_base::failure& e)
         {

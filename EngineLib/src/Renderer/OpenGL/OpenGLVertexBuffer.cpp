@@ -19,9 +19,7 @@ namespace glm
 
 namespace Engine
 {
-
-
-    OpenGLVertexBuffer::OpenGLVertexBuffer(const VertexLayout& layout, float* data, uint32_t length)
+    void OpenGLVertexBuffer::Init(const VertexLayout& layout, float* data, uint32_t length)
     {
         glGenBuffers(1, &m_ID);
         glBindBuffer(GL_ARRAY_BUFFER, m_ID);
@@ -112,8 +110,15 @@ namespace Engine
         glBindBuffer(GL_ARRAY_BUFFER, m_ID);
     }
 
-    uint32_t OpenGLVertexBuffer::GetID() const { return m_ID; }
-
     size_t OpenGLVertexBuffer::GetSize() const { return sizeof(OpenGLVertexBuffer); }
+
+    void OpenGLVertexBuffer::Destroy()
+    {
+        if (m_ID)
+        {
+            glDeleteBuffers(1, &m_ID);
+            m_ID = 0;
+        }
+    }
 
 }// namespace Engine

@@ -6,8 +6,7 @@ class SandboxLayer: public Engine::Layer
 {
 public:
     explicit SandboxLayer(const Engine::ApplicationSpec& spec);
-
-    ~SandboxLayer() override { LOG_ERROR("DESTROYING SANDBOX LAYER\n"); }
+    ~SandboxLayer() override = default;
 
 public:
     void Init(Ref<Engine::Window> window) override;
@@ -35,8 +34,8 @@ public:
     void End() override {}
 
 protected:
-    Engine::Shader* m_Shader;
-
+    Ref<Engine::Shader> m_Shader;
+    std::unique_ptr<Engine::World> m_World;
     ViewportSize m_ViewportSize;
 
     Engine::ApplicationSpec m_AppSpec;

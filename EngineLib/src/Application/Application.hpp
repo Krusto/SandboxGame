@@ -3,8 +3,8 @@
 //
 #pragma once
 
+#include <Engine.hpp>
 #include <Core/Ref.hpp>
-#include "../Engine.hpp"
 #include <Renderer/Window.hpp>
 
 namespace Engine
@@ -14,8 +14,7 @@ namespace Engine
     {
     public:
         Application() = default;
-
-        ~Application() { LOG_ERROR("DESTRPYINH APPLICATION\n"); };
+        ~Application() = default;
 
         explicit Application(const ApplicationSpec& spec) { Init(spec); }
 

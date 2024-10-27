@@ -10,6 +10,11 @@ namespace Engine
 
     public:
         virtual ~IndexBuffer() = default;
+
+        virtual void Init(const uint32_t* data, uint32_t length) = 0;
+
+        virtual void Destroy() = 0;
+
         virtual void Bind() const = 0;
 
         virtual uint32_t GetID() { return m_ID; }
