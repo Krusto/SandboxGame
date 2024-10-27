@@ -1,16 +1,17 @@
 #pragma once
-#include <Core/Ref.hpp>
 #include <Renderer/Viewport.hpp>
 
 namespace Engine
 {
-    class Framebuffer: public RefCounted
+    class Framebuffer
     {
     public:
         virtual ~Framebuffer() = default;
 
-        static Ref<Framebuffer> Create(uint32_t width, uint32_t height);
+    public:
+        static Framebuffer* Create(uint32_t width, uint32_t height);
 
+    public:
         virtual uint32_t GetID() = 0;
 
         virtual uint32_t& GetColorAttachmentID() = 0;

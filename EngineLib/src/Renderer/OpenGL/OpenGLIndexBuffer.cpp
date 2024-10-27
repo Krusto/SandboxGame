@@ -6,7 +6,8 @@
 namespace Engine
 {
 
-    OpenGLIndexBuffer::OpenGLIndexBuffer(const uint32_t* data, uint32_t length)
+
+    void OpenGLIndexBuffer::Init(const uint32_t* data, uint32_t length)
     {
         glGenBuffers(1, &m_ID);
 
@@ -16,14 +17,15 @@ namespace Engine
         indexCount = length;
     }
 
+    void OpenGLIndexBuffer::Destroy()
+    {
+        if (m_ID != 0) { glDeleteBuffers(1, &m_ID); }
+    }
+
     void OpenGLIndexBuffer::Bind() const
     {
         assert(m_ID != 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID);
     }
 
-    OpenGLIndexBuffer OpenGLIndexBuffer::Create(const uint32_t* data, uint32_t length)
-    {
-        return OpenGLIndexBuffer{data, length};
-    }
 }// namespace Engine

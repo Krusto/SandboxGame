@@ -18,14 +18,14 @@ namespace Engine
         OpenGLVertexBuffer() = default;
         ~OpenGLVertexBuffer() = default;
 
-        OpenGLVertexBuffer(const VertexLayout& layout, float* data, uint32_t length);
-
     public:
-        void Bind() const;
+        void Init(const VertexLayout& layout, float* data, uint32_t length) override;
 
-        uint32_t GetID() const;
+        void Bind() const override;
 
-        size_t GetSize() const;
+        size_t GetSize() const override;
+
+        void Destroy() override;
 
     private:
         uint32_t m_ID{};

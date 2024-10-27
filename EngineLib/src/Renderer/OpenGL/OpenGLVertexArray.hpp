@@ -9,12 +9,14 @@ namespace Engine
     {
     public:
         OpenGLVertexArray() = default;
-        ~OpenGLVertexArray();
+        ~OpenGLVertexArray() = default;
 
-        explicit OpenGLVertexArray(uint32_t indexCount);
+        void Init(uint32_t indexCount) override;
 
         void Bind() const override;
 
         void Unbind() const override;
+
+        void Destroy() override;
     };
 }// namespace Engine

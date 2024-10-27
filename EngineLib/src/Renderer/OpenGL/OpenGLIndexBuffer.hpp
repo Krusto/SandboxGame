@@ -10,13 +10,13 @@ namespace Engine
     {
     public:
         OpenGLIndexBuffer() = default;
-
-        OpenGLIndexBuffer(const uint32_t* data, uint32_t length);
         ~OpenGLIndexBuffer() = default;
 
-        static OpenGLIndexBuffer Create(const uint32_t* data, uint32_t length);
-
         void Bind() const override;
+
+        void Destroy() override;
+
+        void Init(const uint32_t* data, uint32_t length) override;
 
     private:
     };

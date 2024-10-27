@@ -7,7 +7,9 @@ namespace Engine
 
     VertexBuffer* VertexBuffer::Create(const VertexLayout& layout, float* data, uint32_t length)
     {
-        return new OpenGLVertexBuffer(layout, data, length);
+        auto ptr = new OpenGLVertexBuffer();
+        ptr->Init(layout, data, length);
+        return ptr;
     }
 
 }// namespace Engine

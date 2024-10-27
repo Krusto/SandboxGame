@@ -6,4 +6,6 @@
 #include <Renderer/Viewport.hpp>
 #include <Renderer/Renderer.hpp>
 #include <Application/Application.hpp>
+#include <Scene/World/WorldGen.hpp>
+#include <Scene/World/World.hpp>
 #include <filesystem>

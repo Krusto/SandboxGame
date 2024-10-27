@@ -13,13 +13,13 @@ public:
     void IncRefCount() const
     {
         m_RefCount++;
-        LOG_INFO("IncRef %u\n", GetRefCount());
+        // LOG_INFO("IncRef %u\n", GetRefCount());
     }
 
     void DecRefCount() const
     {
         m_RefCount--;
-        LOG_INFO("DecRef %i\n", GetRefCount());
+        // LOG_INFO("DecRef %i\n", GetRefCount());
     }
 
     uint32_t GetRefCount() const { return m_RefCount.load(); }

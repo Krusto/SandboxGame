@@ -7,6 +7,8 @@ namespace Engine
 
     IndexBuffer* IndexBuffer::Create(const uint32_t* data, uint32_t length)
     {
-        return new OpenGLIndexBuffer(data, length);
+        auto ptr = new OpenGLIndexBuffer();
+        ptr->Init(data, length);
+        return ptr;
     }
 }// namespace Engine

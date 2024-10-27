@@ -5,7 +5,13 @@
 namespace Engine
 {
 
-    VertexArray* VertexArray::Create(uint32_t indexCount) { return new OpenGLVertexArray(indexCount); }
+    VertexArray* VertexArray::Create(uint32_t indexCount)
+    {
+
+        auto ptr = new OpenGLVertexArray();
+        ptr->Init(indexCount);
+        return ptr;
+    }
 
     void VertexArray::AddVertexBuffer(VertexBuffer* vertexBuffer)
     {

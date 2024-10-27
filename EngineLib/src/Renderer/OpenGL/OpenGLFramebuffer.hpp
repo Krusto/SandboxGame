@@ -8,12 +8,13 @@ namespace Engine
     class OpenGLFramebuffer: public Framebuffer
     {
     public:
-        OpenGLFramebuffer(uint32_t width, uint32_t height) { Init(width, height); }
-
+        OpenGLFramebuffer() = default;
         ~OpenGLFramebuffer() = default;
 
+    public:
         void Init(uint32_t width, uint32_t height);
 
+    public:
         virtual uint32_t GetID() override;
 
         virtual uint32_t& GetColorAttachmentID() override;
@@ -30,7 +31,7 @@ namespace Engine
 
         virtual uint32_t height() override;
 
-        virtual ViewportSize GetViewportSize() override { return {m_width, m_height}; }
+        virtual ViewportSize GetViewportSize() override;
 
     private:
         uint32_t m_width{};

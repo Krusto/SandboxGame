@@ -14,7 +14,7 @@ namespace Engine
         OpenGLShader() = default;
         OpenGLShader(const std::string& filepath, bool forceRecompile);
 
-        ~OpenGLShader() { LOG_INFO("Destroying Shader"); }
+        ~OpenGLShader() = default;
 
     public:
         static OpenGLShader* CreateFromString(const std::string& source);

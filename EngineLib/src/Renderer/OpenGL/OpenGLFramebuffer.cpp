@@ -69,4 +69,6 @@ namespace Engine
     uint32_t OpenGLFramebuffer::width() { return m_width; }
 
     uint32_t OpenGLFramebuffer::height() { return m_height; }
+
+    ViewportSize OpenGLFramebuffer::GetViewportSize() { return {m_width, m_height}; }
 }// namespace Engine

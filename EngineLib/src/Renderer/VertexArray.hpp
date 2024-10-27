@@ -15,9 +15,13 @@ namespace Engine
     public:
         virtual ~VertexArray() = default;
 
+        virtual void Init(uint32_t indexCount) = 0;
+
         virtual void Bind() const = 0;
 
         virtual void Unbind() const = 0;
+
+        virtual void Destroy() = 0;
 
     public:
         uint32_t id() { return m_ID; }

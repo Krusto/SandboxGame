@@ -5,7 +5,7 @@
 namespace Engine
 {
 
-    OpenGLVertexArray::OpenGLVertexArray(uint32_t indexCount)
+    void OpenGLVertexArray::Init(uint32_t indexCount)
     {
         glGenVertexArrays(1, &m_ID);
         this->IndexCount = indexCount;
@@ -19,14 +19,22 @@ namespace Engine
 
     void OpenGLVertexArray::Unbind() const { glBindVertexArray(0); }
 
-    OpenGLVertexArray::~OpenGLVertexArray()
+    void OpenGLVertexArray::Destroy()
     {
         if (m_ID != 0)
         {
             glDeleteVertexArrays(1, &m_ID);
-            uint32_t vbo = m_VertexBuffer->GetID(), ibo = m_IndexBuffer->GetID();
-            glDeleteBuffers(1, &vbo);
-            glDeleteBuffers(1, &ibo);
+            if (m_VertexBuffer)
+            {
+                m_VertexBuffer->Destroy();
+                delete m_VertexBuffer;
+            }
+            if (m_IndexBuffer)
+            {
+                m_IndexBuffer->Destroy();
+                delete m_IndexBuffer;
+            }
         }
     }
+
 }// namespace Engine

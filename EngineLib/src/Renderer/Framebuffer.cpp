@@ -1,12 +1,13 @@
-﻿#include <Core/Ref.hpp>
-#include <Renderer/RendererAPI.hpp>
+﻿#include <Renderer/RendererAPI.hpp>
 #include <Renderer/OpenGL/OpenGLFramebuffer.hpp>
 #include "Framebuffer.hpp"
 
 namespace Engine
 {
-    Ref<Framebuffer> Framebuffer::Create(uint32_t width, uint32_t height)
+    Framebuffer* Framebuffer::Create(uint32_t width, uint32_t height)
     {
-        return Ref<OpenGLFramebuffer>::Create(width, height);
+        auto framebufferPtr = new OpenGLFramebuffer();
+        if (framebufferPtr) framebufferPtr->Init(width, height);
+        return framebufferPtr;
     }
 }// namespace Engine
