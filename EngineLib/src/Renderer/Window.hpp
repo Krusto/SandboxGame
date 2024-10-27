@@ -5,6 +5,7 @@
 #pragma once
 
 #include <Core/Log.hpp>
+#include <Core/Ref.hpp>
 #include <Renderer/Viewport.hpp>
 #include <Layer/LayerStack.hpp>
 #include <Util/Version.hpp>
@@ -33,13 +34,12 @@ namespace Engine
         uint32_t height;
     };
 
-    class Window
+    class Window: public RefCounted
     {
     public:
         Window() = default;
-        ~Window() {
-            LOG_ERROR("DESTROYING WINDOW");
-        }
+
+        ~Window() { LOG_ERROR("DESTROYING WINDOW"); }
 
     public:
         void Create(WindowSpec spec);

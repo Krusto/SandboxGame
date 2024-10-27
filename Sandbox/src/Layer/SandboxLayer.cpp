@@ -7,7 +7,7 @@ SandboxLayer::SandboxLayer(const Engine::ApplicationSpec& spec)
     m_AppSpec.WorkingDirectory = std::filesystem::absolute(spec.WorkingDirectory).string();
 }
 
-void SandboxLayer::Init(std::weak_ptr<Engine::Window> window) { }
+void SandboxLayer::Init(Ref<Engine::Window> window) {}
 
 void SandboxLayer::OnAttach() {}
 

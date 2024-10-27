@@ -30,7 +30,7 @@ namespace Engine
     public:
         static void Init(RendererSpec rendererSpec, ApplicationSpec applicationSpec);
         static void Destroy();
-        static void InitImGUI(std::weak_ptr<Window> window);
+        static void InitImGUI(Ref<Window> window);
         static void Shutdown();
         static void BeginFrame();
         static void EndFrame();

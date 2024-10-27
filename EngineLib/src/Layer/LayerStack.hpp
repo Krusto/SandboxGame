@@ -1,5 +1,6 @@
 #pragma once
 #include "Layer.hpp"
+#include <Core/Ref.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -12,7 +13,7 @@ namespace Engine
     public:
         LayerStack() = default;
 
-        static void InitLayers(std::weak_ptr<Window> window);
+        static void InitLayers(Ref<Window> window);
 
         static void PushLayer(Layer* layer);
 

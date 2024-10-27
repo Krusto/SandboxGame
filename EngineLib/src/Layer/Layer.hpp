@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <string_view>
+#include <Core/Ref.hpp>
 
 namespace Engine
 {
@@ -13,7 +14,7 @@ namespace Engine
         virtual ~Layer() = default;
 
     public:
-        virtual void Init(std::weak_ptr<Window> window) = 0;
+        virtual void Init(Ref<Window> window) = 0;
 
         virtual void OnAttach() = 0;
 

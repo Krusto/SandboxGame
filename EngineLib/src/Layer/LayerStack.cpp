@@ -3,7 +3,7 @@
 
 namespace Engine
 {
-    void LayerStack::InitLayers(std::weak_ptr<Window> window)
+    void LayerStack::InitLayers(Ref<Window> window)
     {
         for (auto layer: m_Layers) { layer->Init(window); }
     }
@@ -35,11 +35,8 @@ namespace Engine
     void LayerStack::DestroyLayers()
     {
         for (auto& layer: m_Layers) { layer->Destroy(); }
-        for (auto& layer : m_Layers)
-        {
-            delete layer;
-        }
-        
+        for (auto& layer: m_Layers) { delete layer; }
+
         m_Layers.clear();
     }
 
