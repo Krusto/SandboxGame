@@ -118,6 +118,8 @@ namespace Engine
 
     void OpenGLShader::Bind() { glUseProgram(m_RendererID); }
 
+    void OpenGLShader::Bind() const { glUseProgram(m_RendererID); }
+
     std::string OpenGLShader::ReadShaderFromFile(const std::string& filepath, ShaderType shaderType) const
     {
         std::string result{};
@@ -162,57 +164,57 @@ namespace Engine
         return result;
     }
 
-    void OpenGLShader::SetUniform(const std::string& fullname, float value)
+    void OpenGLShader::SetUniform(const std::string& fullname, float value) const
     {
         glUniform1f(GetUniformLocation(fullname), value);
     }
 
-    void OpenGLShader::SetUniform(const std::string& fullname, int value)
+    void OpenGLShader::SetUniform(const std::string& fullname, int value) const
     {
         glUniform1i(GetUniformLocation(fullname), value);
     }
 
-    void OpenGLShader::SetUniform(const std::string& fullname, const glm::ivec2& value)
+    void OpenGLShader::SetUniform(const std::string& fullname, const glm::ivec2& value) const
     {
         glUniform2i(GetUniformLocation(fullname), value.x, value.y);
     }
 
-    void OpenGLShader::SetUniform(const std::string& fullname, const glm::ivec3& value)
+    void OpenGLShader::SetUniform(const std::string& fullname, const glm::ivec3& value) const
     {
         glUniform3i(GetUniformLocation(fullname), value.x, value.y, value.z);
     }
 
-    void OpenGLShader::SetUniform(const std::string& fullname, const glm::ivec4& value)
+    void OpenGLShader::SetUniform(const std::string& fullname, const glm::ivec4& value) const
     {
         glUniform4i(GetUniformLocation(fullname), value.x, value.y, value.z, value.w);
     }
 
-    void OpenGLShader::SetUniform(const std::string& fullname, uint32_t value)
+    void OpenGLShader::SetUniform(const std::string& fullname, uint32_t value) const
     {
         glUniform1ui(GetUniformLocation(fullname), value);
     }
 
-    void OpenGLShader::SetUniform(const std::string& fullname, const glm::vec2& value)
+    void OpenGLShader::SetUniform(const std::string& fullname, const glm::vec2& value) const
     {
         glUniform2f(GetUniformLocation(fullname), value.x, value.y);
     }
 
-    void OpenGLShader::SetUniform(const std::string& fullname, const glm::vec3& value)
+    void OpenGLShader::SetUniform(const std::string& fullname, const glm::vec3& value) const
     {
         glUniform3f(GetUniformLocation(fullname), value.x, value.y, value.z);
     }
 
-    void OpenGLShader::SetUniform(const std::string& fullname, const glm::vec4& value)
+    void OpenGLShader::SetUniform(const std::string& fullname, const glm::vec4& value) const
     {
         glUniform4f(GetUniformLocation(fullname), value.x, value.y, value.z, value.w);
     }
 
-    void OpenGLShader::SetUniform(const std::string& fullname, const glm::mat3& value)
+    void OpenGLShader::SetUniform(const std::string& fullname, const glm::mat3& value) const
     {
         glUniformMatrix3fv(GetUniformLocation(fullname), 1, GL_FALSE, glm::value_ptr(value));
     }
 
-    void OpenGLShader::SetUniform(const std::string& fullname, const glm::mat4& value)
+    void OpenGLShader::SetUniform(const std::string& fullname, const glm::mat4& value) const
     {
         glUniformMatrix4fv(GetUniformLocation(fullname), 1, GL_FALSE, glm::value_ptr(value));
     }

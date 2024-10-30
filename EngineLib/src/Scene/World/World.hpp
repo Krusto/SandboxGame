@@ -2,6 +2,7 @@
 #include <glad/glad.h>
 #include <Renderer/VertexArray.hpp>
 #include <Renderer/Shader.hpp>
+#include <Renderer/RendererCommand.hpp>
 
 namespace Engine
 {
@@ -20,10 +21,18 @@ namespace Engine
 
         void Draw(Shader* shader) const;
 
-        void GenerateWorld();
+        void Generate();
 
     private:
-        VertexArray* m_VertexArray;
-        int m_Seed = 0;
+        RendererCommand GetRenderCommand(const Shader* const shader, const VertexArray* const va,
+                                         const glm::mat4& model) const;
+
+    private:
+        VertexArray* m_VertexArray{};
+        int m_Seed{};
+        glm::vec3 m_Position{0.0f, 0.0f, 0.0f};
+        float m_Time;
     };
+
+
 }// namespace Engine

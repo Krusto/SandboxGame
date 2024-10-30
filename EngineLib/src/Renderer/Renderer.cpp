@@ -9,12 +9,18 @@ namespace Engine
 
     RendererAPI* Renderer::GetAPIInstance() { return s_RendererAPI; }
 
-    void Renderer::Submit(const std::function<void(void)>& func) { s_FunctionContainer.push_back(func); }
+    void Renderer::Submit(RendererCommand command) { s_CommandContainer.push_back(command); }
+
+    void Renderer::SubmitAndFlush(RendererCommand command)
+    {
+        s_CommandContainer.push_back(command);
+        Renderer::Flush();
+    }
 
     void Renderer::Flush()
     {
-        for (auto& function: s_FunctionContainer) { function(); }
-        s_FunctionContainer.clear();
+        for (auto& command: s_CommandContainer) { command.Execute(); }
+        s_CommandContainer.clear();
     }
 
     void Renderer::Init(RendererSpec rendererSpec, ApplicationSpec applicationSpec)

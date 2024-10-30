@@ -21,9 +21,9 @@ public:
 
     void OnImGuiDraw() override;
 
-    void OnMouseMoveEvent(int width, int height) override{};
+    void OnMouseMoveEvent(int width, int height) override;
 
-    void OnKeyboardEvent(int action, int key) override{};
+    void OnKeyboardEvent(int action, int key) override;
 
     void OnWindowResizeEvent(int width, int height) override;
 
@@ -36,7 +36,10 @@ public:
 protected:
     Ref<Engine::Shader> m_Shader;
     std::unique_ptr<Engine::World> m_World;
-    ViewportSize m_ViewportSize;
+    Engine::Camera m_Camera;
 
+    float m_DeltaTime = 0.0f;
+
+    ViewportSize m_ViewportSize;
     Engine::ApplicationSpec m_AppSpec;
 };

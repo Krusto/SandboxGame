@@ -29,18 +29,19 @@ namespace Engine
         virtual void Reload(bool forceCompile = true) override;
 
         virtual void Bind() override;
+        virtual void Bind() const override;
 
-        virtual void SetUniform(const std::string& fullname, float value) override;
-        virtual void SetUniform(const std::string& fullname, int value) override;
-        virtual void SetUniform(const std::string& fullname, const glm::ivec2& value) override;
-        virtual void SetUniform(const std::string& fullname, const glm::ivec3& value) override;
-        virtual void SetUniform(const std::string& fullname, const glm::ivec4& value) override;
-        virtual void SetUniform(const std::string& fullname, uint32_t value) override;
-        virtual void SetUniform(const std::string& fullname, const glm::vec2& value) override;
-        virtual void SetUniform(const std::string& fullname, const glm::vec3& value) override;
-        virtual void SetUniform(const std::string& fullname, const glm::vec4& value) override;
-        virtual void SetUniform(const std::string& fullname, const glm::mat3& value) override;
-        virtual void SetUniform(const std::string& fullname, const glm::mat4& value) override;
+        virtual void SetUniform(const std::string& fullname, float value) const override;
+        virtual void SetUniform(const std::string& fullname, int value) const override;
+        virtual void SetUniform(const std::string& fullname, const glm::ivec2& value) const override;
+        virtual void SetUniform(const std::string& fullname, const glm::ivec3& value) const override;
+        virtual void SetUniform(const std::string& fullname, const glm::ivec4& value) const override;
+        virtual void SetUniform(const std::string& fullname, uint32_t value) const override;
+        virtual void SetUniform(const std::string& fullname, const glm::vec2& value) const override;
+        virtual void SetUniform(const std::string& fullname, const glm::vec3& value) const override;
+        virtual void SetUniform(const std::string& fullname, const glm::vec4& value) const override;
+        virtual void SetUniform(const std::string& fullname, const glm::mat3& value) const override;
+        virtual void SetUniform(const std::string& fullname, const glm::mat4& value) const override;
 
     private:
         void Load(const std::string& source, bool forceCompile);

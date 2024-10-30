@@ -14,7 +14,7 @@ uniform Camera camera;
 
 void main()
 {
-    // vec3 worldPos = vec3(camera.model *vec4(aPosition,1.0));
-    gl_Position = vec4(aPosition, 1.0);
-    // gl_Position = camera.projection * camera.view * vec4(worldPos,1.0);
+    vec3 worldPos = vec3(camera.model * vec4(aPosition, 1.0));
+
+    gl_Position = camera.projection * camera.view * vec4(worldPos, 1.0);
 }
