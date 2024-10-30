@@ -9,6 +9,16 @@ namespace Engine
 
     RendererAPI* Renderer::GetAPIInstance() { return s_RendererAPI; }
 
+    void Renderer::SwitchWireframeMode()
+    {
+        if (s_RendererAPI) s_RendererAPI->SwitchMode(1);
+    }
+
+    void Renderer::SwitchFillMode()
+    {
+        if (s_RendererAPI) s_RendererAPI->SwitchMode(0);
+    }
+
     void Renderer::Submit(RendererCommand command) { s_CommandContainer.push_back(command); }
 
     void Renderer::SubmitAndFlush(RendererCommand command)

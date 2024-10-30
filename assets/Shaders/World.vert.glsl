@@ -20,5 +20,5 @@ void main()
     vec3 worldPos = vec3(model * vec4(aPosition, 1.0));
 
     gl_Position = camera.projection * camera.view * vec4(worldPos, 1.0);
-    color = aNormal;
+    color = vec3(aTexCoord, 1.0);
 }

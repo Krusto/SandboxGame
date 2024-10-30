@@ -13,4 +13,11 @@ namespace Engine
     void OpenGLRenderer::Shutdown(){};
     void OpenGLRenderer::BeginFrame(){};
     void OpenGLRenderer::EndFrame(){};
+
+    void OpenGLRenderer::SwitchMode(uint32_t mode)
+    {
+        if (mode == 0) { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
+        else if (mode == 1) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); }
+    };
+
 }// namespace Engine

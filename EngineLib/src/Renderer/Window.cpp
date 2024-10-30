@@ -54,6 +54,7 @@ namespace Engine
         glfwSetWindowSizeCallback(this->s_WindowPtr, _WindowSizeCallback);
         glfwSetKeyCallback(this->s_WindowPtr, _WindowKeyCallback);
         glfwSetCursorPosCallback(this->s_WindowPtr, _WindowMouseMoveCallback);
+        glfwSetScrollCallback(this->s_WindowPtr, _WindowMouseScrollCallback);
     }
 
     void Window::Destroy() { glfwDestroyWindow(s_WindowPtr); }
@@ -111,6 +112,11 @@ namespace Engine
     void Window::_WindowMouseMoveCallback(GLFWwindow* window, double x, double y)
     {
         for (auto& layer: LayerStack::data()) { layer->OnMouseMoveEvent((int) x, (int) y); }
+    }
+
+    void Window::_WindowMouseScrollCallback(GLFWwindow* window, double x, double y)
+    {
+        for (auto& layer: LayerStack::data()) { layer->OnMouseScrollEvent(x, y); }
     }
 
     void GLAPIENTRY Window::_MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
