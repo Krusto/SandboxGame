@@ -12,8 +12,10 @@
 #include "Window.hpp"
 #include "Viewport.hpp"
 #include "Shader.hpp"
+#include "Camera.hpp"
 
 #include <Renderer/GraphicsContext.hpp>
+#include <Renderer/RendererCommand.hpp>
 
 namespace Engine
 {
@@ -39,14 +41,13 @@ namespace Engine
         static GraphicsContext* CreateGraphicsContext(GLFWwindow* handle);
         static RendererAPI* GetAPIInstance();
 
-        static void Submit(const std::function<void(void)>& func);
+        static void Submit(RendererCommand command);
 
-        template <typename T>
-        static void SubmitAndFlush(T func);
+        static void SubmitAndFlush(RendererCommand command);
 
         static void Flush();
 
-        inline static std::vector<std::function<void(void)>> s_FunctionContainer{};
+        inline static std::vector<RendererCommand> s_CommandContainer{};
         inline static RendererSpec s_RendererSpec{};
     };
 }// namespace Engine

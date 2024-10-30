@@ -34,17 +34,18 @@ namespace Engine
         virtual const std::string& GetPath() const = 0;
         virtual void Reload(bool forceCompile = true) = 0;
         virtual void Bind() = 0;
-        virtual void SetUniform(const std::string& fullname, float value) = 0;
-        virtual void SetUniform(const std::string& fullname, int value) = 0;
-        virtual void SetUniform(const std::string& fullname, const glm::ivec2& value) = 0;
-        virtual void SetUniform(const std::string& fullname, const glm::ivec3& value) = 0;
-        virtual void SetUniform(const std::string& fullname, const glm::ivec4& value) = 0;
-        virtual void SetUniform(const std::string& fullname, uint32_t value) = 0;
-        virtual void SetUniform(const std::string& fullname, const glm::vec2& value) = 0;
-        virtual void SetUniform(const std::string& fullname, const glm::vec3& value) = 0;
-        virtual void SetUniform(const std::string& fullname, const glm::vec4& value) = 0;
-        virtual void SetUniform(const std::string& fullname, const glm::mat3& value) = 0;
-        virtual void SetUniform(const std::string& fullname, const glm::mat4& value) = 0;
+        virtual void Bind() const = 0;
+        virtual void SetUniform(const std::string& fullname, float value) const = 0;
+        virtual void SetUniform(const std::string& fullname, int value) const = 0;
+        virtual void SetUniform(const std::string& fullname, const glm::ivec2& value) const = 0;
+        virtual void SetUniform(const std::string& fullname, const glm::ivec3& value) const = 0;
+        virtual void SetUniform(const std::string& fullname, const glm::ivec4& value) const = 0;
+        virtual void SetUniform(const std::string& fullname, uint32_t value) const = 0;
+        virtual void SetUniform(const std::string& fullname, const glm::vec2& value) const = 0;
+        virtual void SetUniform(const std::string& fullname, const glm::vec3& value) const = 0;
+        virtual void SetUniform(const std::string& fullname, const glm::vec4& value) const = 0;
+        virtual void SetUniform(const std::string& fullname, const glm::mat3& value) const = 0;
+        virtual void SetUniform(const std::string& fullname, const glm::mat4& value) const = 0;
 
     public:
         uint32_t offset = 0;
