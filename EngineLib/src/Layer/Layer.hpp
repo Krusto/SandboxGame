@@ -32,6 +32,8 @@ namespace Engine
 
         virtual void OnWindowResizeEvent(int width, int height) = 0;
 
+        virtual void OnMouseScrollEvent(double x, double y) = 0;
+
         virtual void OnWindowShouldCloseEvent() = 0;
 
         virtual void Begin() = 0;

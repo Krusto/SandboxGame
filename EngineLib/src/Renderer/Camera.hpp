@@ -45,7 +45,7 @@ namespace Engine
 
         void ChangeViewport(uint32_t width, uint32_t height);
 
-        void Update();
+        void Update(float dt);
 
         const auto& GetView() const { return this->m_View; }
 
@@ -82,9 +82,11 @@ namespace Engine
 
         const CameraSpec& GetSpec() const { return m_CameraSpec; }
 
-        void ProcessMouseMovement(float x, float y, float dt, float sensitivity = 1, bool constrainPitch = true);
+        void ProcessMouseMovement(float x, float y, float sensitivity = 1, bool constrainPitch = true);
 
-        void ProcessKeyboardInput(int action, int key, float dt, float speed);
+        void ProcessKeyboardInput(int action, int key, float speed);
+
+        void ProcessMouseScroll(float y, double speed = 1);
 
     private:
         glm::vec3 m_VectorUP{};
@@ -98,10 +100,12 @@ namespace Engine
         CameraSpec m_CameraSpec{};
 
         bool startedEvent{};
+        bool startetScrollEvent{};
+        double m_ScrollValue{0.0f};
+
         glm::vec3 m_MoveVector{};
         glm::vec3 m_RotateVector{};
 
-        bool m_FirstMouse{true};
         glm::vec2 m_LastMousePos{0.0f, 0.0f};
     };
 }// namespace Engine

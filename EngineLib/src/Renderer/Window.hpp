@@ -72,6 +72,7 @@ namespace Engine
         static void _WindowSizeCallback(GLFWwindow* window, int width, int height);
         static void _WindowKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
         static void _WindowMouseMoveCallback(GLFWwindow* window, double x, double y);
+        static void _WindowMouseScrollCallback(GLFWwindow* window, double x, double y);
 
         static void GLAPIENTRY _MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
                                                 const GLchar* message, const void* userParam);

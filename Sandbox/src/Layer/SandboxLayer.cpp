@@ -37,6 +37,7 @@ void SandboxLayer::OnUpdate(float dt)
 
     Engine::Renderer::ClearColor(glm::vec4{0.1, 0.2, 0.4, 1.0});
 
+    m_Camera.Update(dt);
     m_Camera.Upload(m_Shader.Raw());
     m_World->Draw(m_Shader.Raw());
 
@@ -51,12 +52,14 @@ void SandboxLayer::OnImGuiDraw() {}
 
 void SandboxLayer::OnMouseMoveEvent(int width, int height)
 {
-    m_Camera.ProcessMouseMovement(width, height, m_DeltaTime, 10000.0f, false);
-    LOG_DEBUG("rotation: %f %f\n", m_Camera.GetRotation().x, m_Camera.GetRotation().y);
+    m_Camera.ProcessMouseMovement(width, height, 10000.0f, true);
 }
+
+void SandboxLayer::OnMouseScrollEvent(double x, double y) { m_Camera.ProcessMouseScroll(y, 10000); }
 
 void SandboxLayer::OnKeyboardEvent(int action, int key)
 {
-    m_Camera.ProcessKeyboardInput(action, key, m_DeltaTime, 100.0f);
-    LOG_DEBUG("position: %f %f %f\n", m_Camera.GetPosition().x, m_Camera.GetPosition().y, m_Camera.GetPosition().z);
+    if (key == GLFW_KEY_C && action == GLFW_PRESS) { Engine::Renderer::SwitchFillMode(); }
+    else if (key == GLFW_KEY_V && action == GLFW_PRESS) { Engine::Renderer::SwitchWireframeMode(); }
+    else { m_Camera.ProcessKeyboardInput(action, key, 100.0f); }
 }

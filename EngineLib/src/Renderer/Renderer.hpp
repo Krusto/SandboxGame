@@ -41,6 +41,9 @@ namespace Engine
         static GraphicsContext* CreateGraphicsContext(GLFWwindow* handle);
         static RendererAPI* GetAPIInstance();
 
+        static void SwitchWireframeMode();
+        static void SwitchFillMode();
+
         static void Submit(RendererCommand command);
 
         static void SubmitAndFlush(RendererCommand command);

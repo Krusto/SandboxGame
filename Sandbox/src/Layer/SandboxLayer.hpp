@@ -27,6 +27,8 @@ public:
 
     void OnWindowResizeEvent(int width, int height) override;
 
+    void OnMouseScrollEvent(double x, double y) override;
+
     void OnWindowShouldCloseEvent() override { SetShouldExit(true); };
 
     void Begin() override {}

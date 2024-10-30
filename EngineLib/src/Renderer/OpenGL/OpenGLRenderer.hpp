@@ -21,5 +21,6 @@ namespace Engine
         virtual void BeginFrame() override;
         virtual void EndFrame() override;
         virtual void ClearColor(glm::vec4 color) override;
+        virtual void SwitchMode(uint32_t mode) override;
     };
 }// namespace Engine
