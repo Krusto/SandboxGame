@@ -1,5 +1,9 @@
 #include "GraphicsContext.hpp"
 #include <Renderer/OpenGL/OpenGLContext.hpp>
+#include <Core/Allocator.hpp>
 GraphicsContext* GraphicsContext::s_Context;
 
-GraphicsContext* GraphicsContext::Create(GLFWwindow* window) { return new OpenGLContext(window); }
+GraphicsContext* GraphicsContext::Create(GLFWwindow* window)
+{
+    return Engine::Allocator::Allocate<OpenGLContext>(window);
+}

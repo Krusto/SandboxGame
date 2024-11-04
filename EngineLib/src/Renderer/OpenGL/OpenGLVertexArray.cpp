@@ -27,12 +27,12 @@ namespace Engine
             if (m_VertexBuffer)
             {
                 m_VertexBuffer->Destroy();
-                delete m_VertexBuffer;
+                Engine::Allocator::Deallocate(m_VertexBuffer);
             }
             if (m_IndexBuffer)
             {
                 m_IndexBuffer->Destroy();
-                delete m_IndexBuffer;
+                Engine::Allocator::Deallocate(m_IndexBuffer);
             }
         }
     }

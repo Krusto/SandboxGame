@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(FIKO_ENGINE)
+project(SandboxGame)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 message("Compiler Version: ${CMAKE_CXX_COMPILER_VERSION}")
 
 message("${PROJECT_NAME}: Adding yaml-cpp...")
@@ -41,6 +41,9 @@ add_library(glad STATIC ${GLAD_SOURCE_FILES} ${GLAD_HEADER_FILES})
 
 add_library(EngineLib STATIC ${ENGINE_SOURCE_FILES} ${ENGINE_HEADER_FILES})
 
+add_library(CUtils INTERFACE)
+target_include_directories(CUtils INTERFACE ${CUTILS_INCLDUE_DIR})
+
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -49,6 +52,8 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_compile_options(EngineLib PRIVATE -static-libstdc++)
     target_compile_options(EngineLib PRIVATE -Wall)
     target_compile_options(EngineLib PRIVATE -pedantic)
+    target_compile_options(CUtils INTERFACE -Wno-fPermissive)
+
 endif()
 if (WIN32)
     target_compile_definitions(EngineLib PRIVATE GLFW_EXPOSE_NATIVE_WIN32)
@@ -59,6 +64,16 @@ else ()
     target_compile_definitions(EngineLib PRIVATE _LINUX)
     target_compile_definitions(EngineLib PRIVATE GLFW_EXPOSE_NATIVE_X11)
 endif ()
+
+target_compile_definitions(EngineLib
+    PUBLIC
+    $<$<CONFIG:Debug>:ENGINE_ENABLE_VERBOSE_LOG>
+    $<$<CONFIG:Debug>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
+    $<$<CONFIG:Release>:_RELEASE>
+
+    $<$<CONFIG:RelWithDebInfo>:_DEBUG>
+    $<$<CONFIG:MinSizeRel>:_RELEASE>
+)
 
 target_include_directories(glad PRIVATE ${GLAD_INCLDUE_DIR})
 
@@ -76,10 +91,6 @@ target_include_directories(EngineLib PUBLIC ${GLM_INCLDUE_DIR})
 target_include_directories(EngineLib PUBLIC ${CUTILS_INCLDUE_DIR})
 
 add_library(EngineInterfaceLibrary INTERFACE)
-
-add_library(CUtils INTERFACE)
-target_include_directories(CUtils INTERFACE ${CUTILS_INCLDUE_DIR})
-target_compile_options(CUtils INTERFACE -Wno-fPermissive)
 
 message("${PROJECT_NAME}: Linking libraries")
 

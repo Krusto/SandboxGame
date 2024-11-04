@@ -3,30 +3,28 @@
 #include <mutex>
 #include "Ref.hpp"
 
-static std::unordered_map<void*, size_t> s_LiveReferences;
-static std::mutex s_LiveReferenceMutex;
-
-namespace RefUtils
+void RefCounted::IncRefCount() const
 {
+    m_RefCount++;
+    RefCounted::IncTotalRefCount();
+}
 
-    void AddToLiveReferences(void* instance, size_t size)
-    {
-        std::scoped_lock<std::mutex> lock(s_LiveReferenceMutex);
-        s_LiveReferences.emplace(instance, size);
-    }
+void RefCounted::DecRefCount() const
+{
+    m_RefCount--;
+    RefCounted::DecTotalRefCount();
+}
 
-    void RemoveFromLiveReferences(void* instance)
-    {
-        std::scoped_lock<std::mutex> lock(s_LiveReferenceMutex);
-        s_LiveReferences.erase(instance);
-    }
+uint32_t RefCounted::GetRefCount() const { return m_RefCount.load(); }
 
-    size_t GetSizeFromLiveReferences(void* instance)
-    {
-        std::scoped_lock<std::mutex> lock(s_LiveReferenceMutex);
-        if (s_LiveReferences.contains(instance)) return s_LiveReferences.at(instance);
-        return 0;
-    }
+void RefCounted::IncTotalRefCount()
+{
+    RefCounted::s_TotalRefCount++;
+    LOG_MEMORY_ALLOC("Total RefCount: %i\n", RefCounted::s_TotalRefCount);
+}
 
-    bool IsLive(void* instance) { return s_LiveReferences.find(instance) != s_LiveReferences.end(); }
-}// namespace RefUtils
+void RefCounted::DecTotalRefCount()
+{
+    RefCounted::s_TotalRefCount--;
+    LOG_MEMORY_ALLOC("Total RefCount: %i\n", RefCounted::s_TotalRefCount);
+}
