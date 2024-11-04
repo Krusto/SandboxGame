@@ -16,8 +16,6 @@ namespace Engine
         Application() = default;
         ~Application() = default;
 
-        explicit Application(const ApplicationSpec& spec) { Init(spec); }
-
         void Run();
         void Init(const ApplicationSpec& spec);
 

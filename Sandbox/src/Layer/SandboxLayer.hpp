@@ -5,8 +5,9 @@
 class SandboxLayer: public Engine::Layer
 {
 public:
+    SandboxLayer() = default;
     explicit SandboxLayer(const Engine::ApplicationSpec& spec);
-    ~SandboxLayer() override = default;
+    ~SandboxLayer() = default;
 
 public:
     void Init(Ref<Engine::Window> window) override;

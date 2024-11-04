@@ -36,3 +36,7 @@ inline static const std::array<Engine::Vertex, 4> BackBlockFaceVertices = {
         Engine::Vertex{glm::vec3(1, 1, 0), glm::vec3{0, 0, 1}, glm::vec2{0, 0}},
         Engine::Vertex{glm::vec3(1, 0, 0), glm::vec3{0, 0, 1}, glm::vec2{1, 0}},
         Engine::Vertex{glm::vec3(0, 0, 0), glm::vec3{0, 0, 1}, glm::vec2{1, 1}}};
+
+inline static const std::array<Engine::Vertex, 4> BlockFaceVertices[6] = {
+        LeftBlockFaceVertices,RightBlockFaceVertices,   TopBlockFaceVertices,
+        BottomBlockFaceVertices, FrontBlockFaceVertices, BackBlockFaceVertices};

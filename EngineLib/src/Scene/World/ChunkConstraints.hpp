@@ -1,6 +1,10 @@
 #pragma once
 #include <cstdint>
 
-constexpr int32_t CHUNK_SIZE = 64;
+constexpr int32_t CHUNK_SIZE = 32;
 constexpr int32_t CHUNK_SIZE_SQUARE = CHUNK_SIZE * CHUNK_SIZE;
 constexpr int32_t CHUNK_SIZE_CUBIC = CHUNK_SIZE_SQUARE * CHUNK_SIZE;
+
+constexpr int32_t CHUNK_SIZE_PADDED = 34;
+constexpr int32_t CHUNK_SIZE_SQUARE_PADDED = CHUNK_SIZE_PADDED * CHUNK_SIZE_PADDED;
+constexpr int32_t CHUNK_SIZE_CUBIC_PADDED = CHUNK_SIZE_SQUARE_PADDED * CHUNK_SIZE_PADDED;

@@ -17,7 +17,7 @@ namespace Engine
         ~World() = default;
 
     public:
-        void Init(int seed);
+        void Init(TerrainGenerationSettings settings);
 
         void Destroy();
 
@@ -32,10 +32,10 @@ namespace Engine
                                          const glm::mat4& model) const;
 
     private:
-        int m_Seed{};
         glm::vec3 m_Position{0.0f, 0.0f, 0.0f};
         float m_Time;
 
+        ChunkFactory m_ChunkFactory;
         std::unordered_map<glm::ivec3, ChunkData*> m_ChunksBlockData;
         std::unordered_map<glm::ivec3, TerrainShapeData*> m_ChunksShapeData;
         std::unordered_map<glm::ivec3, ChunkMesh*> m_ChunksMeshes;

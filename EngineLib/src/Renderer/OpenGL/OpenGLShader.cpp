@@ -1,7 +1,7 @@
 #include "OpenGLShader.hpp"
 #include <Renderer/Renderer.hpp>
 #include <Util/File.hpp>
-
+#include <Core/Allocator.hpp>
 #include <string>
 #include <sstream>
 #include <limits>
@@ -31,7 +31,7 @@ namespace Engine
 
     OpenGLShader* OpenGLShader::CreateFromString(const std::string& source)
     {
-        OpenGLShader* shader = new OpenGLShader();
+        OpenGLShader* shader = Allocator::Allocate<OpenGLShader>();
         shader->Load(source, true);
         return shader;
     }

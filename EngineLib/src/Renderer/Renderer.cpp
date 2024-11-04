@@ -2,6 +2,7 @@
 
 #include <Renderer/OpenGL/OpenGLRenderer.hpp>
 #include <Renderer/OpenGL/OpenGLContext.hpp>
+#include <Core/Allocator.hpp>
 
 namespace Engine
 {
@@ -35,14 +36,14 @@ namespace Engine
 
     void Renderer::Init(RendererSpec rendererSpec, ApplicationSpec applicationSpec)
     {
-        s_RendererAPI = new OpenGLRenderer();
+        s_RendererAPI = Allocator::Allocate<OpenGLRenderer>();
 
         if (s_RendererAPI) s_RendererAPI->Init(rendererSpec, applicationSpec);
     }
 
     void Renderer::Destroy()
     {
-        if (s_RendererAPI) delete s_RendererAPI;
+        if (s_RendererAPI) Allocator::Deallocate(s_RendererAPI);
     }
 
     void Renderer::InitImGUI(Ref<Window> window) {}

@@ -77,6 +77,7 @@ namespace Engine
 
     void Camera::ProcessKeyboardInput(int action, int key, float speed)
     {
+
         if (action == GLFW_PRESS)
         {
             switch (key)

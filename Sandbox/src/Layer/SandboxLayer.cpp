@@ -12,7 +12,8 @@ void SandboxLayer::Init(Ref<Engine::Window> window)
     std::string path = m_AppSpec.WorkingDirectory.string() + "/Assets/Shaders/World";
     m_Shader = Ref<Engine::Shader>(Engine::Shader::Load(path));
     m_World = std::make_unique<Engine::World>();
-    m_World->Init(0);
+    TerrainGenerationSettings settings = {.Seed = 0};
+    m_World->Init(settings);
 
     m_Camera.Init(Engine::CameraSpec({800, 600}, 45.0f, 0.1f, 1000.0f));
     m_Camera.Move({0.0f, 0.0f, 3.0f});

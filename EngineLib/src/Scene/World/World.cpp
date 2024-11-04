@@ -6,21 +6,21 @@
 
 namespace Engine
 {
-    void World::Init(int seed)
+    void World::Init(TerrainGenerationSettings settings)
     {
-        m_Seed = seed;
+        m_ChunkFactory.Init(settings);
 
         glm::ivec3 currentChunkPos = glm::ivec3(0, 0, 0);
 
-        m_ChunksShapeData[currentChunkPos] = ChunkFactory::GenerateTerrainShapeData(m_Seed);
-        m_ChunksBlockData[currentChunkPos] = ChunkFactory::Generate(m_Seed);
+        m_ChunksShapeData[currentChunkPos] = m_ChunkFactory.GenerateTerrainShapeData(currentChunkPos);
+        m_ChunksBlockData[currentChunkPos] = m_ChunkFactory.Generate();
         m_ChunksMeshes[currentChunkPos] = ChunkMeshFactory::Generate(m_ChunksShapeData[currentChunkPos]);
     }
 
     void World::Destroy()
     {
-        ChunkFactory::Destroy(m_ChunksBlockData[glm::ivec3(0, 0, 0)]);
-        ChunkFactory::DestroyTerrainShapeData(m_ChunksShapeData[glm::ivec3(0, 0, 0)]);
+        m_ChunkFactory.Destroy(m_ChunksBlockData[glm::ivec3(0, 0, 0)]);
+        m_ChunkFactory.DestroyTerrainShapeData(m_ChunksShapeData[glm::ivec3(0, 0, 0)]);
         ChunkMeshFactory::Destroy(m_ChunksMeshes[glm::ivec3(0, 0, 0)]);
     }
 

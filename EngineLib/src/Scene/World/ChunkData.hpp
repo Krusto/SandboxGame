@@ -4,16 +4,17 @@
 #include "BlockRegistry.hpp"
 
 constexpr size_t BlockPerByte = 8;
-constexpr size_t TerrainShapeCompresssedSize = CHUNK_SIZE_CUBIC / BlockPerByte;
+constexpr size_t TerrainShapeCompresssedSize = CHUNK_SIZE_CUBIC;
 
 class TerrainShapeData
 {
 public:
     TerrainShapeData() = default;
-    ~TerrainShapeData() = default;
+    ~TerrainShapeData();
 
 public:
     void Init(uint32_t seed);
+    void Init(const TerrainShapeData& other);
     void Destroy();
 
     bool IsSolid(glm::ivec3 position) const;
@@ -24,15 +25,18 @@ public:
     bool IsSolidSafe(glm::vec3 position) const;
     bool IsSolidSafe(size_t index) const;
 
-    uint64_t GetRow(size_t index) const { return m_Data[index]; }
-    uint64_t GetRow(glm::vec3 position) const { return GetRow(ChunkPosition::GetIndex(position)); }
-    uint64_t GetRow(glm::ivec3 position) const { return GetRow(ChunkPosition::GetIndex(position)); }
+    void Set();
+    void Set(glm::vec3 position);
+    void Set(glm::ivec3 position);
+    void Unset();
+    void Unset(glm::vec3 position);
+    void Unset(glm::ivec3 position);
+
+    uint64_t GetRow(uint32_t y, uint32_t z) const;
+
+    uint8_t* m_Data;
 
 private:
-    bool GetBit(size_t index) const;
-    void SetBit(size_t index, bool value);
-
-    uint64_t* m_Data;
 };
 
 class ChunkData
