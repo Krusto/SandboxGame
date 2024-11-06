@@ -1,3 +1,6 @@
 [submodule "Vendor/CUtils"]
 	path = Vendor/CUtils
 	url = https://www.github.com/Krusto/CUtils
+[submodule "Vendor/PerlinNoise"]
+	path = Vendor/PerlinNoise
+	url = https://github.com/Reputeless/PerlinNoise

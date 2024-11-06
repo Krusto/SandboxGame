@@ -33,22 +33,22 @@ namespace Engine
             switch (attr.type)
             {
                 case ShaderUniformType::Float:
-                    glVertexAttribPointer(index, 1, GL_FLOAT, GL_FALSE, static_cast<GLsizei>(layout.stride),
+                    glVertexAttribIPointer(index, 1, GL_FLOAT, static_cast<GLsizei>(layout.stride),
                                           reinterpret_cast<void*>(attr.offset));
                     offset += sizeof(float);
                     break;
                 case ShaderUniformType::Int:
-                    glVertexAttribPointer(index, 1, GL_INT, GL_FALSE, static_cast<GLsizei>(layout.stride),
-                                          reinterpret_cast<void*>(attr.offset));
+                    glVertexAttribIPointer(index, 1, GL_INT, static_cast<GLsizei>(layout.stride),
+                                           reinterpret_cast<void*>(attr.offset));
                     offset += sizeof(int32_t);
                     break;
                 case ShaderUniformType::UInt:
-                    glVertexAttribPointer(index, 1, GL_UNSIGNED_INT, GL_FALSE, static_cast<GLsizei>(layout.stride),
-                                          reinterpret_cast<void*>(attr.offset));
+                    glVertexAttribIPointer(index, 1, GL_UNSIGNED_INT, static_cast<GLsizei>(layout.stride),
+                                           reinterpret_cast<void*>(attr.offset));
                     offset += sizeof(uint32_t);
                     break;
                 case ShaderUniformType::Bool:
-                    glVertexAttribPointer(index, 1, GL_BOOL, GL_FALSE, static_cast<GLsizei>(layout.stride),
+                    glVertexAttribIPointer(index, 1, GL_BOOL, static_cast<GLsizei>(layout.stride),
                                           reinterpret_cast<void*>(attr.offset));
                     offset += sizeof(bool);
                     break;

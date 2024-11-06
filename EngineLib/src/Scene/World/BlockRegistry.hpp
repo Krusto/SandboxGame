@@ -2,6 +2,28 @@
 #include <array>
 #include <string>
 #include <string_view>
+#include <unordered_map>
+
+namespace BlockType
+{
+    inline constexpr uint32_t AIR = 0;
+    inline constexpr uint32_t STONE = 1;
+    inline constexpr uint32_t GRASS = 2;
+    inline constexpr uint32_t DIRT = 3;
+    inline constexpr uint32_t COBBLESTONE = 4;
+    inline constexpr uint32_t WOOD = 5;
+    inline constexpr uint32_t SAPLING = 6;
+    inline constexpr uint32_t BEDROCK = 7;
+    inline constexpr uint32_t WATER = 8;
+    inline constexpr uint32_t MAX = 9;
+}// namespace BlockType
+
+struct BlockInfo {
+
+    uint32_t Type;
+    std::string_view Name;
+    std::string_view Texture;
+};
 
 class BlockRegistry
 {
@@ -13,23 +35,10 @@ public:
     static void Init();
     static void Destroy();
 
-    static std::string GetBlockName(uint32_t id);
+    static const std::string_view GetBlockName(uint32_t id);
     static uint32_t GetBlockID(std::string_view name);
 
-public:
-    enum BlockType
-    {
-        AIR = 0,
-        STONE = 1,
-        GRASS = 2,
-        DIRT = 3,
-        COBBLESTONE = 4,
-        WOOD = 5,
-        SAPLING = 6,
-        BEDROCK = 7,
-        WATER = 8
-    };
-
 private:
-    static std::array<std::string, 256> s_BlockNames;
+    static std::array<BlockInfo, 256> s_BlockInfos;
+    static std::unordered_map<std::string, uint32_t> s_BlockIDs;
 };
