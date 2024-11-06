@@ -3,7 +3,7 @@
 
 void Engine::ChunkFactory::Init(TerrainGenerationSettings settings) { m_Generator.Init(settings); }
 
-ChunkData* Engine::ChunkFactory::Generate()
+ChunkData* Engine::ChunkFactory::GenerateBlockData()
 {
 
     auto ptr = Allocator::Allocate<ChunkData>();
@@ -11,7 +11,7 @@ ChunkData* Engine::ChunkFactory::Generate()
     return ptr;
 }
 
-void Engine::ChunkFactory::Destroy(ChunkData* data)
+void Engine::ChunkFactory::DestroyBlockData(ChunkData* data)
 {
     data->Destroy();
     Allocator::Deallocate(data);

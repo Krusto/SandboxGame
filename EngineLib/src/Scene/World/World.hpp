@@ -29,10 +29,9 @@ namespace Engine
 
     private:
         RendererCommand GetRenderCommand(const Shader* const shader, const VertexArray* const va,
-                                         const glm::mat4& model) const;
+                                         const glm::mat4& model , glm::vec3 pos) const;
 
     private:
-        glm::vec3 m_Position{0.0f, 0.0f, 0.0f};
         float m_Time;
 
         ChunkFactory m_ChunkFactory;

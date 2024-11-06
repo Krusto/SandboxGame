@@ -4,7 +4,7 @@ size_t ChunkPosition::GetIndex(glm::vec3 position) { return GetIndex((glm::ivec3
 
 size_t ChunkPosition::GetIndex(glm::ivec3 position)
 {
-    return position.x + position.y * CHUNK_SIZE + position.z * CHUNK_SIZE_SQUARE;
+    return position.x + position.z * CHUNK_SIZE + position.y * CHUNK_SIZE_SQUARE;
 }
 
 size_t ChunkPosition::GetIndexX_P(glm::vec3 position)

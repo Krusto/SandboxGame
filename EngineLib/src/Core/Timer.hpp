@@ -37,7 +37,7 @@ public:
     ~ScopedTimer()
     {
         float time = m_Timer.ElapsedMillis();
-        LOG_INFO("Timer: %s - %fms\n", m_Name.c_str(), time);
+        LOG("Timer: %s - %fms\n", m_Name.c_str(), time);
     }
 
 private:

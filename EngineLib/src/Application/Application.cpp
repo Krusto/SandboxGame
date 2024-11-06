@@ -24,7 +24,6 @@ void Engine::Application::Run()
             after = (float) glfwGetTime();
             dt = after - before;
         }
-
         m_Window->Update();
     }
 }

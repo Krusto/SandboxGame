@@ -14,8 +14,8 @@ namespace Engine
     public:
         void Init(TerrainGenerationSettings settings);
 
-        ChunkData* Generate();
-        void Destroy(ChunkData* data);
+        ChunkData* GenerateBlockData();
+        void DestroyBlockData(ChunkData* data);
         TerrainShapeData* GenerateTerrainShapeData(glm::ivec3 chunkPosition);
         void DestroyTerrainShapeData(TerrainShapeData* data);
 

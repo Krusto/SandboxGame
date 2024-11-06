@@ -62,5 +62,6 @@ void SandboxLayer::OnKeyboardEvent(int action, int key)
 {
     if (key == GLFW_KEY_C && action == GLFW_PRESS) { Engine::Renderer::SwitchFillMode(); }
     else if (key == GLFW_KEY_V && action == GLFW_PRESS) { Engine::Renderer::SwitchWireframeMode(); }
+    else if (key == GLFW_KEY_R && action == GLFW_PRESS) { m_Shader->Reload(); }
     else { m_Camera.ProcessKeyboardInput(action, key, 100.0f); }
 }
