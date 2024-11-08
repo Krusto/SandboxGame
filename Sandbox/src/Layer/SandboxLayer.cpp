@@ -1,22 +1,27 @@
 #include "SandboxLayer.hpp"
+#include <algorithm>
 
 SandboxLayer::SandboxLayer(const Engine::ApplicationSpec& spec)
 {
     m_Name = "Sandbox Layer";
     m_AppSpec = spec;
-    m_AppSpec.WorkingDirectory = std::filesystem::absolute(spec.WorkingDirectory).string();
+    m_AppSpec.WorkingDirectory = std::filesystem::absolute(spec.WorkingDirectory);
+    m_AssetsDirectory = m_AppSpec.WorkingDirectory.append("Assets");
+    m_ShadersDirectory = (m_AssetsDirectory.string() + "/Shaders");
+    m_TexturesDirectory = (m_AssetsDirectory.string() + "/Textures");
 }
 
 void SandboxLayer::Init(Ref<Engine::Window> window)
 {
-    std::string path = m_AppSpec.WorkingDirectory.string() + "/Assets/Shaders/World";
+    std::string path = m_ShadersDirectory.string() + "/World";
     m_Shader = Ref<Engine::Shader>(Engine::Shader::Load(path));
     m_World = std::make_unique<Engine::World>();
-    TerrainGenerationSettings settings = {.Seed = 0};
-    m_World->Init(settings);
 
-    m_Camera.Init(Engine::CameraSpec({800, 600}, 45.0f, 0.1f, 1000.0f));
-    m_Camera.Move({0.0f, 0.0f, 3.0f});
+    Engine::TerrainGenerationSettings settings = {.Seed = 0, .AssetsDirectory = m_AssetsDirectory};
+    m_World->Init(settings, m_TexturesDirectory);
+
+    m_Camera.Init(Engine::CameraSpec({m_AppSpec.width, m_AppSpec.height}, 45.0f, 0.1f, 1000.0f));
+    m_Camera.Move({0.0f, 35.0f, 3.0f});
 }
 
 void SandboxLayer::OnAttach() {}
@@ -36,7 +41,7 @@ void SandboxLayer::OnUpdate(float dt)
 
     Engine::Renderer::BeginFrame();
 
-    Engine::Renderer::ClearColor(glm::vec4{0.1, 0.2, 0.4, 1.0});
+    Engine::Renderer::ClearColor(glm::vec4{1, 1, 1, 1.0});
 
     m_Camera.Update(dt);
     m_Camera.Upload(m_Shader.Raw());
@@ -45,6 +50,8 @@ void SandboxLayer::OnUpdate(float dt)
     Engine::Renderer::Flush();
 
     Engine::Renderer::EndFrame();
+
+    SetShouldExit(true);
 }
 
 void SandboxLayer::OnWindowResizeEvent(int width, int height) {}

@@ -30,7 +30,7 @@ public:
 
     void OnMouseScrollEvent(double x, double y) override;
 
-    void OnWindowShouldCloseEvent() override { SetShouldExit(true); };
+    void OnWindowShouldCloseEvent() override { SetShouldExit(true); }
 
     void Begin() override {}
 
@@ -39,10 +39,14 @@ public:
 protected:
     Ref<Engine::Shader> m_Shader;
     std::unique_ptr<Engine::World> m_World;
+
     Engine::Camera m_Camera;
 
     float m_DeltaTime = 0.0f;
 
     ViewportSize m_ViewportSize;
     Engine::ApplicationSpec m_AppSpec;
+    std::filesystem::path m_AssetsDirectory;
+    std::filesystem::path m_ShadersDirectory;
+    std::filesystem::path m_TexturesDirectory;
 };

@@ -19,12 +19,13 @@ namespace Engine
         }
 
         constexpr auto OPENGL_VERSION_MAJOR = 4;
-        constexpr auto OPENGL_VERSION_MINOR = 1;
+        constexpr auto OPENGL_VERSION_MINOR = 3;
 
         glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, OPENGL_VERSION_MAJOR);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, OPENGL_VERSION_MINOR);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
         int major, minor, rev;
         glfwGetVersion(&major, &minor, &rev);
@@ -57,7 +58,10 @@ namespace Engine
         glfwSetScrollCallback(this->s_WindowPtr, _WindowMouseScrollCallback);
     }
 
-    void Window::Destroy() { glfwDestroyWindow(s_WindowPtr); }
+    void Window::Destroy() { 
+        glfwDestroyWindow(s_WindowPtr);
+        GraphicsContext::Destroy();
+    }
 
     void Window::Update()
     {

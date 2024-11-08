@@ -9,6 +9,7 @@ namespace Engine
     template <typename T, typename... Args>
     T* Allocator::Allocate(Args&&... args)
     {
+
         auto ptr = new T(std::forward<Args>(args)...);
         LOG_MEMORY_ALLOC("Allocated %ziB\n", sizeof(T));
 
@@ -21,10 +22,10 @@ namespace Engine
     inline T* Allocator::AllocateArray(size_t size)
     {
         auto ptr = new T[size];
-        LOG_MEMORY_ALLOC("Allocated %ziB\n", sizeof(T));
+        LOG_MEMORY_ALLOC("Allocated %ziB\n", sizeof(T) * size);
 
-        s_AllocatedMemorySize += sizeof(T);
-        s_AllocatedMemory[ptr] = sizeof(T);
+        s_AllocatedMemorySize += size * sizeof(T);
+        s_AllocatedMemory[ptr] = size * sizeof(T);
         return ptr;
     }
 
@@ -54,6 +55,7 @@ namespace Engine
     template <typename T>
     void Allocator::DeallocateArray(T* instance)
     {
+
         if (s_AllocatedMemory.find(instance) != s_AllocatedMemory.end())
         {
             s_AllocatedMemorySize -= s_AllocatedMemory[instance];
@@ -83,6 +85,5 @@ namespace Engine
 
         return size;
     }
-
 
 }// namespace Engine

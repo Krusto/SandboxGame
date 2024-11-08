@@ -32,6 +32,8 @@ namespace Engine
         template <typename T>
         static size_t Copy(T* destination, T* source, size_t size);
 
+        static void AnalyzeMemory();
+
     private:
         inline static size_t s_AllocatedMemorySize{};
         inline static std::unordered_map<void*, size_t> s_AllocatedMemory{};

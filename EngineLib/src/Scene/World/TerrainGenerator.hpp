@@ -1,25 +1,33 @@
 #include "ChunkConstraints.hpp"
-#include "ChunkData.hpp"
+#include "BlockData.hpp"
+#include "TerrainShape.hpp"
 
-struct TerrainGenerationSettings {
-    uint32_t Seed;
-};
+#include <filesystem>
 
-class TerrainGenerator
+namespace Engine
 {
-public:
-    TerrainGenerator() = default;
-    ~TerrainGenerator() = default;
 
-public:
-    void Init(TerrainGenerationSettings settings);
-    void Destroy();
-    void GenerateTerrainShape(TerrainShapeData* shapeData, glm::ivec3 chunkPosition);
+    struct TerrainGenerationSettings {
+        uint32_t Seed{};
+        std::filesystem::path AssetsDirectory;
+    };
 
-    TerrainGenerationSettings GetSettings() const;
+    class TerrainGenerator
+    {
+    public:
+        TerrainGenerator() = default;
+        ~TerrainGenerator() = default;
 
-    uint32_t GetSeed() const;
+    public:
+        void Init(TerrainGenerationSettings settings);
+        void Destroy();
+        void GenerateTerrainShape(TerrainShape* shapeData, glm::ivec3 chunkPosition) const;
+        void GenerateBlocks(const TerrainShape* shapeData, BlockData* data, glm::ivec3 chunkPosition) const;
+        TerrainGenerationSettings GetSettings() const;
 
-private:
-    TerrainGenerationSettings m_Settings;
-};
+        uint32_t GetSeed() const;
+
+    private:
+        TerrainGenerationSettings m_Settings;
+    };
+}// namespace Engine

@@ -7,12 +7,19 @@
 
 namespace Engine
 {
-    void World::Init(TerrainGenerationSettings settings)
+    void World::Init(TerrainGenerationSettings settings, std::filesystem::path texturesDirectory)
     {
+        BlockRegistry::Init();
+        std::unordered_map<uint32_t, std::string> texturePaths = BlockRegistry::AssignTexturesToIndices();
+
+        for (auto& path: texturePaths) { path.second.insert(0, texturesDirectory.string() + "/"); }
+
+        m_BlockTextures.Load("BlockTextures", texturePaths);
+
         m_ChunkFactory.Init(settings);
 
         glm::ivec3 currentChunkPos = glm::ivec3(0, 0, 0);
-        uint32_t worldSize = 4;
+        uint32_t worldSize = 8;
 
         for (int z = 0; z < worldSize; z++)
         {
@@ -20,20 +27,15 @@ namespace Engine
             {
                 currentChunkPos = glm::ivec3(x, 0, z);
 
-                m_ChunksShapeData[currentChunkPos] = m_ChunkFactory.GenerateTerrainShapeData(currentChunkPos);
-                m_ChunksBlockData[currentChunkPos] = m_ChunkFactory.GenerateBlockData();
-
-                m_ChunksMeshes[currentChunkPos] = ChunkMeshFactory::Generate(m_ChunksShapeData[currentChunkPos]);
+                m_Chunks[currentChunkPos] = m_ChunkFactory.GenerateChunk(currentChunkPos);
             }
         }
     }
 
     void World::Destroy()
     {
-        for (auto& [pos, shapeData]: m_ChunksShapeData) { m_ChunkFactory.DestroyTerrainShapeData(shapeData); }
-        for (auto& [pos, blockData]: m_ChunksBlockData) { m_ChunkFactory.DestroyBlockData(blockData); }
-
-        for (auto& [pos, mesh]: m_ChunksMeshes) { ChunkMeshFactory::Destroy(mesh); }
+        for (auto& [pos, chunk]: m_Chunks) { m_ChunkFactory.DestroyChunk(chunk); }
+        BlockRegistry::Destroy();
     }
 
     void World::OnUpdate(float dt) { m_Time += dt * 1000; };
@@ -42,28 +44,30 @@ namespace Engine
     {
         if (shader)
         {
-            // model = glm::rotate(model, glm::radians(m_Time), glm::vec3(0.0f, 1.0f, 0.0f));
-            glm::mat4 model = glm::mat4(1.0f);
-            model *= glm::scale(glm::mat4(1.0f), {1, 1, 1});
+            Renderer::Submit(BeginRenderingWorld(shader, &m_BlockTextures));
 
-            for (auto& [pos, mesh]: m_ChunksMeshes)
+            for (auto& [pos, chunk]: m_Chunks)
             {
-                auto va = mesh->GetVertexArray();
-
-                Renderer::Submit(
-                        GetRenderCommand(shader, va, model, glm::vec3{pos.x * CHUNK_SIZE, 0, pos.z * CHUNK_SIZE}));
+                Renderer::Submit(RenderChunk(shader, chunk.mesh->GetVertexArray(), pos));
             }
         }
     }
 
-    RendererCommand World::GetRenderCommand(const Shader* const shader, const VertexArray* const va,
-                                            const glm::mat4& model, glm::vec3 pos) const
+    RendererCommand World::BeginRenderingWorld(const Shader* shader, const TextureArray* textures) const
     {
-        return RendererCommand([shader, va, model, pos]() {
+        return RendererCommand([shader, textures]() {
             shader->Bind();
+            textures->Bind();
+        });
+    }
+
+    RendererCommand World::RenderChunk(const Shader* shader, const VertexArray* va, glm::vec3 pos) const
+    {
+        return RendererCommand([shader, va, pos]() {
+            glm::mat4 model(1.0);
             shader->SetUniform("model", model);
+            shader->SetUniform("offset", glm::vec3{pos.x * CHUNK_SIZE, 0, pos.z * CHUNK_SIZE});
             va->Bind();
-            shader->SetUniform("offset", pos);
             glDrawElements(GL_TRIANGLES, va->IndexCount, GL_UNSIGNED_INT, nullptr);
             va->Unbind();
         });
