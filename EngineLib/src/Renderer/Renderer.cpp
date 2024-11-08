@@ -36,6 +36,7 @@ namespace Engine
 
     void Renderer::Init(RendererSpec rendererSpec, ApplicationSpec applicationSpec)
     {
+
         s_RendererAPI = Allocator::Allocate<OpenGLRenderer>();
 
         if (s_RendererAPI) s_RendererAPI->Init(rendererSpec, applicationSpec);

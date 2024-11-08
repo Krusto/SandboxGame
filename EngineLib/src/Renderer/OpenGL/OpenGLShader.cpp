@@ -31,6 +31,7 @@ namespace Engine
 
     OpenGLShader* OpenGLShader::CreateFromString(const std::string& source)
     {
+
         OpenGLShader* shader = Allocator::Allocate<OpenGLShader>();
         shader->Load(source, true);
         return shader;
@@ -102,7 +103,9 @@ namespace Engine
             GLsizei charsWritten = 0;
             std::cout << onfail << std::endl;
             glGetShaderInfoLog(id, infologLength, &charsWritten, buffer.data());
-            std::cout << buffer.data() << std::endl;
+
+            LOG_ERROR("%s\n", buffer.data());
+            // std::cout << buffer.data() << std::endl;
         }
     }
 

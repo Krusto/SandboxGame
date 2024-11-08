@@ -2,11 +2,8 @@
 #include <glad/glad.h>
 #include <glm/gtx/hash.hpp>
 #include <unordered_map>
-#include <Renderer/VertexArray.hpp>
-#include <Renderer/Shader.hpp>
-#include <Renderer/RendererCommand.hpp>
+#include <Renderer/Renderer.hpp>
 #include "ChunkFactory.hpp"
-#include "ChunkMeshFactory.hpp"
 
 namespace Engine
 {
@@ -17,7 +14,7 @@ namespace Engine
         ~World() = default;
 
     public:
-        void Init(TerrainGenerationSettings settings);
+        void Init(TerrainGenerationSettings settings, std::filesystem::path texturesDirectory);
 
         void Destroy();
 
@@ -28,16 +25,18 @@ namespace Engine
         void Generate();
 
     private:
-        RendererCommand GetRenderCommand(const Shader* const shader, const VertexArray* const va,
-                                         const glm::mat4& model , glm::vec3 pos) const;
+        RendererCommand BeginRenderingWorld(const Shader* shader, const TextureArray* textures) const;
+
+        RendererCommand RenderChunk(const Shader* shader, const VertexArray* va, glm::vec3 pos) const;
 
     private:
-        float m_Time;
+        Engine::TextureArray m_BlockTextures;
 
         ChunkFactory m_ChunkFactory;
-        std::unordered_map<glm::ivec3, ChunkData*> m_ChunksBlockData;
-        std::unordered_map<glm::ivec3, TerrainShapeData*> m_ChunksShapeData;
-        std::unordered_map<glm::ivec3, ChunkMesh*> m_ChunksMeshes;
+
+        std::unordered_map<glm::ivec3, Chunk> m_Chunks;
+
+        float m_Time;
     };
 
 

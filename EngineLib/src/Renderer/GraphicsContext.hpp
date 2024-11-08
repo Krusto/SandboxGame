@@ -11,6 +11,7 @@ public:
 
 public:
     static GraphicsContext* Create(GLFWwindow* window);
+    static void Destroy();
 
 public:
     virtual ~GraphicsContext() = default;

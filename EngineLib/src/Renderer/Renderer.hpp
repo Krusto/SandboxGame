@@ -13,6 +13,7 @@
 #include "Viewport.hpp"
 #include "Shader.hpp"
 #include "Camera.hpp"
+#include "TextureArray.hpp"
 
 #include <Renderer/GraphicsContext.hpp>
 #include <Renderer/RendererCommand.hpp>

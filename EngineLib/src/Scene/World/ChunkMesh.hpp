@@ -1,44 +1,56 @@
 #pragma once
-#include "ChunkData.hpp"
 #include <vector>
 #include <array>
 #include <Renderer/VertexArray.hpp>
+
+#include "BlockRegistry.hpp"
+#include "BlockData.hpp"
 #include "VoxelVertex.hpp"
 
-struct Quad {
-    uint64_t x, y, w, h;
-};
-
-class ChunkMesh
+namespace Engine
 {
-public:
-    ChunkMesh() = default;
-    ~ChunkMesh() = default;
 
-public:
-    void Destroy();
-    void Generate(const TerrainShapeData* chunkData);
+    struct Quad {
+        uint64_t x, y, w, h;
+    };
 
-    const Engine::VertexArray* GetVertexArray() const { return m_VertexArray; }
+    class ChunkMesh
+    {
+    public:
+        ChunkMesh() = default;
+        ~ChunkMesh() = default;
 
-private:
-private:
-    void GenerateVertexData(const TerrainShapeData* chunkData, std::vector<VoxelVertex>& vertices,
-                            std::vector<uint32_t>& indices, uint32_t& maxIndex);
+    public:
+        void Destroy();
+        void Generate(const BlockData* blockData);
 
-    std::vector<Quad> BinaryGreedyMesherPlane(uint32_t* faceData, uint32_t axis);
+        const Engine::VertexArray* GetVertexArray() const { return m_VertexArray; }
 
-    void GenerateVertexDataStupid(const TerrainShapeData* chunkData, std::vector<VoxelVertex>& vertices,
-                                  std::vector<uint32_t>& indices, uint32_t& maxIndex);
+    private:
+    private:
+        void GenerateVertexData(const BlockData* blockData, std::vector<VoxelVertex>& vertices,
+                                std::vector<uint32_t>& indices, uint32_t& maxIndex);
 
-    void InsertFace(std::vector<VoxelVertex>& vertices, std::vector<uint32_t>& indices, uint32_t& maxIndex,
-                    const std::array<VoxelVertex, 4>& verticesToAdd, glm::vec3 position, glm::vec3 scale = {1, 1, 1});
+        std::vector<Quad> BinaryGreedyMesherPlane(uint32_t* faceData, uint32_t axis);
 
-    std::array<VoxelVertex, 4> GetVertex(uint32_t axis, const Quad& quad, uint32_t z);
+        void GenerateVertexDataStupid(const BlockData* blockData, std::vector<VoxelVertex>& vertices,
+                                      std::vector<uint32_t>& indices, uint32_t& maxIndex);
 
-private:
-    static void GenerateFaceLayer(const TerrainShapeData* chunkData, uint32_t axis, uint32_t* data);
+        void InsertFaceStupid(std::vector<VoxelVertex>& vertices, std::array<VoxelVertex, 4> verticesToAdd,
+                              glm::vec3 position, uint8_t block = BlockType::GRASS);
 
-private:
-    Engine::VertexArray* m_VertexArray;
-};
+        void InsertFace(std::vector<VoxelVertex>& vertices, std::array<VoxelVertex, 4>& verticesToAdd,
+                        glm::vec3 position, uint8_t block = BlockType::GRASS, glm::vec2 tiling = {1, 1},
+                        glm::vec3 scale = {1, 1, 1});
+
+        void GenerateIndices(std::vector<uint32_t>& indices, uint32_t numQuads);
+
+        std::array<VoxelVertex, 4> GetVertices(uint32_t axis, const Quad& quad, uint32_t z);
+
+    private:
+        static void GenerateFaceLayer(const BlockData* blockData, uint32_t axis, uint32_t* data);
+
+    private:
+        Engine::VertexArray* m_VertexArray;
+    };
+}// namespace Engine

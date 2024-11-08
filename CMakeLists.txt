@@ -59,6 +59,8 @@ endif()
 if (WIN32)
     target_compile_definitions(EngineLib PRIVATE GLFW_EXPOSE_NATIVE_WIN32)
     
+    target_compile_options(EngineLib PRIVATE /MP)
+
 else ()
     find_package(X11 REQUIRED)
     link_libraries(${X11_LIBRARIES})
@@ -69,7 +71,7 @@ endif ()
 target_compile_definitions(EngineLib
     PUBLIC
     $<$<CONFIG:Debug>:ENGINE_ENABLE_VERBOSE_LOG>
-    $<$<CONFIG:Debug>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
+    # $<$<CONFIG:Debug>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
     $<$<CONFIG:Release>:_RELEASE>
 
     $<$<CONFIG:RelWithDebInfo>:_DEBUG>

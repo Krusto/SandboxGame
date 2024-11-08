@@ -1,10 +1,14 @@
 #pragma once
 
-#include "ChunkData.hpp"
+#include "Chunk.hpp"
+#include "BlockData.hpp"
+#include "TerrainShape.hpp"
+#include "ChunkMesh.hpp"
 #include "TerrainGenerator.hpp"
 
 namespace Engine
 {
+
     class ChunkFactory
     {
     public:
@@ -14,10 +18,15 @@ namespace Engine
     public:
         void Init(TerrainGenerationSettings settings);
 
-        ChunkData* GenerateBlockData();
-        void DestroyBlockData(ChunkData* data);
-        TerrainShapeData* GenerateTerrainShapeData(glm::ivec3 chunkPosition);
-        void DestroyTerrainShapeData(TerrainShapeData* data);
+        Chunk GenerateChunk(glm::ivec3 chunkPosition) const;
+        void DestroyChunk(Chunk chunk) const;
+
+        BlockData* GenerateBlockData(TerrainShape* shapeData, glm::ivec3 chunkPosition) const;
+        void DestroyBlockData(BlockData* data) const;
+        TerrainShape* GenerateTerrainShape(glm::ivec3 chunkPosition) const;
+        void DestroyTerrainShape(TerrainShape* data) const;
+        ChunkMesh* GenerateChunkMesh(BlockData* blockData) const;
+        void DestroyChunkMesh(ChunkMesh* mesh) const;
 
     private:
         TerrainGenerator m_Generator;
