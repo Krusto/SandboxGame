@@ -10,8 +10,8 @@ namespace Engine
     {
         inline constexpr uint32_t AIR = 0;
         inline constexpr uint32_t STONE = 1;
-        inline constexpr uint32_t GRASS = 2;
-        inline constexpr uint32_t DIRT = 3;
+        inline constexpr uint32_t DIRT = 2;
+        inline constexpr uint32_t GRASS = 3;
         inline constexpr uint32_t COBBLESTONE = 4;
         inline constexpr uint32_t WOOD = 5;
         inline constexpr uint32_t SAPLING = 6;

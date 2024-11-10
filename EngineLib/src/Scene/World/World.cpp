@@ -19,7 +19,7 @@ namespace Engine
         m_ChunkFactory.Init(settings);
 
         glm::ivec3 currentChunkPos = glm::ivec3(0, 0, 0);
-        uint32_t worldSize = 8;
+        uint32_t worldSize = 10;
 
         for (int z = 0; z < worldSize; z++)
         {
@@ -48,7 +48,7 @@ namespace Engine
 
             for (auto& [pos, chunk]: m_Chunks)
             {
-                Renderer::Submit(RenderChunk(shader, chunk.mesh->GetVertexArray(), pos));
+                Renderer::Submit(RenderChunk(shader, chunk.mesh->GetVertexArray(), chunk.mesh->GetBuffer(), pos));
             }
         }
     }
@@ -61,9 +61,11 @@ namespace Engine
         });
     }
 
-    RendererCommand World::RenderChunk(const Shader* shader, const VertexArray* va, glm::vec3 pos) const
+    RendererCommand World::RenderChunk(const Shader* shader, const VertexArray* va, const StorageBuffer* blocks,
+                                       glm::vec3 pos) const
     {
-        return RendererCommand([shader, va, pos]() {
+        return RendererCommand([shader, va, pos, blocks]() {
+            blocks->Bind();
             glm::mat4 model(1.0);
             shader->SetUniform("model", model);
             shader->SetUniform("offset", glm::vec3{pos.x * CHUNK_SIZE, 0, pos.z * CHUNK_SIZE});
