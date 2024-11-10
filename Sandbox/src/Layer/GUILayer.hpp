@@ -1,13 +1,13 @@
-﻿#pragma once
+#pragma once
 #include <memory>
 #include <Engine.hpp>
 
-class SandboxLayer: public Engine::Layer
+class GUILayer: public Engine::Layer
 {
 public:
-    SandboxLayer() = default;
-    explicit SandboxLayer(const Engine::ApplicationSpec& spec);
-    ~SandboxLayer() = default;
+    GUILayer() = default;
+    explicit GUILayer(const Engine::ApplicationSpec& spec);
+    ~GUILayer() = default;
 
 public:
     void Init(Ref<Engine::Window> window) override;
@@ -41,12 +41,6 @@ public:
     void End() override {}
 
 protected:
-    Ref<Engine::Window> m_Window;
-    Ref<Engine::Shader> m_Shader;
-    std::unique_ptr<Engine::World> m_World;
-
-    Engine::Camera m_Camera;
-
     double m_DeltaTime = 0.0f;
 
     ViewportSize m_ViewportSize;

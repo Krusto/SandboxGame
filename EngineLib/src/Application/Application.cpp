@@ -4,27 +4,41 @@
 
 #include "Application.hpp"
 #include <Renderer/RendererAPI.hpp>
+#include <chrono>
 
 Engine::Application* Engine::Application::s_Application;
+
+inline static double GetTime()
+{
+    auto before_time = std::chrono::high_resolution_clock::now();
+    return std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(before_time.time_since_epoch())
+            .count();
+}
 
 void Engine::Application::Run()
 {
 
     LayerStack::InitLayers(m_Window);
 
-    float dt = 0, before, after;
+    double dt = 0, before, after;
     while (!m_Window->ShouldClose())
     {
+        before = GetTime();
+        auto imgui = LayerStack::GetLayer("GUILayer");
+        imgui->OnImGuiBegin();
         for (auto& layer: LayerStack::data())
         {
-            before = (float) glfwGetTime();
-            layer->OnImGuiDraw();
-            layer->OnUpdate(dt);
-
-            after = (float) glfwGetTime();
-            dt = after - before;
+            if (layer->GetName() != "GUILayer")
+            {
+                layer->OnImGuiDraw();
+                layer->OnUpdate(dt);
+            }
         }
+        imgui->OnImGuiEnd();
         m_Window->Update();
+        after = GetTime();
+
+        dt = after - before;
     }
 }
 

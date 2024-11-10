@@ -18,7 +18,7 @@ namespace Engine
 
         void Destroy();
 
-        void OnUpdate(float dt);
+        void OnUpdate(double dt);
 
         void Draw(Shader* shader) const;
 
