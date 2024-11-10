@@ -4,6 +4,7 @@
 
 #include <Engine.hpp>
 #include <Layer/SandboxLayer.hpp>
+#include <Layer/GUILayer.hpp>
 #include <iostream>
 
 using namespace Engine;
@@ -11,7 +12,11 @@ using namespace Engine;
 class Sandbox: public Engine::Application
 {
 public:
-    Sandbox(const ApplicationSpec& spec) { Engine::LayerStack::ConstructAndPushLayer<SandboxLayer>(spec); }
+    Sandbox(const ApplicationSpec& spec)
+    {
+        Engine::LayerStack::ConstructAndPushLayer<GUILayer>(spec);
+        Engine::LayerStack::ConstructAndPushLayer<SandboxLayer>(spec);
+    }
 
     ~Sandbox() { Engine::LayerStack::DestroyLayers(); }
 };

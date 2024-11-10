@@ -56,9 +56,11 @@ namespace Engine
         glfwSetKeyCallback(this->s_WindowPtr, _WindowKeyCallback);
         glfwSetCursorPosCallback(this->s_WindowPtr, _WindowMouseMoveCallback);
         glfwSetScrollCallback(this->s_WindowPtr, _WindowMouseScrollCallback);
+        glfwSwapInterval(1);
     }
 
-    void Window::Destroy() { 
+    void Window::Destroy()
+    {
         glfwDestroyWindow(s_WindowPtr);
         GraphicsContext::Destroy();
     }

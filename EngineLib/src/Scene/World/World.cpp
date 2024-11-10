@@ -19,7 +19,7 @@ namespace Engine
         m_ChunkFactory.Init(settings);
 
         glm::ivec3 currentChunkPos = glm::ivec3(0, 0, 0);
-        uint32_t worldSize = 10;
+        uint32_t worldSize = 3;
 
         for (int z = 0; z < worldSize; z++)
         {
@@ -38,7 +38,7 @@ namespace Engine
         BlockRegistry::Destroy();
     }
 
-    void World::OnUpdate(float dt) { m_Time += dt * 1000; };
+    void World::OnUpdate(double dt) { m_Time += dt * 1000; };
 
     void World::Draw(Shader* shader) const
     {

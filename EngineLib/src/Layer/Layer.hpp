@@ -18,13 +18,17 @@ namespace Engine
 
         virtual void OnAttach() = 0;
 
-        virtual void OnUpdate(float dt) = 0;
+        virtual void OnUpdate(double dt) = 0;
 
         virtual void OnDetach() = 0;
 
         virtual void Destroy() = 0;
 
+        virtual void OnImGuiBegin() = 0;
+
         virtual void OnImGuiDraw() = 0;
+
+        virtual void OnImGuiEnd() = 0;
 
         virtual void OnMouseMoveEvent(int width, int height) = 0;
 

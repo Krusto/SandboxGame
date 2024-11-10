@@ -14,13 +14,17 @@ public:
 
     void OnAttach() override;
 
-    void OnUpdate(float dt) override;
+    void OnUpdate(double dt) override;
 
     void OnDetach() override;
 
     void Destroy() override;
 
+    void OnImGuiBegin() override;
+
     void OnImGuiDraw() override;
+
+    void OnImGuiEnd() override;
 
     void OnMouseMoveEvent(int width, int height) override;
 
@@ -37,12 +41,13 @@ public:
     void End() override {}
 
 protected:
+    Ref<Engine::Window> m_Window;
     Ref<Engine::Shader> m_Shader;
     std::unique_ptr<Engine::World> m_World;
 
     Engine::Camera m_Camera;
 
-    float m_DeltaTime = 0.0f;
+    double m_DeltaTime = 0.0f;
 
     ViewportSize m_ViewportSize;
     Engine::ApplicationSpec m_AppSpec;

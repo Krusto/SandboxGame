@@ -45,7 +45,7 @@ namespace Engine
 
         void ChangeViewport(uint32_t width, uint32_t height);
 
-        void Update(float dt);
+        void Update(double dt, double rotationSpeed, double moveSpeed);
 
         const auto& GetView() const { return this->m_View; }
 
@@ -84,7 +84,7 @@ namespace Engine
 
         void ProcessMouseMovement(float x, float y, float sensitivity = 1, bool constrainPitch = true);
 
-        void ProcessKeyboardInput(int action, int key, float speed);
+        void ProcessKeyboardInput(int action, int key, bool spacePressed,bool shiftPressed);
 
         void ProcessMouseScroll(float y, double speed = 1);
 
@@ -103,6 +103,7 @@ namespace Engine
         bool startetScrollEvent{};
         double m_ScrollValue{0.0f};
 
+        double m_MoveDownUp{};
         glm::vec3 m_MoveVector{};
         glm::vec3 m_RotateVector{};
 
