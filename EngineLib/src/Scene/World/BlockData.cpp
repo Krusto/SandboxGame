@@ -9,8 +9,6 @@ namespace Engine
 {
     void BlockData::Init(uint32_t seed)
     {
-
-
         m_Data = Engine::Allocator::AllocateArray<uint8_t>(CHUNK_SIZE_CUBIC);
         for (size_t i = 0; i < CHUNK_SIZE_CUBIC; i++) { m_Data[i] = 0; }
     }
@@ -62,4 +60,6 @@ namespace Engine
     uint8_t* BlockData::RawData() { return m_Data; }
 
     const uint8_t* BlockData::RawData() const { return m_Data; }
+
+    const size_t BlockData::Size() const { return CHUNK_SIZE_CUBIC; }
 }// namespace Engine

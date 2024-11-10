@@ -27,7 +27,8 @@ namespace Engine
     private:
         RendererCommand BeginRenderingWorld(const Shader* shader, const TextureArray* textures) const;
 
-        RendererCommand RenderChunk(const Shader* shader, const VertexArray* va, glm::vec3 pos) const;
+        RendererCommand RenderChunk(const Shader* shader, const VertexArray* va, const StorageBuffer* blocks,
+                                    glm::vec3 pos) const;
 
     private:
         Engine::TextureArray m_BlockTextures;

@@ -2,10 +2,13 @@
 #include <algorithm>
 #include <Core/Allocator.hpp>
 #include <Core/Log.hpp>
+#include <mutex>
 #include "Allocator.hpp"
 
 namespace Engine
 {
+    inline static std::mutex s_AllocatorMutex{};
+
     template <typename T, typename... Args>
     T* Allocator::Allocate(Args&&... args)
     {
@@ -13,6 +16,7 @@ namespace Engine
         auto ptr = new T(std::forward<Args>(args)...);
         LOG_MEMORY_ALLOC("Allocated %ziB\n", sizeof(T));
 
+        std::lock_guard<std::mutex> lock(s_AllocatorMutex);
         s_AllocatedMemorySize += sizeof(T);
         s_AllocatedMemory[ptr] = sizeof(T);
         return ptr;
@@ -21,6 +25,7 @@ namespace Engine
     template <typename T>
     inline T* Allocator::AllocateArray(size_t size)
     {
+        std::lock_guard<std::mutex> lock(s_AllocatorMutex);
         auto ptr = new T[size];
         LOG_MEMORY_ALLOC("Allocated %ziB\n", sizeof(T) * size);
 
@@ -34,6 +39,7 @@ namespace Engine
     {
         if (instance)
         {
+            std::lock_guard<std::mutex> lock(s_AllocatorMutex);
             auto [ignore, inserted] = s_AllocatedMemory.try_emplace(instance, size);
             if (inserted) { s_AllocatedMemorySize += size; }
         }
@@ -42,6 +48,7 @@ namespace Engine
     template <typename T>
     void Allocator::Deallocate(T* instance)
     {
+        std::lock_guard<std::mutex> lock(s_AllocatorMutex);
         if (s_AllocatedMemory.find(instance) != s_AllocatedMemory.end())
         {
             s_AllocatedMemorySize -= s_AllocatedMemory[instance];
@@ -56,6 +63,7 @@ namespace Engine
     void Allocator::DeallocateArray(T* instance)
     {
 
+        std::lock_guard<std::mutex> lock(s_AllocatorMutex);
         if (s_AllocatedMemory.find(instance) != s_AllocatedMemory.end())
         {
             s_AllocatedMemorySize -= s_AllocatedMemory[instance];
@@ -69,6 +77,7 @@ namespace Engine
     template <typename T>
     bool Allocator::IsLive(T* instance)
     {
+        std::lock_guard<std::mutex> lock(s_AllocatorMutex);
         return s_AllocatedMemory.find(instance) != s_AllocatedMemory.end();
     }
 

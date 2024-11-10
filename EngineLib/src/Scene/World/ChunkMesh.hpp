@@ -2,6 +2,7 @@
 #include <vector>
 #include <array>
 #include <Renderer/VertexArray.hpp>
+#include <Renderer/StorageBuffer.hpp>
 
 #include "BlockRegistry.hpp"
 #include "BlockData.hpp"
@@ -26,12 +27,14 @@ namespace Engine
 
         const Engine::VertexArray* GetVertexArray() const { return m_VertexArray; }
 
-    private:
-    private:
-        void GenerateVertexData(const BlockData* blockData, std::vector<VoxelVertex>& vertices,
-                                std::vector<uint32_t>& indices, uint32_t& maxIndex);
+        const Engine::StorageBuffer* GetBuffer() const { return m_Buffer; }
 
-        std::vector<Quad> BinaryGreedyMesherPlane(uint32_t* faceData, uint32_t axis);
+    private:
+    private:
+        void GenerateVertexData(const BlockData* blockData, std::vector<uint8_t>& blocks,
+                                std::vector<VoxelVertex>& vertices, std::vector<uint32_t>& indices);
+
+        static std::vector<Quad> BinaryGreedyMesherPlane(uint32_t* faceData, uint32_t axis);
 
         void GenerateVertexDataStupid(const BlockData* blockData, std::vector<VoxelVertex>& vertices,
                                       std::vector<uint32_t>& indices, uint32_t& maxIndex);
@@ -39,18 +42,18 @@ namespace Engine
         void InsertFaceStupid(std::vector<VoxelVertex>& vertices, std::array<VoxelVertex, 4> verticesToAdd,
                               glm::vec3 position, uint8_t block = BlockType::GRASS);
 
-        void InsertFace(std::vector<VoxelVertex>& vertices, std::array<VoxelVertex, 4>& verticesToAdd,
-                        glm::vec3 position, uint8_t block = BlockType::GRASS, glm::vec2 tiling = {1, 1},
-                        glm::vec3 scale = {1, 1, 1});
+        static void InsertFace(std::vector<VoxelVertex>& vertices, std::array<VoxelVertex, 4>& verticesToAdd,
+                               uint8_t block = BlockType::GRASS, glm::vec2 tiling = {1, 1});
 
         void GenerateIndices(std::vector<uint32_t>& indices, uint32_t numQuads);
 
-        std::array<VoxelVertex, 4> GetVertices(uint32_t axis, const Quad& quad, uint32_t z);
+        static std::array<VoxelVertex, 4> GetVertices(uint32_t axis, const Quad& quad, uint32_t z);
 
     private:
         static void GenerateFaceLayer(const BlockData* blockData, uint32_t axis, uint32_t* data);
 
     private:
         Engine::VertexArray* m_VertexArray;
+        StorageBuffer* m_Buffer;
     };
 }// namespace Engine

@@ -11,18 +11,21 @@ namespace Engine
 {
     void ChunkMesh::Generate(const BlockData* blockData)
     {
-        ScopedTimer timer("ChunkMesh::Generate");
+        //ScopedTimer timer("ChunkMesh::Generate");
         std::vector<VoxelVertex> vertices;
         std::vector<uint32_t> indices;
-        uint32_t maxIndex = 0;
+        std::vector<uint8_t> blocks;
 
-        GenerateVertexData(blockData, vertices, indices, maxIndex);
+
+        GenerateVertexData(blockData, blocks, vertices, indices);
 
         m_VertexArray = Engine::VertexArray::Create(indices.size());
         m_VertexArray->Bind();
         m_VertexArray->AddVertexBuffer(
                 Engine::VertexBuffer::Create(VoxelVertex::GetLayout(), (float*) vertices.data(), vertices.size()));
         m_VertexArray->AddIndexBuffer(Engine::IndexBuffer::Create(indices.data(), indices.size()));
+
+        m_Buffer = Engine::StorageBuffer::Create(blocks.data(), blocks.size(), StorageBufferType::MapCoherent);
     }
 
     void ChunkMesh::GenerateFaceLayer(const BlockData* blockData, uint32_t axis, uint32_t* data)
@@ -44,8 +47,8 @@ namespace Engine
         }
     }
 
-    void ChunkMesh::GenerateVertexData(const BlockData* blockData, std::vector<VoxelVertex>& vertices,
-                                       std::vector<uint32_t>& indices, uint32_t& maxIndex)
+    void ChunkMesh::GenerateVertexData(const BlockData* blockData, std::vector<uint8_t>& blocks,
+                                       std::vector<VoxelVertex>& vertices, std::vector<uint32_t>& indices)
     {
 
 
@@ -104,9 +107,60 @@ namespace Engine
             }
         }
 
-        std::vector<std::thread> threads;
+        std::vector<std::future<std::vector<VoxelVertex>*>> threads;
 
         for (size_t axis = 0; axis < 6; axis++)
+        {
+            threads.push_back(std::async(
+                    std::launch::deferred,
+                    [](std::unordered_map<uint8_t, std::unordered_map<uint32_t, std::vector<uint32_t>>>*
+                               planesAtCurrentAxis,
+                       uint32_t axis, std::vector<uint8_t>* blocks) -> std::vector<VoxelVertex>* {
+                        std::vector<VoxelVertex>* vertices = Allocator::Allocate<std::vector<VoxelVertex>>();
+                        for (auto& [block, planes]: *planesAtCurrentAxis)
+                        {
+                            for (auto& [y, plane]: planes)
+                            {
+                                auto quads = BinaryGreedyMesherPlane(&plane[0], axis);
+
+                                for (auto& quad: quads)
+                                {
+                                    uint32_t newY = y;
+                                    std::array<VoxelVertex, 4> vertices_to_add = GetVertices(axis, quad, newY);
+                                    vertices_to_add[0].compressedData |= axis;
+                                    vertices_to_add[1].compressedData |= axis;
+                                    vertices_to_add[2].compressedData |= axis;
+                                    vertices_to_add[3].compressedData |= axis;
+                                    InsertFace(*vertices, vertices_to_add, block, glm::vec2{quad.w, quad.h});
+                                    blocks->push_back(block);
+                                }
+                            }
+                        }
+                        return vertices;
+                    },
+                    &data[axis], axis, &blocks));
+            threads.back().wait();
+        }
+
+        size_t totalSize = 0;
+        std::array<std::vector<VoxelVertex>*, 6> results;
+        for (size_t i = 0; i < 6; i++)
+        {
+            auto& thread = threads[i];
+            results[i] = thread.get();
+            totalSize += results[i]->size();
+        }
+        vertices.reserve(totalSize);
+        for (size_t i = 0; i < 6; i++)
+        {
+            auto result = results[i];
+            if (result)
+            {
+                vertices.insert(vertices.end(), result->begin(), result->end());
+                Allocator::Deallocate(result);
+            }
+        }
+        /* for (size_t axis = 1; axis < 6; axis++)
         {
             auto& planesAtCurrentAxis = data[axis];
             for (auto& [block, planes]: planesAtCurrentAxis)
@@ -129,7 +183,7 @@ namespace Engine
                     }
                 }
             }
-        }
+        }*/
 
         GenerateIndices(indices, vertices.size() / 4);
 
@@ -223,15 +277,12 @@ namespace Engine
     }
 
     void ChunkMesh::InsertFace(std::vector<VoxelVertex>& vertices, std::array<VoxelVertex, 4>& verticesToAdd,
-                               glm::vec3 position, uint8_t block, glm::vec2 tiling, glm::vec3 scale)
+                               uint8_t block, glm::vec2 tiling)
     {
-        std::for_each(verticesToAdd.begin(), verticesToAdd.end(),
-                      [&position, &scale, &tiling, &block](VoxelVertex& vertex) {
-                          vertex.pos = (vertex.pos * scale) + position;
-                          vertex.compressedData = (uint32_t) tiling.x & 0xFF;
-                          vertex.compressedData |= ((uint32_t) tiling.y & 0xFF) << 8;
-                          vertex.compressedData |= ((uint32_t) block & 0xFF) << 16;
-                      });
+        std::for_each(verticesToAdd.begin(), verticesToAdd.end(), [&tiling, &block](VoxelVertex& vertex) {
+            vertex.compressedData |= ((uint32_t) tiling.x & 0xFF) << 8;
+            vertex.compressedData |= ((uint32_t) tiling.y & 0xFF) << 16;
+        });
 
         vertices.insert(vertices.end(), verticesToAdd.begin(), verticesToAdd.end());
     }
@@ -253,60 +304,24 @@ namespace Engine
     std::array<VoxelVertex, 4> ChunkMesh::GetVertices(uint32_t axis, const Quad& quad, uint32_t z)
     {
         std::array<VoxelVertex, 4> vertices{};
-        if (axis == 0)
+        for (uint32_t i = 0; i < 4; i++)
         {
-            vertices[0].pos = glm::vec3{quad.x, z, quad.y + quad.h};
-            vertices[1].pos = glm::vec3{quad.x, z, quad.y};
-            vertices[2].pos = glm::vec3{quad.x + quad.w, z, quad.y};
-            vertices[3].pos = glm::vec3{quad.x + quad.w, z, quad.y + quad.h};
+            if (axis % 2 == 0) { vertices[i].pos.z = z; }
+            else { vertices[i].pos.z = z + 1; }
+            vertices[i].pos.x = quad.x;
+            vertices[i].pos.y = quad.y;
+            vertices[i].compressedData = axis;
         }
-        else if (axis == 1)
-        {
-
-            vertices[0].pos = glm::vec3{quad.x, z + 1, quad.y + quad.h};
-            vertices[1].pos = glm::vec3{quad.x, z + 1, quad.y};
-            vertices[2].pos = glm::vec3{quad.x + quad.w, z + 1, quad.y};
-            vertices[3].pos = glm::vec3{quad.x + quad.w, z + 1, quad.y + quad.h};
-        }
-        else if (axis == 2)
-        {
-            vertices[0].pos = glm::vec3{z, quad.y, quad.x};
-            vertices[1].pos = glm::vec3{z, quad.y + quad.h, quad.x};
-            vertices[2].pos = glm::vec3{z, quad.y + quad.h, quad.x + quad.w};
-            vertices[3].pos = glm::vec3{z, quad.y, quad.x + quad.w};
-        }
-        else if (axis == 3)
-        {
-            vertices[0].pos = glm::vec3{z + 1, quad.y, quad.x};
-            vertices[1].pos = glm::vec3{z + 1, quad.y + quad.h, quad.x};
-            vertices[2].pos = glm::vec3{z + 1, quad.y + quad.h, quad.x + quad.w};
-            vertices[3].pos = glm::vec3{z + 1, quad.y, quad.x + quad.w};
-        }
-        else if (axis == 5)
-        {
-            vertices[0].pos = glm::vec3{quad.x, quad.y + quad.h, z + 1};
-            vertices[1].pos = glm::vec3{quad.x, quad.y, z + 1};
-            vertices[2].pos = glm::vec3{quad.x + quad.w, quad.y, z + 1};
-            vertices[3].pos = glm::vec3{quad.x + quad.w, quad.y + quad.h, z + 1};
-        }
-        else if (axis == 4)
-        {
-            vertices[0].pos = glm::vec3{quad.x, quad.y + quad.h, z};
-            vertices[1].pos = glm::vec3{quad.x, quad.y, z};
-            vertices[2].pos = glm::vec3{quad.x + quad.w, quad.y, z};
-            vertices[3].pos = glm::vec3{quad.x + quad.w, quad.y + quad.h, z};
-        }
-        vertices[0].axis = axis;
-        vertices[1].axis = axis;
-        vertices[2].axis = axis;
-        vertices[3].axis = axis;
         return vertices;
     }
 
     void ChunkMesh::Destroy()
     {
         m_VertexArray->Destroy();
+        m_Buffer->Destroy();
         Engine::Allocator::Deallocate(m_VertexArray);
+        Engine::Allocator::Deallocate(m_Buffer);
         m_VertexArray = nullptr;
+        m_Buffer = nullptr;
     }
 }// namespace Engine

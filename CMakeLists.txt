@@ -2,14 +2,22 @@ cmake_minimum_required(VERSION 3.20)
 
 project(SandboxGame)
 
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared library" FORCE)
+set(FASTNOISE2_NOISETOOL OFF CACHE BOOL "Build noise tool" FORCE)
+set(FASTNOISE2_TESTS OFF CACHE BOOL "Build noise tests" FORCE)
+
 set(CMAKE_CXX_STANDARD 23)
 message("Compiler Version: ${CMAKE_CXX_COMPILER_VERSION}")
 
 message("${PROJECT_NAME}: Adding yaml-cpp...")
 add_subdirectory("${CMAKE_SOURCE_DIR}/Vendor/yaml-cpp")
 
+
 message("${PROJECT_NAME}: Adding glfw...")
 add_subdirectory("${CMAKE_SOURCE_DIR}/Vendor/glfw-3.4")
+
+message("${PROJECT_NAME}: Adding FastNoise2...")
+add_subdirectory("${CMAKE_SOURCE_DIR}/Vendor/FastNoise")
 
 message("${PROJECT_NAME}: Adding source files")
 file(GLOB_RECURSE GLAD_SOURCE_FILES ./Vendor/glad/src/*.c)
@@ -34,6 +42,7 @@ set(IMGUI_BACKENDS_INCLUDE_DIR "./Vendor/imgui/backends")
 set(GLFW_INCLDUE_DIR           "./Vendor/glfw-3.4/include")
 set(CUTILS_INCLDUE_DIR         "./Vendor/CUtils/include")
 set(PERLIN_INCLUDE_DIR         "./Vendor/PerlinNoise")
+set(FASTNOISE_INCLUDE_DIR         "./Vendor/FastNoise/include")
 
 message("${PROJECT_NAME}: Creating imgui lib")
 add_library(imgui STATIC ${IMGUI_SOURCE_FILES} ${IMGUI_HEADER_FILES})
@@ -70,10 +79,10 @@ endif ()
 
 target_compile_definitions(EngineLib
     PUBLIC
+    FASTNOISE_STATIC_LIB 
     $<$<CONFIG:Debug>:ENGINE_ENABLE_VERBOSE_LOG>
     # $<$<CONFIG:Debug>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
     $<$<CONFIG:Release>:_RELEASE>
-
     $<$<CONFIG:RelWithDebInfo>:_DEBUG>
     $<$<CONFIG:MinSizeRel>:_RELEASE>
 )
@@ -93,6 +102,7 @@ target_include_directories(EngineLib PUBLIC ${GLFW_INCLDUE_DIR})
 target_include_directories(EngineLib PUBLIC ${GLM_INCLDUE_DIR})
 target_include_directories(EngineLib PUBLIC ${CUTILS_INCLDUE_DIR})
 target_include_directories(EngineLib PUBLIC ${PERLIN_INCLUDE_DIR})
+target_include_directories(EngineLib PUBLIC ${FASTNOISE_INCLUDE_DIR})
 
 add_library(EngineInterfaceLibrary INTERFACE)
 
@@ -106,6 +116,7 @@ target_link_libraries(EngineInterfaceLibrary INTERFACE
         imgui
         glad
         CUtils
+        FastNoise 
         )
 target_link_libraries(EngineLib PUBLIC EngineInterfaceLibrary)
 
