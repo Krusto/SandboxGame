@@ -131,7 +131,6 @@ void main()
     uint axis = getAxis();
 
     vec3 blockPosition = getBlockPosition(axis, width, height);
-
     vec4 worldPosition = model * vec4(blockPosition + offset, 1.0);
 
     vec4 posRelToCamera = camera.view * worldPosition;
@@ -145,8 +144,8 @@ void main()
     textureIndex = float(getBlock());
     cameraPos = camera.position;
 
-    float density = 0.004;
-    float gradient = 8;
+    float density = 0.002;
+    float gradient = 5;
     visibility = exp(-pow(density * length(posRelToCamera.xyz), gradient));
     // visibility = 1;
 

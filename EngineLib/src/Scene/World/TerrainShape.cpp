@@ -10,8 +10,6 @@ namespace Engine
 
     void TerrainShape::Init(uint32_t seed)
     {
-
-
         m_Data = Engine::Allocator::AllocateArray<uint32_t>(CHUNK_SIZE_SQUARE);
 
         std::fill_n(m_Data, CHUNK_SIZE_SQUARE, 0);
