@@ -19,7 +19,7 @@ namespace Engine
         m_ChunkFactory.Init(settings);
 
         glm::ivec3 currentChunkPos = glm::ivec3(0, 0, 0);
-        uint32_t worldSize = 3;
+        uint32_t worldSize = 12;
 
         for (int z = 0; z < worldSize; z++)
         {

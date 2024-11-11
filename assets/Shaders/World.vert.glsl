@@ -6,8 +6,10 @@ layout(location = 1) in uint aCompressedData;
 layout(location = 0) out vec3 outColor;
 layout(location = 1) out vec2 texCoord;
 layout(location = 2) out vec3 cameraPos;
-layout(location = 3) out float visibility;
-layout(location = 4) flat out float textureIndex;
+layout(location = 3) out vec3 vertPosition;
+layout(location = 4) out vec3 normal;
+layout(location = 5) out float visibility;
+layout(location = 6) flat out float textureIndex;
 
 struct Camera {
     mat4 projection;
@@ -110,6 +112,17 @@ uint getTilingFactorY() { return (aCompressedData >> 16 & 0xFF); }
 
 uint getAxis() { return aCompressedData & 0xFF; }
 
+vec3 getNormal(uint axis)
+{
+    if (axis == 0) { return vec3(0, -1, 0); }
+    else if (axis == 1) { return vec3(0, 1, 0); }
+    else if (axis == 2) { return vec3(1, 0, 0); }
+    else if (axis == 3) { return vec3(-1, 0, 0); }
+    else if (axis == 4) { return vec3(0, 0, 1); }
+    else if (axis == 5) { return vec3(0, 0, -1); }
+    return vec3(0, 0, 0);
+}
+
 void main()
 {
     uint width = getTilingFactorX();
@@ -132,7 +145,11 @@ void main()
     textureIndex = float(getBlock());
     cameraPos = camera.position;
 
-    float density = 0.015;
-    float gradient = 2.0;
+    float density = 0.004;
+    float gradient = 8;
     visibility = exp(-pow(density * length(posRelToCamera.xyz), gradient));
+    // visibility = 1;
+
+    normal = mat3(transpose(inverse(model))) * vec3(0, -1, 0);
+    vertPosition = worldPosition.xyz;
 }

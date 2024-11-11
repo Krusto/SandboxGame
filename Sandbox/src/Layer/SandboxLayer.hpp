@@ -43,6 +43,7 @@ public:
 protected:
     Ref<Engine::Window> m_Window;
     Ref<Engine::Shader> m_Shader;
+    Engine::Skybox* m_Skybox;
     std::unique_ptr<Engine::World> m_World;
 
     Engine::Camera m_Camera;
@@ -54,4 +55,5 @@ protected:
     std::filesystem::path m_AssetsDirectory;
     std::filesystem::path m_ShadersDirectory;
     std::filesystem::path m_TexturesDirectory;
+    std::filesystem::path m_SkyboxDirectory;
 };
