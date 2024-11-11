@@ -147,8 +147,9 @@ namespace Engine
             auto resultStatus = file_read_string((const int8_t*) path.c_str(), &bufferLen, &buffer);
             if (resultStatus == FILE_READ_SUCCESFULLY)
             {
-                result.resize(bufferLen);
+                result.resize(bufferLen+1);
                 result.assign((const char*) buffer, bufferLen);
+                result[bufferLen] = '\0';
                 free(buffer);
             }
         }

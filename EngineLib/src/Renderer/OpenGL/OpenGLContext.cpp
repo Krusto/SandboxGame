@@ -19,6 +19,16 @@ void OpenGLContext::Init()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    // Enables the Depth Buffer
+    glEnable(GL_DEPTH_TEST);
+
+    // Enables Cull Facing
+    // glEnable(GL_CULL_FACE);
+
+    // Keeps front faces
+    // glCullFace(GL_BACK);
+    // Uses counter clock-wise standard
+    glFrontFace(GL_CCW);
 }
 
 void OpenGLContext::SwapBuffers()

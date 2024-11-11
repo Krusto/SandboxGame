@@ -14,6 +14,8 @@
 #include "Shader.hpp"
 #include "Camera.hpp"
 #include "TextureArray.hpp"
+#include "CubemapTexture.hpp"
+#include "Skybox.hpp"
 
 #include <Renderer/GraphicsContext.hpp>
 #include <Renderer/RendererCommand.hpp>
