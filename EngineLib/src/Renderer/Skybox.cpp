@@ -89,21 +89,12 @@ namespace Engine
             glDepthFunc(GL_LEQUAL);
             shader->Bind();
             shader->SetUniform("skybox", 0);
-            glm::mat4 view = glm::mat4(1.0);
-            glm::mat4 projection = glm::mat4(1.0);
-            view = glm::mat4(glm::mat3(camera->GetView()));
-            // view = glm::mat4(glm::mat3(glm::lookAt(
-            // camera->GetPosition(), camera->GetPosition() + camera->GetVectorForward(), camera->GetVectorUP())));
-            projection = glm::perspective(camera->GetSpec().fov, camera->GetSpec().AspectRatio, camera->GetSpec().Near,
-                                          camera->GetSpec().Far);
-
-            shader->SetUniform("camera.projection", projection);
+            shader->SetUniform("camera.projection", camera->GetProjection());
+            auto view = glm::mat4(glm::mat3(camera->GetView()));
             shader->SetUniform("camera.view", view);
-            // camera->Upload(shader);
-            glActiveTexture(GL_TEXTURE0);
-            cubemap->Bind();
+            
+            cubemap->Bind(0);
             va->Bind();
-            // glDrawArrays(GL_TRIANGLES, 0, 36);
             glDrawElements(GL_TRIANGLES, va->IndexCount, GL_UNSIGNED_INT, nullptr);
             glDepthFunc(GL_LESS);
         });

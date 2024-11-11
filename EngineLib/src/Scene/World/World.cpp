@@ -19,15 +19,17 @@ namespace Engine
         m_ChunkFactory.Init(settings);
 
         glm::ivec3 currentChunkPos = glm::ivec3(0, 0, 0);
-        uint32_t worldSize = 12;
+        uint32_t worldSize = 10;
 
         for (int z = 0; z < worldSize; z++)
         {
             for (int x = 0; x < worldSize; x++)
             {
-                currentChunkPos = glm::ivec3(x, 0, z);
-
-                m_Chunks[currentChunkPos] = m_ChunkFactory.GenerateChunk(currentChunkPos);
+                for (int y = 0; y < worldSize; y++)
+                {
+                    currentChunkPos = glm::ivec3(x, y, z);
+                    m_Chunks[currentChunkPos] = m_ChunkFactory.GenerateChunk(currentChunkPos);
+                }
             }
         }
     }
@@ -68,7 +70,7 @@ namespace Engine
             blocks->Bind();
             glm::mat4 model(1.0);
             shader->SetUniform("model", model);
-            shader->SetUniform("offset", glm::vec3{pos.x * CHUNK_SIZE, 0, pos.z * CHUNK_SIZE});
+            shader->SetUniform("offset", glm::vec3{pos.x * CHUNK_SIZE, pos.y * CHUNK_SIZE, pos.z * CHUNK_SIZE});
             va->Bind();
             glDrawElements(GL_TRIANGLES, va->IndexCount, GL_UNSIGNED_INT, nullptr);
             va->Unbind();
