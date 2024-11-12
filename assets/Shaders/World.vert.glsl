@@ -95,7 +95,7 @@ uint getBlock()
     uint row = quadIndex / 4;
     uint byteIndex = quadIndex % 4;
 
-    return (blocks[row] >> (byteIndex * 8)) & 0xFF - 1;
+    return (blocks[row] >> (byteIndex * 8)) & 0xF + 4;
 }
 
 vec3 getAO(uint axis)
