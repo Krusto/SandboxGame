@@ -9,15 +9,16 @@ namespace Engine
     namespace BlockType
     {
         inline constexpr uint32_t AIR = 0;
-        inline constexpr uint32_t STONE = 1;
+        inline constexpr uint32_t WOOD = 1;
         inline constexpr uint32_t DIRT = 2;
         inline constexpr uint32_t GRASS = 3;
         inline constexpr uint32_t COBBLESTONE = 4;
-        inline constexpr uint32_t WOOD = 5;
+        inline constexpr uint32_t STONE = 5;
         inline constexpr uint32_t SAPLING = 6;
         inline constexpr uint32_t BEDROCK = 7;
         inline constexpr uint32_t WATER = 8;
-        inline constexpr uint32_t MAX = 9;
+        inline constexpr uint32_t SAND = 9;
+        inline constexpr uint32_t MAX = 10;
     }// namespace BlockType
 
     struct BlockTextures {

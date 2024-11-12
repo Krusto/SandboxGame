@@ -34,10 +34,10 @@ namespace Engine
         uint32_t chunkMaxY = chunkBaseY + CHUNK_SIZE;
 
         constexpr glm::vec2 splinePoint1(0.0f, 4);
-        constexpr glm::vec2 splinePoint2(0.5f, 20);
-        constexpr glm::vec2 splinePoint3(1.2f, 60);
-        constexpr glm::vec2 splinePoint4(1.4f, 100);
-        constexpr glm::vec2 splinePoint5(1.8f, 200);
+        constexpr glm::vec2 splinePoint2(0.5f, 50);
+        constexpr glm::vec2 splinePoint3(1.0f, 90);
+        constexpr glm::vec2 splinePoint4(1.2f, 150);
+        constexpr glm::vec2 splinePoint5(1.5f, 250);
         constexpr glm::vec2 splinePoint6(2.0f, 319);
 
         constexpr float slope1 = (splinePoint2.y - splinePoint1.y) / (splinePoint2.x - splinePoint1.x);
@@ -78,6 +78,10 @@ namespace Engine
                     uint32_t blockPosY = height - chunkBaseY;
                     for (uint32_t y = 0; y <= blockPosY; y++) { shapeData->Set(glm::ivec3{x, y, z}); }
                 }
+                else if (height > chunkMaxY)
+                {
+                    for (uint32_t y = 0; y < CHUNK_SIZE; y++) { shapeData->Set(glm::ivec3{x, y, z}); }
+                }
             }
         }
     }
@@ -108,19 +112,19 @@ namespace Engine
             for (uint32_t x = 0; x < CHUNK_SIZE; x++)
             {
                 uint32_t depth = 0;
-                for (uint32_t y = 0; y < CHUNK_SIZE; y++)
+                for (int32_t y = CHUNK_SIZE - 1; y >= 0; y--)
                 {
                     if (shapeData->IsSolid(glm::ivec3(x, y, z)))
                     {
-                        //data->SetBlock(glm::ivec3(x, y, z), chunkPosition.x + 1);
-                        //data->SetBlock(glm::ivec3(x, y, z), BlockType::GRASS);
-                        float set = heightMap[ChunkPosition::GetIndex(glm::vec3{x, y, z})];
-                        if (set >= 0.40 && depth < 1)
-                        {
-                            data->SetBlock(glm::ivec3(x, y, z), BlockType::STONE);
-                        //depth++;
-                        }
-                        else { data->SetBlock(glm::ivec3(x, y, z), BlockType::GRASS); }
+                        //if (depth == 0) {
+                        //float set = heightMap[ChunkPosition::GetIndex(glm::vec3{x, y, z})];
+                        //if (set >= 0.40) { data->SetBlock(glm::ivec3(x, y, z), BlockType::SAND); }
+                        //else { data->SetBlock(glm::ivec3(x, y, z), BlockType::GRASS); }
+                        //}else
+                        if (depth >= 0 && depth < 3) { data->SetBlock(glm::ivec3(x, y, z), BlockType::DIRT); }
+                        else { data->SetBlock(glm::ivec3(x, y, z), BlockType::STONE); }
+
+                        depth++;
                     }
                 }
             }
