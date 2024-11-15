@@ -1,28 +1,31 @@
 #pragma once
 #include <functional>
 
-class RendererCommand
+namespace Engine
 {
-public:
-    RendererCommand() = default;
-
-    RendererCommand(std::function<void(void)> command) : m_Command(command) {}
-
-    ~RendererCommand() = default;
-
-public:
-    void Execute()
+    class RendererCommand
     {
-        if (m_Command) { m_Command(); }
-    }
+    public:
+        RendererCommand() = default;
 
-    static RendererCommand Create(std::function<void(void)> command)
-    {
-        RendererCommand result;
-        result.m_Command = command;
-        return result;
-    }
+        RendererCommand(std::function<void(void)> command) : m_Command(command) {}
 
-private:
-    std::function<void(void)> m_Command;
-};
+        ~RendererCommand() = default;
+
+    public:
+        void Execute()
+        {
+            if (m_Command) { m_Command(); }
+        }
+
+        static RendererCommand Create(std::function<void(void)> command)
+        {
+            RendererCommand result;
+            result.m_Command = command;
+            return result;
+        }
+
+    private:
+        std::function<void(void)> m_Command;
+    };
+}// namespace Engine

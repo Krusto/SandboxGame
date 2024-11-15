@@ -3,6 +3,7 @@
 #include <array>
 #include <Renderer/VertexArray.hpp>
 #include <Renderer/StorageBuffer.hpp>
+#include <Renderer/Renderer.hpp>
 
 #include "BlockRegistry.hpp"
 #include "BlockData.hpp"
@@ -13,6 +14,12 @@ namespace Engine
 
     struct Quad {
         uint64_t x, y, w, h;
+    };
+
+    struct ChunkMeshRaw {
+        std::vector<VoxelVertex> vertices;
+        std::vector<uint32_t> indices;
+        std::vector<uint8_t> blocks;
     };
 
     class ChunkMesh
@@ -29,7 +36,8 @@ namespace Engine
 
         const Engine::StorageBuffer* GetBuffer() const { return m_Buffer; }
 
-    private:
+        static void UploadData(ChunkMesh* mesh);
+
     private:
         void GenerateVertexData(const BlockData* blockData, std::vector<uint8_t>& blocks,
                                 std::vector<VoxelVertex>& vertices, std::vector<uint32_t>& indices);
@@ -52,8 +60,11 @@ namespace Engine
     private:
         static void GenerateFaceLayer(const BlockData* blockData, uint32_t axis, uint32_t* data);
 
+        static RendererCommand GetGenerateCommand(ChunkMesh* mesh);
     private:
-        Engine::VertexArray* m_VertexArray;
+        ChunkMeshRaw m_Mesh;
+
+        VertexArray* m_VertexArray;
         StorageBuffer* m_Buffer;
     };
 }// namespace Engine

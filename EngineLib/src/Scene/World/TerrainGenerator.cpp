@@ -6,11 +6,8 @@
 namespace Engine
 {
 
-    void TerrainGenerator::Init(TerrainGenerationSettings settings) { m_Settings = settings; }
-
-    void TerrainGenerator::Destroy() {}
-
-    void TerrainGenerator::GenerateTerrainShape(TerrainShape* shapeData, glm::ivec3 chunkPosition) const
+    void TerrainGenerator::GenerateTerrainShape(TerrainGenerationSettings settings, TerrainShape* shapeData,
+                                                glm::ivec3 chunkPosition)
     {
         ScopedTimer timer("TerrainGenerator::GenerateTerrainShape");
         auto fnSimplex = FastNoise::New<FastNoise::OpenSimplex2>();
@@ -25,12 +22,11 @@ namespace Engine
 
         std::vector<float> continetalness(CHUNK_SIZE_SQUARE);
         fnNoise->GenUniformGrid2D(continetalness.data(), chunkPosition.x * CHUNK_SIZE, chunkPosition.z * CHUNK_SIZE,
-                                  CHUNK_SIZE, CHUNK_SIZE, frequency, 1234);
+                                  CHUNK_SIZE, CHUNK_SIZE, frequency, settings.Seed);
 
-        shapeData->Init(m_Settings.Seed);
+        shapeData->Init(settings.Seed);
 
         uint32_t chunkBaseY = chunkPosition.y * CHUNK_SIZE;
-        LOG("%d\n", chunkBaseY);
         uint32_t chunkMaxY = chunkBaseY + CHUNK_SIZE;
 
         constexpr glm::vec2 splinePoint1(0.0f, 4);
@@ -86,8 +82,8 @@ namespace Engine
         }
     }
 
-    void TerrainGenerator::GenerateBlocks(const TerrainShape* shapeData, BlockData* data,
-                                          glm::ivec3 chunkPosition) const
+    void TerrainGenerator::GenerateBlocks(TerrainGenerationSettings settings, const TerrainShape* shapeData,
+                                          BlockData* data, glm::ivec3 chunkPosition)
     {
         auto fnSimplex = FastNoise::New<FastNoise::OpenSimplex2>();
         auto fnFractal = FastNoise::New<FastNoise::FractalPingPong>();
@@ -104,7 +100,7 @@ namespace Engine
         std::vector<float> heightMap(CHUNK_SIZE_CUBIC);
         fnFractal->GenUniformGrid3D(heightMap.data(), chunkPosition.x * CHUNK_SIZE, chunkPosition.y * CHUNK_SIZE,
                                     chunkPosition.z * CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE, frequency,
-                                    m_Settings.Seed);
+                                    settings.Seed);
 
 
         for (uint32_t z = 0; z < CHUNK_SIZE; z++)
@@ -131,7 +127,4 @@ namespace Engine
         }
     }
 
-    TerrainGenerationSettings TerrainGenerator::GetSettings() const { return m_Settings; }
-
-    uint32_t TerrainGenerator::GetSeed() const { return m_Settings.Seed; }
 }// namespace Engine

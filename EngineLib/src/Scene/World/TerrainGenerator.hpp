@@ -21,15 +21,11 @@ namespace Engine
         ~TerrainGenerator() = default;
 
     public:
-        void Init(TerrainGenerationSettings settings);
-        void Destroy();
-        void GenerateTerrainShape(TerrainShape* shapeData, glm::ivec3 chunkPosition) const;
-        void GenerateBlocks(const TerrainShape* shapeData, BlockData* data, glm::ivec3 chunkPosition) const;
-        TerrainGenerationSettings GetSettings() const;
-
-        uint32_t GetSeed() const;
+        static void GenerateTerrainShape(TerrainGenerationSettings settings, TerrainShape* shapeData,
+                                         glm::ivec3 chunkPosition);
+        static void GenerateBlocks(TerrainGenerationSettings settings, const TerrainShape* shapeData, BlockData* data,
+                                   glm::ivec3 chunkPosition);
 
     private:
-        TerrainGenerationSettings m_Settings;
     };
 }// namespace Engine

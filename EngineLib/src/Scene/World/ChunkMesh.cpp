@@ -7,26 +7,37 @@
 #include <unordered_map>
 #include <Core/Timer.hpp>
 
+#include <Renderer/Renderer.hpp>
+
 namespace Engine
 {
     void ChunkMesh::Generate(const BlockData* blockData)
     {
         //ScopedTimer timer("ChunkMesh::Generate");
-        std::vector<VoxelVertex> vertices;
-        std::vector<uint32_t> indices;
-        std::vector<uint8_t> blocks;
+        GenerateVertexData(blockData, m_Mesh.blocks, m_Mesh.vertices, m_Mesh.indices);
 
-
-        GenerateVertexData(blockData, blocks, vertices, indices);
-
-        m_VertexArray = Engine::VertexArray::Create(indices.size());
-        m_VertexArray->Bind();
-        m_VertexArray->AddVertexBuffer(
-                Engine::VertexBuffer::Create(VoxelVertex::GetLayout(), (float*) vertices.data(), vertices.size()));
-        m_VertexArray->AddIndexBuffer(Engine::IndexBuffer::Create(indices.data(), indices.size()));
-
-        m_Buffer = Engine::StorageBuffer::Create(blocks.data(), blocks.size(), StorageBufferType::MapCoherent);
+        //Renderer::Submit(GetGenerateCommand(this));
     }
+
+    RendererCommand ChunkMesh::GetGenerateCommand(ChunkMesh* mesh)
+    {
+        return RendererCommand([&]() { 
+                ChunkMesh::UploadData(mesh);
+            });
+    }
+
+    void ChunkMesh::UploadData(ChunkMesh* mesh) {
+        mesh->m_VertexArray = Engine::VertexArray::Create(mesh->m_Mesh.indices.size());
+        mesh->m_VertexArray->Bind();
+        mesh->m_VertexArray->AddVertexBuffer(Engine::VertexBuffer::Create(
+                VoxelVertex::GetLayout(), (float*) mesh->m_Mesh.vertices.data(), mesh->m_Mesh.vertices.size()));
+        mesh->m_VertexArray->AddIndexBuffer(
+                Engine::IndexBuffer::Create(mesh->m_Mesh.indices.data(), mesh->m_Mesh.indices.size()));
+
+        mesh->m_Buffer = Engine::StorageBuffer::Create(mesh->m_Mesh.blocks.data(), mesh->m_Mesh.blocks.size(),
+                                                       StorageBufferType::MapCoherent);
+    }
+
 
     void ChunkMesh::GenerateFaceLayer(const BlockData* blockData, uint32_t axis, uint32_t* data)
     {
@@ -46,6 +57,7 @@ namespace Engine
             }
         }
     }
+
 
     void ChunkMesh::GenerateVertexData(const BlockData* blockData, std::vector<uint8_t>& blocks,
                                        std::vector<VoxelVertex>& vertices, std::vector<uint32_t>& indices)

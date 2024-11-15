@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <memory>
 #include <Engine.hpp>
+#include "Cube.hpp"
 
 class SandboxLayer: public Engine::Layer
 {
@@ -43,6 +44,7 @@ public:
 protected:
     Ref<Engine::Window> m_Window;
     Ref<Engine::Shader> m_Shader;
+    Ref<Engine::Shader> m_CubeShader;
     Engine::Skybox* m_Skybox;
     std::unique_ptr<Engine::World> m_World;
 
@@ -56,4 +58,6 @@ protected:
     std::filesystem::path m_ShadersDirectory;
     std::filesystem::path m_TexturesDirectory;
     std::filesystem::path m_SkyboxDirectory;
+
+    std::vector<Cube*> m_Cubes;
 };
