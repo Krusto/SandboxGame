@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <Renderer/Renderer.hpp>
 #include "ChunkFactory.hpp"
+#include <future>
 
 namespace Engine
 {
@@ -24,6 +25,8 @@ namespace Engine
 
         void Generate();
 
+        uint8_t GetBlock(glm::ivec3 position) const;
+
     private:
         RendererCommand BeginRenderingWorld(const Shader* shader, const TextureArray* textures) const;
 
@@ -36,6 +39,9 @@ namespace Engine
         ChunkFactory m_ChunkFactory;
 
         std::unordered_map<glm::ivec3, Chunk> m_Chunks;
+        std::unordered_map<glm::ivec3, BlockData*> m_Blocks;
+        std::unordered_map<glm::ivec3, ChunkMesh*> m_Meshes;
+        std::vector < std::pair<glm::ivec3, std::future < ChunkMesh* >>> m_MeshFutures;
 
         float m_Time;
     };

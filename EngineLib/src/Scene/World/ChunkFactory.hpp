@@ -16,19 +16,20 @@ namespace Engine
         ~ChunkFactory() = default;
 
     public:
-        void Init(TerrainGenerationSettings settings);
-
-        Chunk GenerateChunk(glm::ivec3 chunkPosition) const;
+        Chunk GenerateChunk(TerrainGenerationSettings* settings, glm::ivec3 chunkPosition) const;
         void DestroyChunk(Chunk chunk) const;
 
-        BlockData* GenerateBlockData(TerrainShape* shapeData, glm::ivec3 chunkPosition) const;
-        void DestroyBlockData(BlockData* data) const;
-        TerrainShape* GenerateTerrainShape(glm::ivec3 chunkPosition) const;
-        void DestroyTerrainShape(TerrainShape* data) const;
-        ChunkMesh* GenerateChunkMesh(BlockData* blockData) const;
-        void DestroyChunkMesh(ChunkMesh* mesh) const;
+        static BlockData* GenerateBlockData(TerrainGenerationSettings* settings, TerrainShape* shapeData,
+                                            glm::ivec3 chunkPosition);
+        static void DestroyBlockData(BlockData* data);
+
+        static TerrainShape* GenerateTerrainShape(TerrainGenerationSettings* settings, glm::ivec3 chunkPosition);
+        static void DestroyTerrainShape(TerrainShape* data);
+
+        static ChunkMesh* GenerateChunkMesh(BlockData* blockData);
+        static void DestroyChunkMesh(ChunkMesh* mesh);
+
 
     private:
-        TerrainGenerator m_Generator;
     };
 }// namespace Engine

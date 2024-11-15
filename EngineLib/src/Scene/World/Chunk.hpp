@@ -8,9 +8,9 @@ namespace Engine
     class ChunkMesh;
 
     struct Chunk {
-        TerrainShape* terrainShape;
-        BlockData* blockData;
-        ChunkMesh* mesh;
+        TerrainShape* terrainShape{};
+        BlockData* blockData{};
+        ChunkMesh* mesh{};
     };
 
 }// namespace Engine

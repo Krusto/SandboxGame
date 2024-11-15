@@ -1,16 +1,14 @@
 #include "ChunkFactory.hpp"
 #include <Core/Allocator.hpp>
 
-void Engine::ChunkFactory::Init(TerrainGenerationSettings settings) { m_Generator.Init(settings); }
-
-Engine::Chunk Engine::ChunkFactory::GenerateChunk(glm::ivec3 chunkPosition) const
+Engine::Chunk Engine::ChunkFactory::GenerateChunk(TerrainGenerationSettings* settings, glm::ivec3 chunkPosition) const
 {
 
     Chunk chunk;
 
-    chunk.terrainShape = GenerateTerrainShape(chunkPosition);
+    chunk.terrainShape = GenerateTerrainShape(settings, chunkPosition);
 
-    chunk.blockData = GenerateBlockData(chunk.terrainShape, chunkPosition);
+    chunk.blockData = GenerateBlockData(settings, chunk.terrainShape, chunkPosition);
 
     chunk.mesh = GenerateChunkMesh(chunk.blockData);
 
@@ -27,41 +25,43 @@ void Engine::ChunkFactory::DestroyChunk(Chunk chunk) const
     DestroyChunkMesh(chunk.mesh);
 }
 
-Engine::BlockData* Engine::ChunkFactory::GenerateBlockData(TerrainShape* shapeData, glm::ivec3 chunkPosition) const
+Engine::BlockData* Engine::ChunkFactory::GenerateBlockData(TerrainGenerationSettings* settings, TerrainShape* shapeData,
+                                                           glm::ivec3 chunkPosition)
 {
     auto ptr = Allocator::Allocate<BlockData>();
-    ptr->Init(m_Generator.GetSeed());
-    m_Generator.GenerateBlocks(shapeData, ptr, chunkPosition);
+    ptr->Init(settings->Seed);
+    TerrainGenerator::GenerateBlocks(*settings, shapeData, ptr, chunkPosition);
     return ptr;
 }
 
-void Engine::ChunkFactory::DestroyBlockData(BlockData* data) const
+void Engine::ChunkFactory::DestroyBlockData(BlockData* data)
 {
     data->Destroy();
     Allocator::Deallocate(data);
 }
 
-Engine::TerrainShape* Engine::ChunkFactory::GenerateTerrainShape(glm::ivec3 chunkPosition) const
+Engine::TerrainShape* Engine::ChunkFactory::GenerateTerrainShape(TerrainGenerationSettings* settings,
+                                                                 glm::ivec3 chunkPosition)
 {
     auto ptr = Allocator::Allocate<TerrainShape>();
-    m_Generator.GenerateTerrainShape(ptr, chunkPosition);
+    TerrainGenerator::GenerateTerrainShape(*settings, ptr, chunkPosition);
     return ptr;
 }
 
-void Engine::ChunkFactory::DestroyTerrainShape(TerrainShape* data) const
+void Engine::ChunkFactory::DestroyTerrainShape(TerrainShape* data)
 {
     data->Destroy();
     Allocator::Deallocate(data);
 }
 
-Engine::ChunkMesh* Engine::ChunkFactory::GenerateChunkMesh(BlockData* blockData) const
+Engine::ChunkMesh* Engine::ChunkFactory::GenerateChunkMesh(BlockData* blockData)
 {
     auto ptr = Allocator::Allocate<ChunkMesh>();
     ptr->Generate(blockData);
     return ptr;
 }
 
-void Engine::ChunkFactory::DestroyChunkMesh(ChunkMesh* mesh) const
+void Engine::ChunkFactory::DestroyChunkMesh(ChunkMesh* mesh)
 {
     mesh->Destroy();
     Allocator::Deallocate(mesh);

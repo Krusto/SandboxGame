@@ -12,7 +12,7 @@ namespace Engine
     inline constexpr BlockInfo Dirt_Block =
             BlockInfo{BlockType::DIRT, "Dirt", {.numTextures = 1, .data = {"Dirt.png"}}};
     inline constexpr BlockInfo Grass_Block =
-            BlockInfo{BlockType::GRASS, "Grass", {.numTextures = 1, .data = {"Grass.png"}}};
+            BlockInfo{BlockType::GRASS, "Grass", {.numTextures = 1, .data = {"Grass2.png"}}};
     inline constexpr BlockInfo Cobblestone_Block =
             BlockInfo{BlockType::COBBLESTONE, "Cobblestone", {.numTextures = 1, .data = {"Cobblestone.png"}}};
     inline constexpr BlockInfo Wood_Block =

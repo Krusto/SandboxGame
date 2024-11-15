@@ -4,6 +4,7 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/hash.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include "BlockRegistry.hpp"
 
 namespace Engine
 {
@@ -16,10 +17,8 @@ namespace Engine
 
         m_BlockTextures.Load("BlockTextures", texturePaths);
 
-        m_ChunkFactory.Init(settings);
-
         glm::ivec3 currentChunkPos = glm::ivec3(0, 0, 0);
-        uint32_t worldSize = 10;
+        uint32_t worldSize = 15;
 
         for (int z = 0; z < worldSize; z++)
         {
@@ -28,7 +27,14 @@ namespace Engine
                 for (int y = 0; y < worldSize; y++)
                 {
                     currentChunkPos = glm::ivec3(x, y, z);
-                    m_Chunks[currentChunkPos] = m_ChunkFactory.GenerateChunk(currentChunkPos);
+                    m_Chunks[currentChunkPos] = Chunk();
+                    m_Chunks[currentChunkPos].terrainShape =
+                            ChunkFactory::GenerateTerrainShape(&settings, currentChunkPos);
+                    m_Chunks[currentChunkPos].blockData = ChunkFactory::GenerateBlockData(
+                            &settings, m_Chunks[currentChunkPos].terrainShape, currentChunkPos);
+                    LOG_INFO("Generating %s\n", glm::to_string(currentChunkPos).c_str());
+                    m_MeshFutures.push_back(std::make_pair(currentChunkPos,std::async(std::launch::async, ChunkFactory::GenerateChunkMesh,
+                                                                m_Chunks[currentChunkPos].blockData)));
                 }
             }
         }
@@ -40,7 +46,23 @@ namespace Engine
         BlockRegistry::Destroy();
     }
 
-    void World::OnUpdate(double dt) { m_Time += dt * 1000; };
+    void World::OnUpdate(double dt)
+    {
+        m_Time += dt * 1000;
+        for (uint32_t i = 0; i < m_MeshFutures.size(); i++)
+        {
+            glm::ivec3 pos = m_MeshFutures[i].first;
+            std::future<ChunkMesh*>* mesh = &m_MeshFutures[i].second;
+
+            std::string p = glm::to_string(pos);
+            if (mesh->wait_for(std::chrono::seconds(0)) == std::future_status::ready)
+            {
+                m_Meshes[pos] = mesh->get();
+                ChunkMesh::UploadData(m_Meshes[pos]);
+                m_MeshFutures.erase(m_MeshFutures.begin() + i);
+            }
+        }
+    };
 
     void World::Draw(Shader* shader) const
     {
@@ -48,9 +70,9 @@ namespace Engine
         {
             Renderer::Submit(BeginRenderingWorld(shader, &m_BlockTextures));
 
-            for (auto& [pos, chunk]: m_Chunks)
+            for (auto& [pos, mesh]: m_Meshes)
             {
-                Renderer::Submit(RenderChunk(shader, chunk.mesh->GetVertexArray(), chunk.mesh->GetBuffer(), pos));
+                Renderer::Submit(RenderChunk(shader, mesh->GetVertexArray(), mesh->GetBuffer(), pos));
             }
         }
     }
@@ -78,4 +100,22 @@ namespace Engine
     }
 
     void World::Generate() {}
+
+    uint8_t World::GetBlock(glm::ivec3 position) const
+    {
+        uint8_t block = BlockType::AIR;
+
+        glm::ivec3 chunkPos = glm::ivec3(position.x / CHUNK_SIZE, position.y / CHUNK_SIZE, position.z / CHUNK_SIZE);
+        for (auto& [pos, chunk]: m_Chunks)
+        {
+            if (pos == chunkPos)
+            {
+                glm::ivec3 localPos = position - glm::ivec3(chunkPos.x * CHUNK_SIZE, chunkPos.y * CHUNK_SIZE,
+                                                            chunkPos.z * CHUNK_SIZE);
+                block = chunk.blockData->GetBlock(localPos);
+                return block;
+            }
+        }
+        return 0;
+    }
 }// namespace Engine
