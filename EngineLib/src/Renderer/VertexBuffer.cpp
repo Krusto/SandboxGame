@@ -8,8 +8,7 @@ namespace Engine
 
     VertexBuffer* VertexBuffer::Create(const VertexLayout& layout, float* data, uint32_t length)
     {
-
-        auto ptr = Allocator::Allocate<OpenGLVertexBuffer>();
+        Allocate(OpenGLVertexBuffer, ptr);
         ptr->Init(layout, data, length);
         return ptr;
     }

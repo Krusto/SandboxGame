@@ -21,12 +21,11 @@ namespace Engine
 
     RendererCommand ChunkMesh::GetGenerateCommand(ChunkMesh* mesh)
     {
-        return RendererCommand([&]() { 
-                ChunkMesh::UploadData(mesh);
-            });
+        return RendererCommand([&]() { ChunkMesh::UploadData(mesh); });
     }
 
-    void ChunkMesh::UploadData(ChunkMesh* mesh) {
+    void ChunkMesh::UploadData(ChunkMesh* mesh)
+    {
         mesh->m_VertexArray = Engine::VertexArray::Create(mesh->m_Mesh.indices.size());
         mesh->m_VertexArray->Bind();
         mesh->m_VertexArray->AddVertexBuffer(Engine::VertexBuffer::Create(
@@ -37,7 +36,6 @@ namespace Engine
         mesh->m_Buffer = Engine::StorageBuffer::Create(mesh->m_Mesh.blocks.data(), mesh->m_Mesh.blocks.size(),
                                                        StorageBufferType::MapCoherent);
     }
-
 
     void ChunkMesh::GenerateFaceLayer(const BlockData* blockData, uint32_t axis, uint32_t* data)
     {
@@ -58,13 +56,13 @@ namespace Engine
         }
     }
 
-
     void ChunkMesh::GenerateVertexData(const BlockData* blockData, std::vector<uint8_t>& blocks,
                                        std::vector<VoxelVertex>& vertices, std::vector<uint32_t>& indices)
     {
 
 
-        uint32_t* face_layers = Engine::Allocator::AllocateArray<uint32_t>(CHUNK_SIZE_SQUARE * 3);
+        uint32_t* face_layers = {};
+        AllocateArray(uint32_t, face_layers, CHUNK_SIZE_SQUARE * 3);
         std::memset(face_layers, 0, (size_t) CHUNK_SIZE_SQUARE * 3 * 4);
         GenerateFaceLayer(blockData, 0, face_layers);
 
@@ -128,7 +126,7 @@ namespace Engine
                     [](std::unordered_map<uint8_t, std::unordered_map<uint32_t, std::vector<uint32_t>>>*
                                planesAtCurrentAxis,
                        uint32_t axis, std::vector<uint8_t>* blocks) -> std::vector<VoxelVertex>* {
-                        std::vector<VoxelVertex>* vertices = Allocator::Allocate<std::vector<VoxelVertex>>();
+                        Allocate(std::vector<VoxelVertex>, vertices);
                         for (auto& [block, planes]: *planesAtCurrentAxis)
                         {
                             for (auto& [y, plane]: planes)
@@ -169,7 +167,7 @@ namespace Engine
             if (result)
             {
                 vertices.insert(vertices.end(), result->begin(), result->end());
-                Allocator::Deallocate(result);
+                Deallocate(result);
             }
         }
         /* for (size_t axis = 1; axis < 6; axis++)
@@ -199,7 +197,7 @@ namespace Engine
 
         GenerateIndices(indices, vertices.size() / 4);
 
-        Engine::Allocator::DeallocateArray(face_layers);
+        DeallocateArray(face_layers);
     }
 
     std::vector<Quad> ChunkMesh::BinaryGreedyMesherPlane(uint32_t* faceData, uint32_t axis)
@@ -331,8 +329,8 @@ namespace Engine
     {
         m_VertexArray->Destroy();
         m_Buffer->Destroy();
-        Engine::Allocator::Deallocate(m_VertexArray);
-        Engine::Allocator::Deallocate(m_Buffer);
+        Deallocate(m_VertexArray);
+        Deallocate(m_Buffer);
         m_VertexArray = nullptr;
         m_Buffer = nullptr;
     }

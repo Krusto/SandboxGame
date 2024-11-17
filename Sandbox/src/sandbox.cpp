@@ -18,7 +18,7 @@ public:
         Engine::LayerStack::ConstructAndPushLayer<SandboxLayer>(spec);
     }
 
-    ~Sandbox() { Engine::LayerStack::DestroyLayers(); }
+    ~Sandbox() {  }
 };
 
 int main()

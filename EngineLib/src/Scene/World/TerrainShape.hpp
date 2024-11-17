@@ -38,6 +38,6 @@ namespace Engine
         void Unset(glm::ivec3 position);
 
     private:
-        uint32_t* m_Data;
+        uint32_t* m_Data{};
     };
 }// namespace Engine

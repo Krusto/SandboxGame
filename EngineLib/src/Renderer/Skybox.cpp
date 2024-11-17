@@ -12,7 +12,7 @@ namespace Engine
     Skybox* Skybox::Create(std::string_view cubemapName, const std::string& shaderPath,
                            const std::unordered_map<CubemapTextureFace, std::string>& Path)
     {
-        auto ptr = Allocator::Allocate<Skybox>();
+        Allocate(Skybox, ptr);
         ptr->Load(cubemapName, shaderPath, Path);
         return ptr;
     }
@@ -58,19 +58,19 @@ namespace Engine
         if (m_Cubemap)
         {
             m_Cubemap->Destroy();
-            Allocator::Deallocate(m_Cubemap);
+            Deallocate(m_Cubemap);
             m_Cubemap = nullptr;
         }
         if (m_Shader)
         {
             m_Shader->Destroy();
-            Allocator::Deallocate(m_Shader);
+            Deallocate(m_Shader);
             m_Shader = nullptr;
         }
         if (m_VertexArray)
         {
             m_VertexArray->Destroy();
-            Allocator::Deallocate(m_VertexArray);
+            Deallocate(m_VertexArray);
             m_VertexArray = nullptr;
         }
     }
@@ -92,7 +92,7 @@ namespace Engine
             shader->SetUniform("camera.projection", camera->GetProjection());
             auto view = glm::mat4(glm::mat3(camera->GetView()));
             shader->SetUniform("camera.view", view);
-            
+
             cubemap->Bind(0);
             va->Bind();
             glDrawElements(GL_TRIANGLES, va->IndexCount, GL_UNSIGNED_INT, nullptr);

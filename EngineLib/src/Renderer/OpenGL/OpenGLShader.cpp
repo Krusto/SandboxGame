@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 #define NO_STD_LOG
-#include <CFilesystem.h>
+// #include <CFilesystem.h>
 
 #ifdef __cplusplus
 }
@@ -31,8 +31,7 @@ namespace Engine
 
     OpenGLShader* OpenGLShader::CreateFromString(const std::string& source)
     {
-
-        OpenGLShader* shader = Allocator::Allocate<OpenGLShader>();
+        Allocate(OpenGLShader, shader);
         shader->Load(source, true);
         return shader;
     }
@@ -123,6 +122,22 @@ namespace Engine
 
     void OpenGLShader::Bind() const { glUseProgram(m_RendererID); }
 
+    static bool file_read_string(const int8_t* path, size_t* len, std::string* buffer)
+    {
+        std::ifstream f(std::string((const char*) path), std::ios::in);
+        if (f)
+        {
+            f.seekg(0, std::ios::end);
+            *len = f.tellg();
+            f.seekg(0, std::ios::beg);
+            buffer->resize(*len, '\n');
+            f.read((char*) buffer->data(), *len);
+            f.close();
+            return buffer->size() > 0;
+        }
+        return false;
+    }
+
     std::string OpenGLShader::ReadShaderFromFile(const std::string& filepath, ShaderType shaderType) const
     {
         std::string result{};
@@ -133,7 +148,7 @@ namespace Engine
 
         try
         {
-            int8_t* buffer;
+            std::string buffer;
             size_t bufferLen;
             std::string path;
             std::unordered_map<ShaderType, std::string> extensions;
@@ -145,13 +160,7 @@ namespace Engine
             path = filepath + extensions[shaderType];
 
             auto resultStatus = file_read_string((const int8_t*) path.c_str(), &bufferLen, &buffer);
-            if (resultStatus == FILE_READ_SUCCESFULLY)
-            {
-                result.resize(bufferLen+1);
-                result.assign((const char*) buffer, bufferLen);
-                result[bufferLen] = '\0';
-                free(buffer);
-            }
+            if (resultStatus != false) { result = buffer; }
         }
         catch (std::ios_base::failure& e)
         {

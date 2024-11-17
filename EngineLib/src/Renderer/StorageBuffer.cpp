@@ -8,8 +8,7 @@ namespace Engine
 
     StorageBuffer* StorageBuffer::Create(uint8_t* data, size_t size, StorageBufferType type)
     {
-
-        auto ptr = Allocator::Allocate<OpenGLStorageBuffer>();
+        Allocate(OpenGLStorageBuffer, ptr);
         ptr->Init(data, size, type);
         return ptr;
     }

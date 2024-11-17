@@ -10,8 +10,7 @@ namespace Engine
     CubemapTexture* CubemapTexture::Create(std::string_view cubemapName,
                                            const std::unordered_map<CubemapTextureFace, std::string>& Path)
     {
-
-        auto ptr = Allocator::Allocate<CubemapTexture>();
+        Allocate(CubemapTexture, ptr);
         ptr->Load(cubemapName, Path);
         return ptr;
     }
