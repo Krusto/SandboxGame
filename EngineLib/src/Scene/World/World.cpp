@@ -17,8 +17,10 @@ namespace Engine
 
         m_BlockTextures.Load("BlockTextures", texturePaths);
 
+        ChunkFactory::Init(settings);
+
         glm::ivec3 currentChunkPos = glm::ivec3(0, 0, 0);
-        uint32_t worldSize = 15;
+        uint32_t worldSize = 1;
 
         for (int z = 0; z < worldSize; z++)
         {
@@ -27,14 +29,15 @@ namespace Engine
                 for (int y = 0; y < worldSize; y++)
                 {
                     currentChunkPos = glm::ivec3(x, y, z);
-                    m_Chunks[currentChunkPos] = Chunk();
-                    m_Chunks[currentChunkPos].terrainShape =
-                            ChunkFactory::GenerateTerrainShape(&settings, currentChunkPos);
-                    m_Chunks[currentChunkPos].blockData = ChunkFactory::GenerateBlockData(
-                            &settings, m_Chunks[currentChunkPos].terrainShape, currentChunkPos);
-                    LOG_INFO("Generating %s\n", glm::to_string(currentChunkPos).c_str());
-                    m_MeshFutures.push_back(std::make_pair(currentChunkPos,std::async(std::launch::async, ChunkFactory::GenerateChunkMesh,
-                                                                m_Chunks[currentChunkPos].blockData)));
+                    ChunkFactory::ScheduleChunkForGeneration(currentChunkPos);
+                    // m_Chunks[currentChunkPos] = Chunk();
+                    // m_Chunks[currentChunkPos].terrainShape =
+                    //         ChunkFactory::GenerateTerrainShape(&settings, currentChunkPos);
+                    // m_Chunks[currentChunkPos].blockData = ChunkFactory::GenerateBlockData(
+                    //         &settings, m_Chunks[currentChunkPos].terrainShape, currentChunkPos);
+                    // LOG_INFO("Generating %s\n", glm::to_string(currentChunkPos).c_str());
+                    // m_MeshFutures.push_back(std::make_pair(currentChunkPos,std::async(std::launch::async, ChunkFactory::GenerateChunkMesh,
+                    //                                             m_Chunks[currentChunkPos].blockData)));
                 }
             }
         }
@@ -49,19 +52,32 @@ namespace Engine
     void World::OnUpdate(double dt)
     {
         m_Time += dt * 1000;
-        for (uint32_t i = 0; i < m_MeshFutures.size(); i++)
-        {
-            glm::ivec3 pos = m_MeshFutures[i].first;
-            std::future<ChunkMesh*>* mesh = &m_MeshFutures[i].second;
+        ChunkFactory::Update();
 
-            std::string p = glm::to_string(pos);
-            if (mesh->wait_for(std::chrono::seconds(0)) == std::future_status::ready)
+        auto generatedChunks = ChunkFactory::GetChunks();
+
+        for (auto& [pos, chunk]: generatedChunks)
+        {
+            if (m_Meshes.find(pos) == m_Meshes.end())
             {
-                m_Meshes[pos] = mesh->get();
+                m_Meshes[pos] = chunk.mesh;
                 ChunkMesh::UploadData(m_Meshes[pos]);
-                m_MeshFutures.erase(m_MeshFutures.begin() + i);
             }
+            m_Chunks[pos] = chunk;
         }
+        // for (uint32_t i = 0; i < m_MeshFutures.size(); i++)
+        // {
+        //     glm::ivec3 pos = m_MeshFutures[i].first;
+        //     std::future<ChunkMesh*>* mesh = &m_MeshFutures[i].second;
+
+        //     std::string p = glm::to_string(pos);
+        //     if (mesh->wait_for(std::chrono::seconds(0)) == std::future_status::ready)
+        //     {
+        //         m_Meshes[pos] = mesh->get();
+        //         ChunkMesh::UploadData(m_Meshes[pos]);
+        //         m_MeshFutures.erase(m_MeshFutures.begin() + i);
+        //     }
+        // }
     };
 
     void World::Draw(Shader* shader) const

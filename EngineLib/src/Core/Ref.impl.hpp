@@ -145,9 +145,9 @@ template <typename T>
 template <typename... Args>
 Ref<T> Ref<T>::Create(Args&&... args)
 {
-
-
-    return Ref<T>(Engine::Allocator::Allocate<T>(std::forward<Args>(args)...));
+    T* ptr;
+    Allocate(T, ptr, std::forward<Args>(args)...);
+    return Ref<T>(ptr);
 }
 
 template <typename T>
@@ -207,7 +207,7 @@ void Ref<T>::DecRef() const
         if (m_Instance->GetRefCount() == 0)
         {
             std::lock_guard<std::mutex> lock(m);
-            Engine::Allocator::Deallocate(m_Instance);
+            Deallocate(m_Instance);
             m_Instance = nullptr;
         }
     }

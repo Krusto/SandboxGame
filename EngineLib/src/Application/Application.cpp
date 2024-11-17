@@ -57,7 +57,6 @@ void Engine::Application::Init(const Engine::ApplicationSpec& spec)
 
 void Engine::Application::Destroy()
 {
-    m_Window->Close();
 
     LayerStack::PopLayers();
     LayerStack::DestroyLayers();
@@ -65,6 +64,9 @@ void Engine::Application::Destroy()
     Renderer::Shutdown();
     Renderer::Destroy();
 
+    m_Window->Close();
     m_Window->Destroy();
     glfwTerminate();
 }
+
+Engine::Application::~Application() { Destroy(); }

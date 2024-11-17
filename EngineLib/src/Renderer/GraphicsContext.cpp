@@ -5,9 +5,9 @@ GraphicsContext* GraphicsContext::s_Context;
 
 GraphicsContext* GraphicsContext::Create(GLFWwindow* window)
 {
+    Allocate(OpenGLContext, ptr, window);
 
-
-    return Engine::Allocator::Allocate<OpenGLContext>(window);
+    return ptr;
 }
 
-void GraphicsContext::Destroy() { Engine::Allocator::Deallocate(GraphicsContext::s_Context); }
+void GraphicsContext::Destroy() { Deallocate(GraphicsContext::s_Context); }

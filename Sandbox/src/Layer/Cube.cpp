@@ -35,14 +35,14 @@ void Cube::Destroy()
     if (m_VertexArray)
     {
         m_VertexArray->Destroy();
-        Engine::Allocator::Deallocate(m_VertexArray);
+        Deallocate(m_VertexArray);
         m_VertexArray = nullptr;
     }
 }
 
 Engine::RendererCommand Cube::Render(uint32_t axis, Engine::Shader* shader, Engine::Camera* camera) const
 {
-    return Engine::RendererCommand([=,a = axis]() {
+    return Engine::RendererCommand([=, a = axis]() {
         glDepthFunc(GL_LESS);
         //Engine::Renderer::SwitchWireframeMode();
         shader->Bind();

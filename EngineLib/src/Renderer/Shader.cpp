@@ -6,5 +6,9 @@
 namespace Engine
 {
 
-    Shader* Shader::Load(const std::string& path) { return Allocator::Allocate<OpenGLShader>(path, false); }
+    Shader* Shader::Load(const std::string& path)
+    {
+        Allocate(OpenGLShader, ptr, path, false);
+        return ptr;
+    }
 }// namespace Engine
