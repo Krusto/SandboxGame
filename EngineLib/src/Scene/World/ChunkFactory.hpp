@@ -18,6 +18,7 @@ namespace Engine
     enum class ChunkStatus
     {
         None,
+        Uploaded,
         StartGeneratingShape,
         GeneratingShape,
         GeneratingShapeDone,
@@ -44,7 +45,13 @@ namespace Engine
 
         static void Update();
 
-        static std::unordered_map<glm::ivec3, Chunk> GetChunks();
+        static void Reload();
+
+        static std::unordered_map<glm::ivec3, Chunk>& GetGeneratedChunks();
+
+        static size_t GeneratedChunksCount();
+
+        static void UploadChunks();
 
     public:
         static Chunk GenerateChunk(TerrainGenerationSettings settings, glm::ivec3 chunkPosition);
@@ -63,13 +70,12 @@ namespace Engine
     private:
         inline static TerrainGenerationSettings s_TerrainGenerationSettings{};
 
-        inline static std::unordered_map<glm::ivec3, ChunkStatus> s_ChunksToGenerate{};
+        inline static std::unordered_map<glm::ivec3, std::future<Chunk*>> s_ChunkGenerationWorkers{};
+        inline static std::unordered_map<glm::ivec3, Chunk> s_DoneChunks{};
+        inline static std::unordered_map<glm::ivec3, ChunkStatus> s_ScheduledChunks{};
+        inline static std::unordered_map<glm::ivec3, ChunkStatus> s_ChunksToUpload{};
 
-        inline static std::unordered_map<glm::ivec3, std::future<TerrainShape*>> s_TerrainShapeWorkers{};
-        inline static std::unordered_map<glm::ivec3, std::future<BlockData*>> s_BlockDataWorkers{};
-        inline static std::unordered_map<glm::ivec3, std::future<ChunkMesh*>> s_ChunkMeshWorkers{};
-        inline static std::unordered_map<glm::ivec3, Chunk> s_ChunksInProgress{};
-
-        inline static std::unordered_map<glm::ivec3, ChunkStatus> s_ChunkGenerationStatus{};
+        inline static size_t s_CurrentChunkGenerationCount = 0;
+        inline static constexpr size_t s_MaxChunksToGenerate = 100;
     };
 }// namespace Engine

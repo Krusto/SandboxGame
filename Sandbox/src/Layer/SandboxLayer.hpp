@@ -45,8 +45,9 @@ protected:
     Ref<Engine::Window> m_Window;
     Ref<Engine::Shader> m_Shader;
     Ref<Engine::Shader> m_CubeShader;
-    Engine::Skybox* m_Skybox;
+    Engine::Skybox* m_Skybox{};
     std::unique_ptr<Engine::World> m_World;
+    bool shouldReloadWorld{};
 
     Engine::Camera m_Camera;
 

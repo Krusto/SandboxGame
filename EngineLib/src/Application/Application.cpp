@@ -68,5 +68,3 @@ void Engine::Application::Destroy()
     m_Window->Destroy();
     glfwTerminate();
 }
-
-Engine::Application::~Application() { Destroy(); }

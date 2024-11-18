@@ -9,7 +9,6 @@ namespace Engine
     void TerrainGenerator::GenerateTerrainShape(TerrainGenerationSettings settings, TerrainShape* shapeData,
                                                 glm::ivec3 chunkPosition)
     {
-        ScopedTimer timer("TerrainGenerator::GenerateTerrainShape");
         auto fnSimplex = FastNoise::New<FastNoise::OpenSimplex2>();
         auto fnNoise = FastNoise::New<FastNoise::FractalRidged>();
         fnNoise->SetSource(fnSimplex);
@@ -112,12 +111,13 @@ namespace Engine
                 {
                     if (shapeData->IsSolid(glm::ivec3(x, y, z)))
                     {
-                        //if (depth == 0) {
-                        //float set = heightMap[ChunkPosition::GetIndex(glm::vec3{x, y, z})];
-                        //if (set >= 0.40) { data->SetBlock(glm::ivec3(x, y, z), BlockType::SAND); }
-                        //else { data->SetBlock(glm::ivec3(x, y, z), BlockType::GRASS); }
-                        //}else
-                        if (depth >= 0 && depth < 3) { data->SetBlock(glm::ivec3(x, y, z), BlockType::DIRT); }
+                        if (depth == 0)
+                        {
+                            float set = heightMap[ChunkPosition::GetIndex(glm::vec3{x, y, z})];
+                            if (set >= 0.40) { data->SetBlock(glm::ivec3(x, y, z), BlockType::SAND); }
+                            else { data->SetBlock(glm::ivec3(x, y, z), BlockType::GRASS); }
+                        }
+                        else if (depth >= 0 && depth < 3) { data->SetBlock(glm::ivec3(x, y, z), BlockType::DIRT); }
                         else { data->SetBlock(glm::ivec3(x, y, z), BlockType::STONE); }
 
                         depth++;

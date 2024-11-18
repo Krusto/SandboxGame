@@ -25,6 +25,8 @@ namespace Engine
 
         void Generate();
 
+        void Reload();
+
         uint8_t GetBlock(glm::ivec3 position) const;
 
     private:
@@ -34,14 +36,12 @@ namespace Engine
                                     glm::vec3 pos) const;
 
     private:
+        TerrainGenerationSettings m_Settings;
         Engine::TextureArray m_BlockTextures;
 
         ChunkFactory m_ChunkFactory;
 
         std::unordered_map<glm::ivec3, Chunk> m_Chunks;
-        std::unordered_map<glm::ivec3, BlockData*> m_Blocks;
-        std::unordered_map<glm::ivec3, ChunkMesh*> m_Meshes;
-        std::vector < std::pair<glm::ivec3, std::future < ChunkMesh* >>> m_MeshFutures;
 
         float m_Time;
     };

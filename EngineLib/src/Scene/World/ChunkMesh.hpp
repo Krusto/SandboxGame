@@ -62,9 +62,9 @@ namespace Engine
 
         static RendererCommand GetGenerateCommand(ChunkMesh* mesh);
     private:
-        ChunkMeshRaw m_Mesh;
+        ChunkMeshRaw m_Mesh{};
 
-        VertexArray* m_VertexArray;
-        StorageBuffer* m_Buffer;
+        VertexArray* m_VertexArray{};
+        StorageBuffer* m_Buffer{};
     };
 }// namespace Engine

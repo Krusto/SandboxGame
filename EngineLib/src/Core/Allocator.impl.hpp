@@ -22,33 +22,33 @@ namespace Engine
         inline static void LOG_ALLOC_LOCATION(size_t size,
                                               std::source_location location = std::source_location::current())
         {
-            LOG("Allocated %ziB\n     FILE: %s(%d:%d) `%s`: \n", size, location.file_name(), location.line(),
-                location.column(), location.function_name());
+            // LOG("Allocated %ziB\n     FILE: %s(%d:%d) `%s`: \n", size, location.file_name(), location.line(),
+            // location.column(), location.function_name());
         }
 
         inline static void LOG_DEALLOC_LOCATION(size_t size,
                                                 std::source_location location = std::source_location::current())
         {
-            LOG("Deallocated %ziB\n     FILE: %s(%d:%d) `%s`: \n", size, location.file_name(), location.line(),
-                location.column(), location.function_name());
+
+            // LOG("Deallocated %ziB\n     FILE: %s(%d:%d) `%s`: \n", size, location.file_name(), location.line(),
+            // location.column(), location.function_name());
         }
 
         inline static void LOG_ALLOC_ARRAY_LOCATION(size_t size,
                                                     std::source_location location = std::source_location::current())
         {
-            LOG("Allocated araray %ziB\n     FILE: %s(%d:%d) `%s`: \n", size, location.file_name(), location.line(),
-                location.column(), location.function_name());
+            // LOG("Allocated araray %ziB\n     FILE: %s(%d:%d) `%s`: \n", size, location.file_name(), location.line(),
+            // location.column(), location.function_name());
         }
 
         inline static void LOG_DEALLOC_ARRAY_LOCATION(size_t size,
                                                       std::source_location location = std::source_location::current())
         {
-            LOG("Deallocated array %ziB\n     FILE: %s(%d:%d) `%s`: \n", size, location.file_name(), location.line(),
-                location.column(), location.function_name());
+            // LOG("Deallocated array %ziB\n     FILE: %s(%d:%d) `%s`: \n", size, location.file_name(), location.line(),
+            // location.column(), location.function_name());
         }
 
 #define Allocate(T, varName, ...)                                                                                      \
-    T* varName;                                                                                                        \
     do {                                                                                                               \
         Engine::Allocator::LOG_ALLOC_LOCATION(sizeof(T));                                                              \
         varName = Engine::Allocator::_Allocate<T>(__VA_ARGS__);                                                        \
@@ -73,6 +73,28 @@ namespace Engine
         varName = nullptr;                                                                                             \
     } while (0);
 #else
+#define Allocate(T, varName, ...)                                                                                      \
+    do {                                                                                                               \
+        varName = Engine::Allocator::_Allocate<T>(__VA_ARGS__);                                                        \
+    } while (0);
+
+#define Deallocate(varName)                                                                                            \
+    do {                                                                                                               \
+        Engine::Allocator::_Deallocate<decltype(varName)>(varName);                                                    \
+        varName = nullptr;                                                                                             \
+    } while (0);
+
+#define AllocateArray(T, varName, size)                                                                                \
+    do {                                                                                                               \
+        varName = Engine::Allocator::_AllocateArray<T>(size);                                                          \
+    } while (0);
+
+#define DeallocateArray(varName)                                                                                       \
+    do {                                                                                                               \
+                                                                                                                       \
+        Engine::Allocator::_DeallocateArray<decltype(varName)>(varName);                                               \
+        varName = nullptr;                                                                                             \
+    } while (0);
 #endif
 
         template <typename T, typename... Args>
