@@ -5,6 +5,7 @@ GraphicsContext* GraphicsContext::s_Context;
 
 GraphicsContext* GraphicsContext::Create(GLFWwindow* window)
 {
+    GraphicsContext* ptr;
     Allocate(OpenGLContext, ptr, window);
 
     return ptr;

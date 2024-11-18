@@ -10,6 +10,7 @@ namespace Engine
 {
     void World::Init(TerrainGenerationSettings settings, std::filesystem::path texturesDirectory)
     {
+        m_Settings = settings;
         BlockRegistry::Init();
         std::unordered_map<uint32_t, std::string> texturePaths = BlockRegistry::AssignTexturesToIndices();
 
@@ -20,24 +21,17 @@ namespace Engine
         ChunkFactory::Init(settings);
 
         glm::ivec3 currentChunkPos = glm::ivec3(0, 0, 0);
-        uint32_t worldSize = 1;
+        uint32_t worldSize = settings.GenerationDistance;
 
+        uint32_t maxChunksY = settings.maxTerrainHeight / CHUNK_SIZE;
         for (int z = 0; z < worldSize; z++)
         {
             for (int x = 0; x < worldSize; x++)
             {
-                for (int y = 0; y < worldSize; y++)
+                for (int y = 0; y < maxChunksY; y++)
                 {
                     currentChunkPos = glm::ivec3(x, y, z);
                     ChunkFactory::ScheduleChunkForGeneration(currentChunkPos);
-                    // m_Chunks[currentChunkPos] = Chunk();
-                    // m_Chunks[currentChunkPos].terrainShape =
-                    //         ChunkFactory::GenerateTerrainShape(&settings, currentChunkPos);
-                    // m_Chunks[currentChunkPos].blockData = ChunkFactory::GenerateBlockData(
-                    //         &settings, m_Chunks[currentChunkPos].terrainShape, currentChunkPos);
-                    // LOG_INFO("Generating %s\n", glm::to_string(currentChunkPos).c_str());
-                    // m_MeshFutures.push_back(std::make_pair(currentChunkPos,std::async(std::launch::async, ChunkFactory::GenerateChunkMesh,
-                    //                                             m_Chunks[currentChunkPos].blockData)));
                 }
             }
         }
@@ -53,31 +47,17 @@ namespace Engine
     {
         m_Time += dt * 1000;
         ChunkFactory::Update();
-
-        auto generatedChunks = ChunkFactory::GetChunks();
-
-        for (auto& [pos, chunk]: generatedChunks)
+        ChunkFactory::UploadChunks();
+        if (ChunkFactory::GeneratedChunksCount() > 0)
         {
-            if (m_Meshes.find(pos) == m_Meshes.end())
+            auto& generatedChunks = ChunkFactory::GetGeneratedChunks();
+            m_Chunks.merge(generatedChunks);
+            if (generatedChunks.size() > 0)
             {
-                m_Meshes[pos] = chunk.mesh;
-                ChunkMesh::UploadData(m_Meshes[pos]);
+                for (auto& [pos, chunk]: generatedChunks) { ChunkFactory::DestroyChunk(chunk); }
+                generatedChunks.clear();
             }
-            m_Chunks[pos] = chunk;
         }
-        // for (uint32_t i = 0; i < m_MeshFutures.size(); i++)
-        // {
-        //     glm::ivec3 pos = m_MeshFutures[i].first;
-        //     std::future<ChunkMesh*>* mesh = &m_MeshFutures[i].second;
-
-        //     std::string p = glm::to_string(pos);
-        //     if (mesh->wait_for(std::chrono::seconds(0)) == std::future_status::ready)
-        //     {
-        //         m_Meshes[pos] = mesh->get();
-        //         ChunkMesh::UploadData(m_Meshes[pos]);
-        //         m_MeshFutures.erase(m_MeshFutures.begin() + i);
-        //     }
-        // }
     };
 
     void World::Draw(Shader* shader) const
@@ -86,8 +66,9 @@ namespace Engine
         {
             Renderer::Submit(BeginRenderingWorld(shader, &m_BlockTextures));
 
-            for (auto& [pos, mesh]: m_Meshes)
+            for (auto& [pos, chunk]: m_Chunks)
             {
+                auto& mesh = chunk.mesh;
                 Renderer::Submit(RenderChunk(shader, mesh->GetVertexArray(), mesh->GetBuffer(), pos));
             }
         }
@@ -116,6 +97,28 @@ namespace Engine
     }
 
     void World::Generate() {}
+
+    void World::Reload()
+    {
+        ChunkFactory::Reload();
+        for (auto& [pos, chunk]: m_Chunks) { m_ChunkFactory.DestroyChunk(chunk); }
+        m_Chunks.clear();
+
+        uint32_t worldSize = m_Settings.GenerationDistance;
+
+        uint32_t maxChunksY = m_Settings.maxTerrainHeight / CHUNK_SIZE;
+        for (int z = 0; z < worldSize; z++)
+        {
+            for (int x = 0; x < worldSize; x++)
+            {
+                for (int y = 0; y < maxChunksY; y++)
+                {
+                    auto currentChunkPos = glm::ivec3(x, y, z);
+                    ChunkFactory::ScheduleChunkForGeneration(currentChunkPos);
+                }
+            }
+        }
+    }
 
     uint8_t World::GetBlock(glm::ivec3 position) const
     {

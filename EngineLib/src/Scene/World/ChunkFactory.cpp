@@ -9,121 +9,95 @@ namespace Engine
 
     void ChunkFactory::ScheduleChunkForGeneration(glm::ivec3 chunkPosition)
     {
-        s_ChunksToGenerate.try_emplace(chunkPosition, ChunkStatus::None);
+        s_ScheduledChunks.try_emplace(chunkPosition, ChunkStatus::None);
     }
 
     void ChunkFactory::RunWorkers() {}
 
-    std::unordered_map<glm::ivec3, Chunk> ChunkFactory::GetChunks()
+    std::unordered_map<glm::ivec3, Chunk>& ChunkFactory::GetGeneratedChunks()
     {
-        std::unordered_map<glm::ivec3, Chunk> chunks;
-        for (auto& [chunkPos, chunk]: s_ChunksInProgress)
+        LOG_INFO("Getting chunks!\n");
+        LOG_INFO("Got %zi!\n", s_DoneChunks.size());
+
+        return s_DoneChunks;
+    }
+
+    size_t ChunkFactory::GeneratedChunksCount() { return s_DoneChunks.size(); }
+
+    void ChunkFactory::UploadChunks()
+    {
+        if (s_ChunksToUpload.size() > 0)
         {
-            if (s_ChunkGenerationStatus[chunkPos] == ChunkStatus::GeneratingMeshDone)
+            std::vector<glm::ivec3> chunksToErase;
+            chunksToErase.reserve(s_ChunksToUpload.size());
+            for (auto& [pos, status]: s_ChunksToUpload)
             {
-                chunks.try_emplace(chunkPos, chunk);
+                ChunkMesh::UploadData(s_DoneChunks[pos].mesh);
+                status = ChunkStatus::Uploaded;
+                chunksToErase.push_back(pos);
             }
+            for (auto& pos: chunksToErase) { s_ChunksToUpload.erase(pos); }
         }
-        for (auto& [chunkPos, chunk]: chunks) { s_ChunksInProgress.erase(chunkPos); }
-        return chunks;
     }
 
     void ChunkFactory::Update()
     {
-        if (!s_ChunksToGenerate.empty())
+        if (!s_ScheduledChunks.empty() && s_CurrentChunkGenerationCount < s_MaxChunksToGenerate)
         {
-            for (auto& [chunkPos, status]: s_ChunksToGenerate)
+            for (auto& [chunkPos, status]: s_ScheduledChunks)
             {
-                s_ChunkGenerationStatus.try_emplace(chunkPos, status);
-            }
-            s_ChunksToGenerate.clear();
-        }
+                if (s_CurrentChunkGenerationCount >= s_MaxChunksToGenerate ||
+                    s_ChunkGenerationWorkers.contains(chunkPos))
+                {
+                    break;
+                }
 
-        for (auto& [chunkPos, status]: s_ChunkGenerationStatus)
-        {
-            switch (status)
-            {
-                case ChunkStatus::None: {
-                    status = ChunkStatus::StartGeneratingShape;
-                }
-                break;
-                case ChunkStatus::StartGeneratingShape: {
-                    if (!s_TerrainShapeWorkers.contains(chunkPos))
-                    {
-                        s_TerrainShapeWorkers[chunkPos] = std::async(std::launch::async, GenerateTerrainShape,
-                                                                     s_TerrainGenerationSettings, chunkPos);
-                        status = ChunkStatus::GeneratingShape;
-                        LOG("Generating shape for chunk %d %d %d\n", chunkPos.x, chunkPos.y, chunkPos.z);
-                    }
-                }
-                break;
-                case ChunkStatus::GeneratingShape: {
-                    if (s_TerrainShapeWorkers[chunkPos].valid())
-                    {
-                        if (s_TerrainShapeWorkers[chunkPos].wait_for(std::chrono::milliseconds(0)) ==
-                            std::future_status::ready)
-                        {
-                            status = ChunkStatus::StartGeneratingBlockData;
-                            LOG("Generated shape for chunk %d %d %d\n", chunkPos.x, chunkPos.y, chunkPos.z);
-                        }
-                    }
-                }
-                break;
-                case ChunkStatus::StartGeneratingBlockData: {
-                    if (!s_BlockDataWorkers.contains(chunkPos))
-                    {
-                        auto ptr = s_TerrainShapeWorkers[chunkPos].get();
-                        s_BlockDataWorkers[chunkPos] = std::async(std::launch::async, GenerateBlockData,
-                                                                  s_TerrainGenerationSettings, ptr, chunkPos);
-                        s_ChunksInProgress[chunkPos].terrainShape = ptr;
-                        status = ChunkStatus::GeneratingBlockData;
-                        LOG("Generating block data for chunk %d %d %d\n", chunkPos.x, chunkPos.y, chunkPos.z);
-                    }
-                }
-                break;
-                case ChunkStatus::GeneratingBlockData: {
-                    if (s_BlockDataWorkers[chunkPos].valid())
-                    {
-                        if (s_BlockDataWorkers[chunkPos].wait_for(std::chrono::milliseconds(0)) ==
-                            std::future_status::ready)
-                        {
-                            DestroyTerrainShape(s_ChunksInProgress[chunkPos].terrainShape);
-                            s_ChunksInProgress[chunkPos].terrainShape = nullptr;
-                            status = ChunkStatus::StartGeneratingMesh;
-                            LOG("Generated block data for chunk %d %d %d\n", chunkPos.x, chunkPos.y, chunkPos.z);
-                        }
-                    }
-                }
-                break;
-                case ChunkStatus::StartGeneratingMesh: {
-                    if (!s_ChunkMeshWorkers.contains(chunkPos))
-                    {
-                        auto ptr = s_BlockDataWorkers[chunkPos].get();
+                s_CurrentChunkGenerationCount++;
 
-                        s_ChunkMeshWorkers[chunkPos] = std::async(std::launch::async, GenerateChunkMesh, ptr);
-
-                        s_ChunksInProgress[chunkPos].blockData = ptr;
-                        status = ChunkStatus::GeneratingMesh;
-                        LOG("Generating mesh for chunk %d %d %d\n", chunkPos.x, chunkPos.y, chunkPos.z);
-                    }
-                }
-                break;
-                case ChunkStatus::GeneratingMesh: {
-                    if (s_ChunkMeshWorkers[chunkPos].valid())
-                    {
-                        if (s_ChunkMeshWorkers[chunkPos].wait_for(std::chrono::milliseconds(0)) ==
-                            std::future_status::ready)
-                        {
-                            s_ChunksInProgress[chunkPos].mesh = s_ChunkMeshWorkers[chunkPos].get();
-                            status = ChunkStatus::GeneratingMeshDone;
-                            LOG("Generated mesh for chunk %d %d %d\n", chunkPos.x, chunkPos.y, chunkPos.z);
-                            ChunkMesh::UploadData(s_ChunksInProgress[chunkPos].mesh);
-                        }
-                    }
-                }
-                break;
+                s_ChunkGenerationWorkers[chunkPos] =
+                        std::async(std::launch::async, [settings = s_TerrainGenerationSettings, chunkPos]() {
+                            Chunk* chunk = new Chunk;
+                            chunk->terrainShape = GenerateTerrainShape(settings, chunkPos);
+                            chunk->blockData = GenerateBlockData(settings, chunk->terrainShape, chunkPos);
+                            chunk->mesh = GenerateChunkMesh(chunk->blockData);
+                            return chunk;
+                        });
             }
         }
+
+        std::vector<glm::ivec3> workersToErase;
+        for (auto& [chunkPos, worker]: s_ChunkGenerationWorkers)
+        {
+            if (worker.valid() && worker.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready)
+            {
+                Chunk* chunk = worker.get();
+                s_CurrentChunkGenerationCount--;
+                s_DoneChunks.try_emplace(chunkPos, *chunk);
+                delete chunk;
+                s_ChunksToUpload.try_emplace(chunkPos, ChunkStatus::None);
+                workersToErase.push_back(chunkPos);
+            }
+            if (s_ScheduledChunks.contains(chunkPos)) { s_ScheduledChunks.erase(chunkPos); }
+        }
+        for (auto& chunkPos: workersToErase) { s_ChunkGenerationWorkers.erase(chunkPos); }
+    }
+
+    void ChunkFactory::Reload()
+    {
+        s_CurrentChunkGenerationCount = 0;
+
+        for (auto& [chunkPos, worker]: s_ChunkGenerationWorkers)
+        {
+            worker.wait();
+            auto chunk = worker.get();
+            ChunkFactory::DestroyChunk(*chunk);
+            delete chunk;
+        }
+        s_ChunkGenerationWorkers.clear();
+        s_ScheduledChunks.clear();
+
+        for (auto& [pos, chunk]: s_DoneChunks) { DestroyChunk(chunk); }
+        s_DoneChunks.clear();
     }
 
     Chunk ChunkFactory::GenerateChunk(TerrainGenerationSettings settings, glm::ivec3 chunkPosition)
@@ -144,15 +118,17 @@ namespace Engine
     {
 
         DestroyTerrainShape(chunk.terrainShape);
-
+        chunk.terrainShape = nullptr;
         DestroyBlockData(chunk.blockData);
-
+        chunk.blockData = nullptr;
         DestroyChunkMesh(chunk.mesh);
+        chunk.mesh = nullptr;
     }
 
     BlockData* ChunkFactory::GenerateBlockData(TerrainGenerationSettings settings, TerrainShape* shapeData,
                                                glm::ivec3 chunkPosition)
     {
+        BlockData* ptr = nullptr;
         Allocate(BlockData, ptr);
         ptr->Init(settings.Seed);
         TerrainGenerator::GenerateBlocks(settings, shapeData, ptr, chunkPosition);
@@ -170,6 +146,7 @@ namespace Engine
 
     TerrainShape* ChunkFactory::GenerateTerrainShape(TerrainGenerationSettings settings, glm::ivec3 chunkPosition)
     {
+        TerrainShape* ptr = nullptr;
         Allocate(TerrainShape, ptr);
         TerrainGenerator::GenerateTerrainShape(settings, ptr, chunkPosition);
         return ptr;
@@ -186,6 +163,7 @@ namespace Engine
 
     ChunkMesh* ChunkFactory::GenerateChunkMesh(BlockData* blockData)
     {
+        ChunkMesh* ptr = nullptr;
         Allocate(ChunkMesh, ptr);
         ptr->Generate(blockData);
         return ptr;

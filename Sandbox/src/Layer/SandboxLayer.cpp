@@ -1,4 +1,5 @@
 #include "SandboxLayer.hpp"
+#include <Scene/World/ChunkConstraints.hpp>
 #include <algorithm>
 #include <imgui.h>
 
@@ -32,13 +33,19 @@ void SandboxLayer::Init(Ref<Engine::Window> window)
     };
     m_Skybox = Engine::Skybox::Create(skyboxName, skyboxShaderPath, faces);
 
-    //m_World = std::make_unique<Engine::World>();
+    m_World = std::make_unique<Engine::World>();
 
-    Engine::TerrainGenerationSettings settings = {.Seed = 0, .AssetsDirectory = m_AssetsDirectory};
-    //m_World->Init(settings, m_TexturesDirectory);
+    Engine::TerrainGenerationSettings settings = {.Seed = 0,
+                                                  .AssetsDirectory = m_AssetsDirectory,
+                                                  .GenerationDistance = 10};
+    m_World->Init(settings, m_TexturesDirectory);
 
     m_Camera.Init(Engine::CameraSpec({m_AppSpec.width, m_AppSpec.height}, 45.0f, 0.1f, 1000.0f));
-    m_Camera.Move({0.0f, 35.0f, 3.0f});
+
+    glm::vec3 offset{(settings.GenerationDistance / 2) * 32, 0, (settings.GenerationDistance / 2) * 32};
+    glm::vec3 startPosition = glm::vec3(0, 150, 3);
+
+    m_Camera.Move(startPosition + offset);
     m_Camera.Update(m_DeltaTime, 1, 1);
 
     std::string cubeShaderPath = m_ShadersDirectory.string() + "/Cube";
@@ -52,7 +59,7 @@ void SandboxLayer::OnDetach() {}
 
 void SandboxLayer::Destroy()
 {
-    //m_World->Destroy();
+    m_World->Destroy();
     m_Shader->Destroy();
     m_CubeShader->Destroy();
     m_Skybox->Destroy();
@@ -143,7 +150,7 @@ void SandboxLayer::OnUpdate(double dt)
     // }
 
 
-    //m_World->OnUpdate(dt);
+    m_World->OnUpdate(dt);
     m_Camera.Update(dt, 10.0f, 10.0f);
 
     Engine::Renderer::BeginFrame();
@@ -151,10 +158,10 @@ void SandboxLayer::OnUpdate(double dt)
     Engine::Renderer::ClearColor(glm::vec4{1, 1, 1, 1.0});
 
     m_Skybox->Draw(&m_Camera);
-    // m_Shader->Bind();
-    // m_Skybox->BindTexture(1);
-    // m_Camera.Upload(m_Shader.Raw());
-    // m_World->Draw(m_Shader.Raw());
+    m_Shader->Bind();
+    m_Skybox->BindTexture(1);
+    m_Camera.Upload(m_Shader.Raw());
+    m_World->Draw(m_Shader.Raw());
 
     //for (int i = 0; i < m_Cubes.size(); i++) {
     //m_Cubes[i]->Draw(m_CubeShader.Raw(), &m_Camera);
@@ -167,16 +174,18 @@ void SandboxLayer::OnUpdate(double dt)
     // m_Cubes.clear();
     Engine::Renderer::EndFrame();
 
+    if (shouldReloadWorld)
+    {
+        shouldReloadWorld = false;
+        m_World->Reload();
+    }
 }
 
 void SandboxLayer::OnWindowResizeEvent(int width, int height) {}
 
 void SandboxLayer::OnImGuiBegin() {}
 
-void SandboxLayer::OnImGuiDraw()
-{
-    // ImGui::Text("%.3fms %.2ffps", m_DeltaTime, 1000.0f / m_DeltaTime);
-}
+void SandboxLayer::OnImGuiDraw() { ImGui::Text("%.3fms %.2ffps", m_DeltaTime, 1000.0f / m_DeltaTime); }
 
 void SandboxLayer::OnImGuiEnd() {}
 
@@ -193,6 +202,7 @@ void SandboxLayer::OnKeyboardEvent(int action, int key)
         m_Shader->Reload();
         m_Skybox->Reload();
     }
+    else if (key == GLFW_KEY_T && action == GLFW_PRESS) { shouldReloadWorld = true; }
     else
     {
         m_Camera.ProcessKeyboardInput(action, key, glfwGetKey(m_Window->GetRawHandler(), GLFW_KEY_SPACE) == GLFW_PRESS,

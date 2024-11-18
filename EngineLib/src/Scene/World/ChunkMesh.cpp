@@ -126,6 +126,7 @@ namespace Engine
                     [](std::unordered_map<uint8_t, std::unordered_map<uint32_t, std::vector<uint32_t>>>*
                                planesAtCurrentAxis,
                        uint32_t axis, std::vector<uint8_t>* blocks) -> std::vector<VoxelVertex>* {
+                        std::vector<VoxelVertex>* vertices = {};
                         Allocate(std::vector<VoxelVertex>, vertices);
                         for (auto& [block, planes]: *planesAtCurrentAxis)
                         {

@@ -14,7 +14,7 @@ namespace Engine
     {
     public:
         Application() = default;
-        ~Application();
+        ~Application() = default;
 
         void Run();
         void Init(const ApplicationSpec& spec);
