@@ -12,12 +12,12 @@ namespace Engine
         auto fnSimplex = FastNoise::New<FastNoise::OpenSimplex2>();
         auto fnNoise = FastNoise::New<FastNoise::FractalRidged>();
         fnNoise->SetSource(fnSimplex);
-        fnNoise->SetGain(0.54f);
-        fnNoise->SetLacunarity(1.52f);
+        fnNoise->SetGain(0.6f);
+        fnNoise->SetLacunarity(1.82f);
         fnNoise->SetWeightedStrength(2.58f);
         fnNoise->SetOctaveCount(4);
 
-        constexpr float frequency = 0.002f;
+        constexpr float frequency = 0.001f;
 
         std::vector<float> continetalness(CHUNK_SIZE_SQUARE);
         fnNoise->GenUniformGrid2D(continetalness.data(), chunkPosition.x * CHUNK_SIZE, chunkPosition.z * CHUNK_SIZE,
@@ -30,8 +30,8 @@ namespace Engine
 
         constexpr glm::vec2 splinePoint1(0.0f, 4);
         constexpr glm::vec2 splinePoint2(0.5f, 50);
-        constexpr glm::vec2 splinePoint3(1.0f, 90);
-        constexpr glm::vec2 splinePoint4(1.2f, 150);
+        constexpr glm::vec2 splinePoint3(1.0f, 130);
+        constexpr glm::vec2 splinePoint4(1.2f, 200);
         constexpr glm::vec2 splinePoint5(1.5f, 250);
         constexpr glm::vec2 splinePoint6(2.0f, 319);
 
