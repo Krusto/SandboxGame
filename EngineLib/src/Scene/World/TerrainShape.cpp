@@ -10,14 +10,15 @@ namespace Engine
 
     void TerrainShape::Init(uint32_t seed)
     {
-        AllocateArray(uint32_t, m_Data, CHUNK_SIZE_SQUARE);
+         m_Data=
+        AllocateArray(uint32_t, CHUNK_SIZE_SQUARE);
 
         std::fill_n(m_Data, CHUNK_SIZE_SQUARE, 0);
     }
 
     void TerrainShape::Init(const TerrainShape& other)
     {
-        AllocateArray(uint32_t, m_Data, CHUNK_SIZE_SQUARE);
+         m_Data = AllocateArray(uint32_t, CHUNK_SIZE_SQUARE);
         std::copy(other.m_Data, other.m_Data + CHUNK_SIZE_SQUARE, m_Data);
     }
 

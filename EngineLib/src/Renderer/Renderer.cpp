@@ -36,7 +36,7 @@ namespace Engine
 
     void Renderer::Init(RendererSpec rendererSpec, ApplicationSpec applicationSpec)
     {
-        Allocate(OpenGLRenderer, s_RendererAPI);
+        s_RendererAPI = Allocate(OpenGLRenderer);
 
         if (s_RendererAPI) s_RendererAPI->Init(rendererSpec, applicationSpec);
     }
@@ -46,7 +46,7 @@ namespace Engine
         if (s_RendererAPI) Deallocate(s_RendererAPI);
     }
 
-    void Renderer::InitImGUI(Ref<Window> window) {}
+    void Renderer::InitImGUI(Window* window) {}
 
     void Renderer::Shutdown()
     {

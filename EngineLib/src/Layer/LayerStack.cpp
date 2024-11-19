@@ -3,7 +3,7 @@
 
 namespace Engine
 {
-    void LayerStack::InitLayers(Ref<Window> window)
+    void LayerStack::InitLayers(Window* window)
     {
         for (auto layer: m_Layers) { layer->Init(window); }
     }

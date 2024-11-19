@@ -13,7 +13,7 @@ namespace Engine
     public:
         LayerStack() = default;
 
-        static void InitLayers(Ref<Window> window);
+        static void InitLayers(Window* window);
 
         static void PushLayer(Layer* layer);
 

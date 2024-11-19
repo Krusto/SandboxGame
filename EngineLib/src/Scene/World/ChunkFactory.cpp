@@ -56,7 +56,7 @@ namespace Engine
 
                 s_ChunkGenerationWorkers[chunkPos] =
                         std::async(std::launch::async, [settings = s_TerrainGenerationSettings, chunkPos]() {
-                            Chunk* chunk = new Chunk;
+                            Chunk* chunk=Allocate(Chunk);
                             chunk->terrainShape = GenerateTerrainShape(settings, chunkPos);
                             chunk->blockData = GenerateBlockData(settings, chunk->terrainShape, chunkPos);
                             chunk->mesh = GenerateChunkMesh(chunk->blockData);
@@ -73,7 +73,7 @@ namespace Engine
                 Chunk* chunk = worker.get();
                 s_CurrentChunkGenerationCount--;
                 s_DoneChunks.try_emplace(chunkPos, *chunk);
-                delete chunk;
+                Deallocate(chunk);
                 s_ChunksToUpload.try_emplace(chunkPos, ChunkStatus::None);
                 workersToErase.push_back(chunkPos);
             }
@@ -128,8 +128,8 @@ namespace Engine
     BlockData* ChunkFactory::GenerateBlockData(TerrainGenerationSettings settings, TerrainShape* shapeData,
                                                glm::ivec3 chunkPosition)
     {
-        BlockData* ptr = nullptr;
-        Allocate(BlockData, ptr);
+        BlockData* ptr =  
+        Allocate(BlockData );
         ptr->Init(settings.Seed);
         TerrainGenerator::GenerateBlocks(settings, shapeData, ptr, chunkPosition);
         return ptr;
@@ -146,8 +146,8 @@ namespace Engine
 
     TerrainShape* ChunkFactory::GenerateTerrainShape(TerrainGenerationSettings settings, glm::ivec3 chunkPosition)
     {
-        TerrainShape* ptr = nullptr;
-        Allocate(TerrainShape, ptr);
+        TerrainShape* ptr =  
+        Allocate(TerrainShape   );
         TerrainGenerator::GenerateTerrainShape(settings, ptr, chunkPosition);
         return ptr;
     }
@@ -163,8 +163,7 @@ namespace Engine
 
     ChunkMesh* ChunkFactory::GenerateChunkMesh(BlockData* blockData)
     {
-        ChunkMesh* ptr = nullptr;
-        Allocate(ChunkMesh, ptr);
+        ChunkMesh* ptr =  Allocate(ChunkMesh   );
         ptr->Generate(blockData);
         return ptr;
     }

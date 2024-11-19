@@ -5,8 +5,8 @@ namespace Engine
     template <typename T, typename... Args>
     void LayerStack::ConstructAndPushLayer(Args&&... args)
     {
-        T* ptr;
-        Allocate(T, ptr, std::forward<Args>(args)...);
+        T* ptr=
+        Allocate(T, std::forward<Args>(args)...);
         LayerStack::PushLayer(ptr);
     }
 

@@ -2,8 +2,4 @@
 
 namespace Engine
 {
-    namespace Allocator
-    {
-
-    }// namespace Allocator
 }// namespace Engine

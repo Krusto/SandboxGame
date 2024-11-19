@@ -31,8 +31,7 @@ namespace Engine
 
     OpenGLShader* OpenGLShader::CreateFromString(const std::string& source)
     {
-        OpenGLShader* shader = nullptr;
-        Allocate(OpenGLShader, shader);
+        OpenGLShader* shader =  Allocate(OpenGLShader   );
         shader->Load(source, true);
         return shader;
     }

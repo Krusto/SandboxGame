@@ -48,7 +48,7 @@ void Engine::Application::Init(const Engine::ApplicationSpec& spec)
     m_ApplicationSpec.WorkingDirectory = std::filesystem::absolute(spec.WorkingDirectory);
     Logger::Create();
 
-    m_Window = Ref(new Window());
+    m_Window = Allocate(Window);
     m_Window->Create(WindowSpec{m_ApplicationSpec.ApplicationName, m_ApplicationSpec.width, m_ApplicationSpec.height});
 
     RendererSpec rendererSpec = {.SurfaceSize = {m_ApplicationSpec.width, m_ApplicationSpec.height}};

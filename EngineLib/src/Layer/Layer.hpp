@@ -14,7 +14,7 @@ namespace Engine
         virtual ~Layer() = default;
 
     public:
-        virtual void Init(Ref<Window> window) = 0;
+        virtual void Init(Window* window) = 0;
 
         virtual void OnAttach() = 0;
 

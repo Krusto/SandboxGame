@@ -28,7 +28,7 @@ namespace Engine
         {
             for (int x = 0; x < worldSize; x++)
             {
-                for (int y = 0; y < maxChunksY; y++)
+                for (int y = 0; y < 1; y++)
                 {
                     currentChunkPos = glm::ivec3(x, y, z);
                     ChunkFactory::ScheduleChunkForGeneration(currentChunkPos);
@@ -111,7 +111,7 @@ namespace Engine
         {
             for (int x = 0; x < worldSize; x++)
             {
-                for (int y = 0; y < maxChunksY; y++)
+                for (int y = 0; y < 1; y++)
                 {
                     auto currentChunkPos = glm::ivec3(x, y, z);
                     ChunkFactory::ScheduleChunkForGeneration(currentChunkPos);

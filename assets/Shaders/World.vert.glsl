@@ -1,6 +1,6 @@
 #version 450 core
 
-layout(location = 0) in vec3 aPosition;
+layout(location = 0) in vec3 aPos;
 layout(location = 1) in uint aCompressedData;
 
 layout(location = 0) out vec3 outColor;
@@ -22,6 +22,17 @@ uniform mat4 model;
 uniform vec3 offset;
 
 layout(std430, binding = 3) buffer blockBuffer { uint blocks[]; };
+
+uvec3 getPosition()
+{
+    uint x = aCompressedData & 0x1F;
+    uint y = (aCompressedData >> 5) & 0x1F;
+    uint z = (aCompressedData >> 10) & 0x1F;
+    x = uint(aPos.x);
+    y = uint(aPos.y);
+    z = uint(aPos.z);
+    return uvec3(x, y, z);
+}
 
 vec2 getTexCoord(uint axis, uint vertexID, uint width, uint height)
 {
@@ -63,28 +74,29 @@ vec3 getBlockPosition(uint axis, uint width, uint height)
     vec3 blockPosition = vec3(0, 0, 0);
     uint vert = gl_VertexID;
     uint vertexID = getVertexID();
-
+    uvec3 position = getPosition();
+    // if (axis == 1 || axis == 3 || axis == 5) { position.z = position.z + 1; }
     if (axis == 0 || axis == 1)
     {
-        if (vertexID == 3) { blockPosition = vec3(aPosition.x + width, aPosition.z, aPosition.y + height); }
-        else if (vertexID == 2) { blockPosition = vec3(aPosition.x + width, aPosition.z, aPosition.y); }
-        else if (vertexID == 1) { blockPosition = vec3(aPosition.x, aPosition.z, aPosition.y); }
-        else { blockPosition = vec3(aPosition.x, aPosition.z, aPosition.y + height); }
+        if (vertexID == 3) { blockPosition = vec3(position.x + width, position.z, position.y + height); }
+        else if (vertexID == 2) { blockPosition = vec3(position.x + width, position.z, position.y); }
+        else if (vertexID == 1) { blockPosition = vec3(position.x, position.z, position.y); }
+        else { blockPosition = vec3(position.x, position.z, position.y + height); }
     }
     else if (axis == 2 || axis == 3)
     {
-        if (vertexID == 0) { blockPosition = vec3(aPosition.z, aPosition.y + height, aPosition.x + width); }
-        else if (vertexID == 1) { blockPosition = vec3(aPosition.z, aPosition.y, aPosition.x + width); }
-        else if (vertexID == 2) { blockPosition = vec3(aPosition.z, aPosition.y, aPosition.x); }
-        else { blockPosition = vec3(aPosition.z, aPosition.y + height, aPosition.x); }
+        if (vertexID == 0) { blockPosition = vec3(position.z, position.y + height, position.x + width); }
+        else if (vertexID == 1) { blockPosition = vec3(position.z, position.y, position.x + width); }
+        else if (vertexID == 2) { blockPosition = vec3(position.z, position.y, position.x); }
+        else { blockPosition = vec3(position.z, position.y + height, position.x); }
     }
 
     else if (axis == 4 || axis == 5)
     {
-        if (vertexID == 3) { blockPosition = vec3(aPosition.x + width, aPosition.y + height, aPosition.z); }
-        else if (vertexID == 2) { blockPosition = vec3(aPosition.x, aPosition.y + height, aPosition.z); }
-        else if (vertexID == 1) { blockPosition = vec3(aPosition.x, aPosition.y, aPosition.z); }
-        else { blockPosition = vec3(aPosition.x + width, aPosition.y, aPosition.z); }
+        if (vertexID == 3) { blockPosition = vec3(position.x + width, position.y + height, position.z); }
+        else if (vertexID == 2) { blockPosition = vec3(position.x, position.y + height, position.z); }
+        else if (vertexID == 1) { blockPosition = vec3(position.x, position.y, position.z); }
+        else { blockPosition = vec3(position.x + width, position.y, position.z); }
     }
     return blockPosition;
 }
@@ -106,11 +118,11 @@ vec3 getAO(uint axis)
     return vec3(1, 1, 1);
 }
 
-uint getTilingFactorX() { return (aCompressedData >> 8 & 0xFF); }
+uint getTilingFactorX() { return (aCompressedData >> 15 & 0x1F); }
 
-uint getTilingFactorY() { return (aCompressedData >> 16 & 0xFF); }
+uint getTilingFactorY() { return (aCompressedData >> 20 & 0x1F); }
 
-uint getAxis() { return aCompressedData & 0xFF; }
+uint getAxis() { return (aCompressedData >> 25); }
 
 vec3 getNormal(uint axis)
 {
