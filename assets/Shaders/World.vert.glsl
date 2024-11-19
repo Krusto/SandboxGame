@@ -1,7 +1,6 @@
 #version 450 core
 
-layout(location = 0) in vec3 aPos;
-layout(location = 1) in uint aCompressedData;
+layout(location = 0) in uint aCompressedData;
 
 layout(location = 0) out vec3 outColor;
 layout(location = 1) out vec2 texCoord;
@@ -22,17 +21,6 @@ uniform mat4 model;
 uniform vec3 offset;
 
 layout(std430, binding = 3) buffer blockBuffer { uint blocks[]; };
-
-uvec3 getPosition()
-{
-    uint x = aCompressedData & 0x1F;
-    uint y = (aCompressedData >> 5) & 0x1F;
-    uint z = (aCompressedData >> 10) & 0x1F;
-    x = uint(aPos.x);
-    y = uint(aPos.y);
-    z = uint(aPos.z);
-    return uvec3(x, y, z);
-}
 
 vec2 getTexCoord(uint axis, uint vertexID, uint width, uint height)
 {
@@ -69,13 +57,16 @@ vec2 getTexCoord(uint axis, uint vertexID, uint width, uint height)
 
 uint getVertexID() { return gl_VertexID % 4; }
 
+vec3 getPosition() { return vec3(aCompressedData & 0x1F, aCompressedData >> 5 & 0x1F, aCompressedData >> 10 & 0x1F); }
+
 vec3 getBlockPosition(uint axis, uint width, uint height)
 {
     vec3 blockPosition = vec3(0, 0, 0);
     uint vert = gl_VertexID;
     uint vertexID = getVertexID();
-    uvec3 position = getPosition();
-    // if (axis == 1 || axis == 3 || axis == 5) { position.z = position.z + 1; }
+    vec3 position = getPosition();
+
+    if (axis == 1 || axis == 3 || axis == 5) { position.z += 1; }
     if (axis == 0 || axis == 1)
     {
         if (vertexID == 3) { blockPosition = vec3(position.x + width, position.z, position.y + height); }
@@ -118,9 +109,9 @@ vec3 getAO(uint axis)
     return vec3(1, 1, 1);
 }
 
-uint getTilingFactorX() { return (aCompressedData >> 15 & 0x1F); }
+uint getTilingFactorX() { return (aCompressedData >> 15 & 31) + 1; }
 
-uint getTilingFactorY() { return (aCompressedData >> 20 & 0x1F); }
+uint getTilingFactorY() { return (aCompressedData >> 20 & 31) + 1; }
 
 uint getAxis() { return (aCompressedData >> 25); }
 

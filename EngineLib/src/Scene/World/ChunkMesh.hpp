@@ -44,12 +44,6 @@ namespace Engine
 
         static std::vector<Quad> BinaryGreedyMesherPlane(uint32_t* faceData, uint32_t axis);
 
-        void GenerateVertexDataStupid(const BlockData* blockData, std::vector<VoxelVertex>& vertices,
-                                      std::vector<uint32_t>& indices, uint32_t& maxIndex);
-
-        void InsertFaceStupid(std::vector<VoxelVertex>& vertices, std::array<VoxelVertex, 4> verticesToAdd,
-                              glm::vec3 position, uint8_t block = BlockType::GRASS);
-
         static void InsertFace(std::vector<VoxelVertex>& vertices, uint32_t axis, const Quad& quad, uint32_t z);
 
         void GenerateIndices(std::vector<uint32_t>& indices, uint32_t numQuads);

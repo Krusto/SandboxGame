@@ -37,7 +37,7 @@ void SandboxLayer::Init(Engine::Window* window)
 
     Engine::TerrainGenerationSettings settings = {.Seed = 0,
                                                   .AssetsDirectory = m_AssetsDirectory,
-                                                  .GenerationDistance = 1};
+                                                  .GenerationDistance = 50};
     m_World->Init(settings, m_TexturesDirectory);
 
     m_Camera.Init(Engine::CameraSpec({m_AppSpec.width, m_AppSpec.height}, 45.0f, 0.1f, 1000.0f));
