@@ -38,14 +38,8 @@ namespace Engine
             std::unique_lock<std::recursive_mutex> lock(Engine::Allocator::s_Mutex);
             T* ptr;
 
-            if (metadata.isArray == true) 
-            { 
-                ptr = new T[metadata.len * metadata.size];
-            }
-            else
-            {
-                ptr = new T(std::forward<Args>(args)...);
-            }
+            if (metadata.isArray == true) { ptr = new T[metadata.len * metadata.size]; }
+            else { ptr = new T(std::forward<Args>(args)...); }
             Engine::PointerMetaData newmetadata = metadata;
             newmetadata.size = metadata.size * metadata.len;
             newmetadata.ptr = ptr;
@@ -140,62 +134,55 @@ namespace Engine
 
 #define Allocate(type, ...)                                                                                            \
     std::invoke([&, location = std::source_location::current()]() -> type* {                                           \
-        Engine::PointerMetaData metaData(location);                                                                            \
+        Engine::PointerMetaData metaData(location);                                                                    \
         metaData.size = sizeof(type);                                                                                  \
         metaData.isArray = false;                                                                                      \
         metaData.len = 1;                                                                                              \
-        return Engine::Allocator::_Allocate<type>(metaData, __VA_ARGS__);                                                 \
+        return Engine::Allocator::_Allocate<type>(metaData, __VA_ARGS__);                                              \
     })
 #define AllocateArray(type, ssize)                                                                                     \
     std::invoke([&, location = std::source_location::current()]() -> type* {                                           \
-        Engine::PointerMetaData metaData(location);                                                                            \
+        Engine::PointerMetaData metaData(location);                                                                    \
         metaData.size = sizeof(type);                                                                                  \
         metaData.isArray = true;                                                                                       \
         metaData.len = ssize;                                                                                          \
-        return Engine::Allocator::_Allocate<type>(metaData);                                                              \
+        return Engine::Allocator::_Allocate<type>(metaData);                                                           \
     })
 #define Deallocate(pptr)                                                                                               \
     std::invoke([&, location = std::source_location::current()]() -> void {                                            \
-        Engine::PointerMetaData metaData(location);                                                                            \
+        Engine::PointerMetaData metaData(location);                                                                    \
         metaData.ptr = pptr;                                                                                           \
         metaData.isArray = false;                                                                                      \
-        Engine::Allocator::_Deallocate<decltype(pptr)>(metaData);                                                              \
+        Engine::Allocator::_Deallocate<decltype(pptr)>(metaData);                                                      \
     })
 #define DeallocateArray(pptr)                                                                                          \
     std::invoke([&, location = std::source_location::current()]() -> void {                                            \
-        Engine::PointerMetaData metaData(location);                                                                            \
+        Engine::PointerMetaData metaData(location);                                                                    \
         metaData.ptr = pptr;                                                                                           \
         metaData.isArray = true;                                                                                       \
-        Engine::Allocator::_Deallocate<decltype(pptr)>(metaData);                                                              \
+        Engine::Allocator::_Deallocate<decltype(pptr)>(metaData);                                                      \
     })
 #define AddToAllocatedMemory(pptr, type)                                                                               \
     std::invoke([&, location = std::source_location::current()]() -> void {                                            \
-        Engine::PointerMetaData metaData(location);                                                                            \
+        Engine::PointerMetaData metaData(location);                                                                    \
         metaData.ptr = pptr;                                                                                           \
         metaData.size = sizeof(type);                                                                                  \
-        Engine::Allocator::_AddToAllocatedMemory<type>(metaData);                                                              \
+        Engine::Allocator::_AddToAllocatedMemory<type>(metaData);                                                      \
     })
 #define AllocatorIsLive(pptr, type)                                                                                    \
     std::invoke([&, location = std::source_location::current()]() -> bool {                                            \
-        Engine::PointerMetaData metaData(location);                                                                            \
+        Engine::PointerMetaData metaData(location);                                                                    \
         metaData.ptr = pptr;                                                                                           \
-        return Engine::Allocator::_IsLive<type>(metaData);                                                                     \
+        return Engine::Allocator::_IsLive<type>(metaData);                                                             \
     })
 #else
-
-#define Allocate(type, ...) Allocator::_Allocate<type>(sizeof(type), __VA_ARGS__)
-#define AllocateArray(type, size) Allocator::_Allocate<type>(size * sizeof(type))
-#define AddToAllocatedMemory(ptr, size) Allocator::_AddToAllocatedMemory<type>(ptr, size)
-#define Deallocate(ptr) Allocator::_Deallocate<decltype(ptr)>(ptr, false)
-#define DeallocateArray(ptr) Allocator::_Deallocate<decltype(ptr)>(ptr, true)
-#define IsLive(ptr, size) Allocator::_IsLive<decltype(ptr)>(ptr, size)
 
     class Allocator
     {
     public:
-        inline static std::vector<std::pair<void*, size_t>> Engine::Allocator::s_Allocations;
-        inline static size_t Engine::Allocator::s_AllocatedMemorySize;
-        inline static std::recursive_mutex Engine::Allocator::s_Mutex{};
+        inline static std::vector<std::pair<void*, size_t>> s_Allocations;
+        inline static size_t s_AllocatedMemorySize;
+        inline static std::recursive_mutex s_Mutex{};
 
         template <typename T, typename... Args>
         static T* _Allocate(size_t size, Args... args)
@@ -232,7 +219,7 @@ namespace Engine
         }
 
         template <typename T>
-        static void _AddToAllocatedMemory(T* ptr = nullptr, size_t size)
+        static void _AddToAllocatedMemory(T* ptr = nullptr, size_t size = sizeof(T))
         {
             std::unique_lock<std::recursive_mutex> lock(Engine::Allocator::s_Mutex);
             bool found = false;
@@ -241,8 +228,9 @@ namespace Engine
             {
                 if (allocation.first == ptr)
                 {
+                    LOG("Found at: %i\n", index);
                     found = true;
-                    break;
+                    return;
                 }
                 index++;
             }
@@ -254,7 +242,7 @@ namespace Engine
         {
             for (auto& allocation: Engine::Allocator::s_Allocations)
             {
-                if (allocation.ptr == metadata.ptr) { return true; }
+                if (allocation.first == ptr) { return true; }
             }
             return false;
         }
@@ -271,6 +259,13 @@ namespace Engine
             LOG_INFO("============================================\n");
         }
     };
+
+#define Allocate(type, ...) Engine::Allocator::_Allocate<type>(sizeof(type), __VA_ARGS__)
+#define AllocateArray(type, size) Engine::Allocator::_Allocate<type>(size * sizeof(type))
+#define AddToAllocatedMemory(ptr, type) Engine::Allocator::_AddToAllocatedMemory<type>(ptr, sizeof(type))
+#define Deallocate(ptr) Engine::Allocator::_Deallocate<decltype(ptr)>(ptr, false)
+#define DeallocateArray(ptr) Engine::Allocator::_Deallocate<decltype(ptr)>(ptr, true)
+#define IsLive(ptr, size) Engine::Allocator::_IsLive<decltype(ptr)>(ptr, size)
 #endif
 
 }// namespace Engine

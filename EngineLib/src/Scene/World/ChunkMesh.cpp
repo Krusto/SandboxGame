@@ -116,26 +116,10 @@ namespace Engine
             }
         }
 
-        // for (size_t axis = 0; axis < 6; axis++)
-        // {
-        //     for (auto& [block, planes]: data[axis])
-        //     {
-        //         for (auto& [y, plane]: planes)
-        //         {
-        //             auto quads = BinaryGreedyMesherPlane(&plane[0], axis);
-
-        //             for (auto& quad: quads)
-        //             {
-        //                 InsertFace(vertices, axis, quad, y);
-        //                 blocks.push_back(block);
-        //             }
-        //         }
-        //     }
-        // }
-
         for (size_t axis = 0; axis < 6; axis++)
         {
-            for (auto& [block, planes]: data[axis])
+            auto& planesAtCurrentAxis = data[axis];
+            for (auto& [block, planes]: planesAtCurrentAxis)
             {
                 for (auto& [y, plane]: planes)
                 {
@@ -149,25 +133,6 @@ namespace Engine
                 }
             }
         }
-
-        // size_t totalSize = 0;
-        // std::array<std::vector<VoxelVertex>*, 6> results;
-        // for (size_t i = 0; i < 6; i++)
-        // {
-        //     auto& thread = threads[i];
-        //     results[i] = thread.get();
-        //     totalSize += results[i]->size();
-        // }
-        // vertices.reserve(totalSize);
-        // for (size_t i = 0; i < 6; i++)
-        // {
-        //     auto result = results[i];
-        //     if (result)
-        //     {
-        //         vertices.insert(vertices.end(), result->begin(), result->end());
-        //         Deallocate(result);
-        //     }
-        // }
 
         GenerateIndices(indices, vertices.size() / 4);
 
@@ -205,83 +170,20 @@ namespace Engine
         return quads;
     }
 
-    void ChunkMesh::GenerateVertexDataStupid(const BlockData* blockData, std::vector<VoxelVertex>& vertices,
-                                             std::vector<uint32_t>& indices, uint32_t& maxIndex)
-    {
-        for (size_t y = 0; y < CHUNK_SIZE; y++)
-        {
-            for (size_t x = 0; x < CHUNK_SIZE; x++)
-            {
-                for (size_t z = 0; z < CHUNK_SIZE; z++)
-                {
-                    glm::vec3 topPosition = glm::vec3{x, y + 1, z};
-                    glm::vec3 bottomPosition = glm::vec3{x, y - 1, z};
-                    glm::vec3 leftPosition = glm::vec3{x - 1, y, z};
-                    glm::vec3 rightPosition = glm::vec3{x + 1, y, z};
-                    glm::vec3 frontPosition = glm::vec3{x, y, z + 1};
-                    glm::vec3 backPosition = glm::vec3{x, y, z - 1};
-                    /*if (!blockData->IsSolidSafe(topPosition))
-                    {
-                        InsertFaceStupid(vertices, TopBlockFaceVertices, glm::vec3{x, y, z});
-                    }
-                    if (!blockData->IsSolidSafe(bottomPosition))
-                    {
-                        InsertFaceStupid(vertices, BottomBlockFaceVertices, glm::vec3{x, y, z});
-                    }
-                    if (!blockData->IsSolidSafe(leftPosition))
-                    {
-                        InsertFaceStupid(vertices, LeftBlockFaceVertices, glm::vec3{x, y, z});
-                    }
-                    if (!blockData->IsSolidSafe(rightPosition))
-                    {
-                        InsertFaceStupid(vertices, RightBlockFaceVertices, glm::vec3{x, y, z});
-                    }
-                    if (!blockData->IsSolidSafe(frontPosition))
-                    {
-                        InsertFaceStupid(vertices, FrontBlockFaceVertices, glm::vec3{x, y, z});
-                    }
-                    if (!blockData->IsSolidSafe(backPosition))
-                    {
-                        InsertFaceStupid(vertices, BackBlockFaceVertices, glm::vec3{x, y, z});
-                    }*/
-                }
-            }
-        }
-        GenerateIndices(indices, vertices.size() / 4);
-    }
-
-    void ChunkMesh::InsertFaceStupid(std::vector<VoxelVertex>& vertices, std::array<VoxelVertex, 4> verticesToAdd,
-                                     glm::vec3 position, uint8_t block)
-    {
-        std::for_each(verticesToAdd.begin(), verticesToAdd.end(), [block](VoxelVertex& vertex) {
-            vertex.compressedData = 257;
-            vertex.compressedData |= ((uint32_t) block & 0xFF) << 16;
-        });
-        vertices.insert(vertices.end(), verticesToAdd.begin(), verticesToAdd.end());
-    }
-
     void ChunkMesh::InsertFace(std::vector<VoxelVertex>& vertices, uint32_t axis, const Quad& quad, uint32_t z)
     {
 
         for (uint32_t i = 0; i < 4; i++)
         {
             VoxelVertex vertex{};
-            if (axis % 2 == 0) { vertex.pos.z = z; }
-            else
-            {
-                vertex.pos.z = z + 1;
-                //vertex.compressedData |= ((uint32_t) (z) & 0x1Fu) << 10;
-            }
-            vertex.pos.x = quad.x;
-            vertex.pos.y = quad.y;
-            vertex.compressedData |= (uint32_t) quad.x & 0x1Fu;
+
+            vertex.compressedData = (uint32_t) quad.x & 0x1Fu;
             vertex.compressedData |= ((uint32_t) quad.y & 0x1Fu) << 5;
             vertex.compressedData |= ((uint32_t) z & 0x1Fu) << 10;
-            vertex.compressedData |= ((uint32_t) quad.w & 0x1Fu) << 15;// << 15;
-            vertex.compressedData |= ((uint32_t) quad.h & 0x1Fu) << 20;// << 20;
+            vertex.compressedData |= ((uint32_t) quad.w - 1) << 15;
+            vertex.compressedData |= ((uint32_t) quad.h - 1) << 20;
             vertex.compressedData |= ((uint32_t) axis) << 25;
 
-            // LOG("Vertex: %d %d %d %d %d %d\n", quad.x, quad.y, z, quad.w, quad.h, axis);
             vertices.push_back(vertex);
         }
     }
@@ -305,10 +207,6 @@ namespace Engine
         std::array<VoxelVertex, 4> vertices{};
         for (uint32_t i = 0; i < 4; i++)
         {
-            // if (axis % 2 == 0) { vertices[i].pos.z = z; }
-            // else { vertices[i].pos.z = z + 1; }
-            // vertices[i].pos.x = quad.x;
-            // vertices[i].pos.y = quad.y;
             vertices[i].compressedData |= axis;
             vertices[i].compressedData |= ((uint32_t) quad.w & 0xFF) << 8;
             vertices[i].compressedData |= ((uint32_t) quad.h & 0xFF) << 16;
