@@ -50,8 +50,7 @@ namespace Engine
         void InsertFaceStupid(std::vector<VoxelVertex>& vertices, std::array<VoxelVertex, 4> verticesToAdd,
                               glm::vec3 position, uint8_t block = BlockType::GRASS);
 
-        static void InsertFace(std::vector<VoxelVertex>& vertices, std::array<VoxelVertex, 4>& verticesToAdd,
-                               uint8_t block = BlockType::GRASS, glm::vec2 tiling = {1, 1});
+        static void InsertFace(std::vector<VoxelVertex>& vertices, uint32_t axis, const Quad& quad, uint32_t z);
 
         void GenerateIndices(std::vector<uint32_t>& indices, uint32_t numQuads);
 
@@ -61,6 +60,7 @@ namespace Engine
         static void GenerateFaceLayer(const BlockData* blockData, uint32_t axis, uint32_t* data);
 
         static RendererCommand GetGenerateCommand(ChunkMesh* mesh);
+
     private:
         ChunkMeshRaw m_Mesh{};
 

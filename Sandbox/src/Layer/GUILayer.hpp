@@ -10,7 +10,7 @@ public:
     ~GUILayer() = default;
 
 public:
-    void Init(Ref<Engine::Window> window) override;
+    void Init(Engine::Window* window) override;
 
     void OnAttach() override;
 

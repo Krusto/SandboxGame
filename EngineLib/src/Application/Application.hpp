@@ -31,14 +31,14 @@ namespace Engine
 
         static Application& Get() { return *Application::s_Application; }
 
-        Ref<Window> WindowHandle() { return m_Window; }
+        Window* WindowHandle() { return m_Window; }
 
         void Destroy();
 
     protected:
         static Application* s_Application;
 
-        Ref<Window> m_Window;
+        Window* m_Window;
         ApplicationSpec m_ApplicationSpec;
     };
 

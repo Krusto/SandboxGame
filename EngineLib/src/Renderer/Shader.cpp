@@ -8,8 +8,7 @@ namespace Engine
 
     Shader* Shader::Load(const std::string& path)
     {
-        Shader* ptr;
-        Allocate(OpenGLShader, ptr, path, false);
+        Shader* ptr =Allocate(OpenGLShader, path, false);
         return ptr;
     }
 }// namespace Engine

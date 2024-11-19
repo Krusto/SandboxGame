@@ -4,7 +4,7 @@
 
 namespace Engine
 {
-    inline static constexpr std::array<VoxelVertex, 4> TopBlockFaceVertices = {
+   /* inline static constexpr std::array<VoxelVertex, 4> TopBlockFaceVertices = {
             VoxelVertex{glm::vec3(0, 1, 1)},
             VoxelVertex{glm::vec3(0, 1, 0)},
             VoxelVertex{glm::vec3(1, 1, 0)},
@@ -43,5 +43,5 @@ namespace Engine
 
     inline static const std::array<VoxelVertex, 4> BlockFaceVertices[6] = {
             LeftBlockFaceVertices,   RightBlockFaceVertices, TopBlockFaceVertices,
-            BottomBlockFaceVertices, FrontBlockFaceVertices, BackBlockFaceVertices};
+            BottomBlockFaceVertices, FrontBlockFaceVertices, BackBlockFaceVertices};*/
 }// namespace Engine

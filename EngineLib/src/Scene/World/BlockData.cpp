@@ -1,7 +1,7 @@
 #include <Core/Log.hpp>
 #include <Core/Allocator.hpp>
 #include <algorithm>
-
+#include <functional>
 #include "BlockRegistry.hpp"
 #include "BlockData.hpp"
 
@@ -9,7 +9,7 @@ namespace Engine
 {
     void BlockData::Init(uint32_t seed)
     {
-        AllocateArray(uint8_t, m_Data, CHUNK_SIZE_CUBIC);
+        m_Data = AllocateArray(uint8_t, CHUNK_SIZE_CUBIC);
         for (size_t i = 0; i < CHUNK_SIZE_CUBIC; i++) { m_Data[i] = 0; }
     }
 

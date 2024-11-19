@@ -81,7 +81,8 @@ target_compile_definitions(EngineLib
     PUBLIC
     FASTNOISE_STATIC_LIB 
     $<$<CONFIG:Debug>:ENGINE_ENABLE_VERBOSE_LOG>
-    # $<$<CONFIG:Debug>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
+    $<$<CONFIG:Debug>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
+    $<$<CONFIG:Release>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
     $<$<CONFIG:Release>:_RELEASE>
     $<$<CONFIG:RelWithDebInfo>:_DEBUG>
     $<$<CONFIG:MinSizeRel>:_RELEASE>

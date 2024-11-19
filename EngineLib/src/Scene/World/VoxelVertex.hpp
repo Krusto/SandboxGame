@@ -11,8 +11,7 @@ namespace Engine
 
         static Engine::VertexLayout GetLayout()
         {
-            return {{"Position", Engine::ShaderUniformType::Vec3},
-                    {"CompressedData", Engine::ShaderUniformType::UInt}};
+            return {{"Position", Engine::ShaderUniformType::Vec3}, {"CompressedData", Engine::ShaderUniformType::UInt}};
         }
     };
 }// namespace Engine

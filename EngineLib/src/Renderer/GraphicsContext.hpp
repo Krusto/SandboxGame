@@ -7,6 +7,7 @@
 class GraphicsContext
 {
 public:
+    GraphicsContext() {}
     GraphicsContext(GLFWwindow* handle) : p_WindowPtr(handle) {}
 
 public:
@@ -23,5 +24,5 @@ public:
     static GraphicsContext* s_Context;
 
 protected:
-    GLFWwindow* p_WindowPtr;
+    GLFWwindow* p_WindowPtr{};
 };

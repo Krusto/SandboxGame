@@ -14,7 +14,7 @@ SandboxLayer::SandboxLayer(const Engine::ApplicationSpec& spec)
     m_SkyboxDirectory = (m_TexturesDirectory.string() + "/Skybox");
 }
 
-void SandboxLayer::Init(Ref<Engine::Window> window)
+void SandboxLayer::Init(Engine::Window* window)
 {
     m_Window = window;
     std::string worldShaderPath = m_ShadersDirectory.string() + "/World";
@@ -37,7 +37,7 @@ void SandboxLayer::Init(Ref<Engine::Window> window)
 
     Engine::TerrainGenerationSettings settings = {.Seed = 0,
                                                   .AssetsDirectory = m_AssetsDirectory,
-                                                  .GenerationDistance = 50};
+                                                  .GenerationDistance = 1};
     m_World->Init(settings, m_TexturesDirectory);
 
     m_Camera.Init(Engine::CameraSpec({m_AppSpec.width, m_AppSpec.height}, 45.0f, 0.1f, 1000.0f));

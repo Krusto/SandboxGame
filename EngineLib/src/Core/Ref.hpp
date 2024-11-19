@@ -112,7 +112,17 @@ public:
     WeakRef(T* instance) { m_Instance = instance; }
 
 public:
-    bool IsValid() const { return m_Instance ? Engine::Allocator::IsLive(m_Instance) : false; }
+    bool IsValid() const
+    {
+
+        bool flag{};
+        if (flag) {
+            flag = AllocatorIsLive(m_Instance,T);
+        }
+
+        return flag;
+
+    }
 
     Ref<T> Lock() const
     {

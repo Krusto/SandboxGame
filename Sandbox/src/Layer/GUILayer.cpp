@@ -14,7 +14,7 @@ GUILayer::GUILayer(const Engine::ApplicationSpec& spec)
     m_TexturesDirectory = (m_AssetsDirectory.string() + "/Textures");
 }
 
-void GUILayer::Init(Ref<Engine::Window> window)
+void GUILayer::Init(Engine::Window* window)
 {
 
 

@@ -7,7 +7,7 @@ class OpenGLContext: public GraphicsContext
 public:
     OpenGLContext() = default;
 
-    OpenGLContext(GLFWwindow* handle) : GraphicsContext(handle) {}
+    explicit OpenGLContext(GLFWwindow* handle) : GraphicsContext(handle) {}
 
     ~OpenGLContext() = default;
 

@@ -11,7 +11,7 @@ public:
     ~SandboxLayer() = default;
 
 public:
-    void Init(Ref<Engine::Window> window) override;
+    void Init(Engine::Window* window) override;
 
     void OnAttach() override;
 
@@ -42,7 +42,7 @@ public:
     void End() override {}
 
 protected:
-    Ref<Engine::Window> m_Window;
+    Engine::Window* m_Window;
     Ref<Engine::Shader> m_Shader;
     Ref<Engine::Shader> m_CubeShader;
     Engine::Skybox* m_Skybox{};
