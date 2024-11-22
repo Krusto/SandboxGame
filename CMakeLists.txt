@@ -65,11 +65,12 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_compile_options(CUtils INTERFACE -Wno-fPermissive)
 
 endif()
+
+if(MSVC)
+    target_compile_options(EngineLib PRIVATE /MP)
+endif()
 if (WIN32)
     target_compile_definitions(EngineLib PRIVATE GLFW_EXPOSE_NATIVE_WIN32)
-    
-    target_compile_options(EngineLib PRIVATE /MP)
-
 else ()
     find_package(X11 REQUIRED)
     link_libraries(${X11_LIBRARIES})

@@ -36,14 +36,14 @@ namespace Engine
 
     void Renderer::Init(RendererSpec rendererSpec, ApplicationSpec applicationSpec)
     {
-        s_RendererAPI = Allocate(OpenGLRenderer);
+        s_RendererAPI = Engine::Allocator::Allocate < OpenGLRenderer>();
 
         if (s_RendererAPI) s_RendererAPI->Init(rendererSpec, applicationSpec);
     }
 
     void Renderer::Destroy()
     {
-        if (s_RendererAPI) Deallocate(s_RendererAPI);
+        if (s_RendererAPI) Engine::Allocator::Deallocate(s_RendererAPI);
     }
 
     void Renderer::InitImGUI(Window* window) {}

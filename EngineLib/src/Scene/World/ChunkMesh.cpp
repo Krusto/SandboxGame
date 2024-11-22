@@ -61,7 +61,7 @@ namespace Engine
     {
 
 
-        uint32_t* face_layers = AllocateArray(uint32_t, CHUNK_SIZE_SQUARE * 3);
+        uint32_t* face_layers = Engine::Allocator::AllocateArray < uint32_t>( CHUNK_SIZE_SQUARE * 3);
         std::memset(face_layers, 0, (size_t) CHUNK_SIZE_SQUARE * 3 * 4);
         GenerateFaceLayer(blockData, 0, face_layers);
 
@@ -136,7 +136,7 @@ namespace Engine
 
         GenerateIndices(indices, vertices.size() / 4);
 
-        DeallocateArray(face_layers);
+        Engine::Allocator::Deallocate(face_layers);
     }
 
     std::vector<Quad> ChunkMesh::BinaryGreedyMesherPlane(uint32_t* faceData, uint32_t axis)
@@ -218,8 +218,8 @@ namespace Engine
     {
         m_VertexArray->Destroy();
         m_Buffer->Destroy();
-        Deallocate(m_VertexArray);
-        Deallocate(m_Buffer);
+        Engine::Allocator::Deallocate(m_VertexArray);
+        Engine::Allocator::Deallocate(m_Buffer);
         m_VertexArray = nullptr;
         m_Buffer = nullptr;
     }

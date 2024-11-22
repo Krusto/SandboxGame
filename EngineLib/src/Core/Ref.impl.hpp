@@ -8,7 +8,7 @@ Ref<T>::Ref(T* instance) : m_Instance(instance)
     {
         static_assert(std::is_base_of<RefCounted, T>::value, "Class is not RefCounted!");
         std::lock_guard<std::mutex> lock(m);
-        AddToAllocatedMemory(m_Instance,T);
+        Engine::Allocator::AddToAllocatedMemory<T>(m_Instance);
         IncRef();
     }
 }
@@ -145,7 +145,7 @@ template <typename T>
 template <typename... Args>
 Ref<T> Ref<T>::Create(Args&&... args)
 {
-    T* ptr = Allocate(T, std::forward<Args>(args)...);
+    T* ptr = Engine::Allocator::Allocate<T>(std::forward<Args>(args)...);
     return Ref<T>(ptr);
 }
 
@@ -206,7 +206,7 @@ void Ref<T>::DecRef() const
         if (m_Instance->GetRefCount() == 0)
         {
             std::lock_guard<std::mutex> lock(m);
-            Deallocate(m_Instance);
+            Engine::Allocator::Deallocate(m_Instance);
             m_Instance = nullptr;
         }
     }

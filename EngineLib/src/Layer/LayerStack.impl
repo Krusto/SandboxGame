@@ -6,7 +6,7 @@ namespace Engine
     void LayerStack::ConstructAndPushLayer(Args&&... args)
     {
         T* ptr=
-        Allocate(T, std::forward<Args>(args)...);
+        Engine::Allocator::Allocate<T>(std::forward<Args>(args)...);
         LayerStack::PushLayer(ptr);
     }
 

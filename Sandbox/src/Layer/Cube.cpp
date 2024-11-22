@@ -35,7 +35,7 @@ void Cube::Destroy()
     if (m_VertexArray)
     {
         m_VertexArray->Destroy();
-        Deallocate(m_VertexArray);
+        Engine::Allocator::Deallocate(m_VertexArray);
         m_VertexArray = nullptr;
     }
 }

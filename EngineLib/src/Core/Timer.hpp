@@ -34,6 +34,7 @@ class ScopedTimer
 public:
     ScopedTimer(std::string_view name) : m_Name(name) {}
 
+
     ~ScopedTimer()
     {
         float time = m_Timer.ElapsedMillis();

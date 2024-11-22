@@ -8,7 +8,7 @@ namespace Engine
 
     VertexArray* VertexArray::Create(uint32_t indexCount)
     {
-        VertexArray* ptr=Allocate(OpenGLVertexArray);
+        VertexArray* ptr=Engine::Allocator::Allocate<OpenGLVertexArray>();
         ptr->Init(indexCount);
         return ptr;
     }

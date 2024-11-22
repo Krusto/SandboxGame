@@ -13,7 +13,7 @@ namespace Engine
                            const std::unordered_map<CubemapTextureFace, std::string>& Path)
     {
         Skybox* ptr = 
-        Allocate(Skybox);
+        Engine::Allocator::Allocate < Skybox>();
         ptr->Load(cubemapName, shaderPath, Path);
         return ptr;
     }
@@ -59,19 +59,19 @@ namespace Engine
         if (m_Cubemap)
         {
             m_Cubemap->Destroy();
-            Deallocate(m_Cubemap);
+            Engine::Allocator::Deallocate(m_Cubemap);
             m_Cubemap = nullptr;
         }
         if (m_Shader)
         {
             m_Shader->Destroy();
-            Deallocate(m_Shader);
+            Engine::Allocator::Deallocate(m_Shader);
             m_Shader = nullptr;
         }
         if (m_VertexArray)
         {
             m_VertexArray->Destroy();
-            Deallocate(m_VertexArray);
+            Engine::Allocator::Deallocate(m_VertexArray);
             m_VertexArray = nullptr;
         }
     }

@@ -63,8 +63,8 @@ void SandboxLayer::Destroy()
     m_Shader->Destroy();
     m_CubeShader->Destroy();
     m_Skybox->Destroy();
-    Deallocate(m_Skybox);
-    for (int i = 0; i < m_Cubes.size(); i++) { Deallocate(m_Cubes[i]); }
+    Engine::Allocator::Deallocate(m_Skybox);
+    for (int i = 0; i < m_Cubes.size(); i++) { Engine::Allocator::Deallocate(m_Cubes[i]); }
     m_Cubes.clear();
 }
 
