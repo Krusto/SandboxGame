@@ -56,7 +56,7 @@ namespace Engine
 
                 s_ChunkGenerationWorkers[chunkPos] =
                         std::async(std::launch::async, [settings = s_TerrainGenerationSettings, chunkPos]() {
-                            Chunk* chunk=Allocate(Chunk);
+                            Chunk* chunk = Engine::Allocator::Allocate < Chunk>();
                             chunk->terrainShape = GenerateTerrainShape(settings, chunkPos);
                             chunk->blockData = GenerateBlockData(settings, chunk->terrainShape, chunkPos);
                             chunk->mesh = GenerateChunkMesh(chunk->blockData);
@@ -73,7 +73,7 @@ namespace Engine
                 Chunk* chunk = worker.get();
                 s_CurrentChunkGenerationCount--;
                 s_DoneChunks.try_emplace(chunkPos, *chunk);
-                Deallocate(chunk);
+                Engine::Allocator::Deallocate(chunk);
                 s_ChunksToUpload.try_emplace(chunkPos, ChunkStatus::None);
                 workersToErase.push_back(chunkPos);
             }
@@ -129,7 +129,7 @@ namespace Engine
                                                glm::ivec3 chunkPosition)
     {
         BlockData* ptr =  
-        Allocate(BlockData );
+        Engine::Allocator::Allocate < BlockData>();
         ptr->Init(settings.Seed);
         TerrainGenerator::GenerateBlocks(settings, shapeData, ptr, chunkPosition);
         return ptr;
@@ -140,14 +140,14 @@ namespace Engine
         if (data)
         {
             data->Destroy();
-            Deallocate(data);
+            Engine::Allocator::Deallocate(data);
         }
     }
 
     TerrainShape* ChunkFactory::GenerateTerrainShape(TerrainGenerationSettings settings, glm::ivec3 chunkPosition)
     {
         TerrainShape* ptr =  
-        Allocate(TerrainShape   );
+        Engine::Allocator::Allocate < TerrainShape>();
         TerrainGenerator::GenerateTerrainShape(settings, ptr, chunkPosition);
         return ptr;
     }
@@ -157,13 +157,13 @@ namespace Engine
         if (data)
         {
             data->Destroy();
-            Deallocate(data);
+            Engine::Allocator::Deallocate(data);
         }
     }
 
     ChunkMesh* ChunkFactory::GenerateChunkMesh(BlockData* blockData)
     {
-        ChunkMesh* ptr =  Allocate(ChunkMesh   );
+        ChunkMesh* ptr = Engine::Allocator::Allocate < ChunkMesh>();
         ptr->Generate(blockData);
         return ptr;
     }
@@ -173,7 +173,7 @@ namespace Engine
         if (mesh)
         {
             mesh->Destroy();
-            Deallocate(mesh);
+            Engine::Allocator::Deallocate(mesh);
         }
     }
 }// namespace Engine

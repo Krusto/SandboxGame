@@ -7,7 +7,7 @@ namespace Engine
 {
     Framebuffer* Framebuffer::Create(uint32_t width, uint32_t height)
     {
-        OpenGLFramebuffer* framebufferPtr = Allocate(OpenGLFramebuffer);
+        OpenGLFramebuffer* framebufferPtr = Engine::Allocator::Allocate<OpenGLFramebuffer>();
         if (framebufferPtr) framebufferPtr->Init(width, height);
         return framebufferPtr;
     }

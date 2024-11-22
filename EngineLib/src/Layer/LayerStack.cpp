@@ -35,7 +35,7 @@ namespace Engine
     void LayerStack::DestroyLayers()
     {
         for (auto& layer: m_Layers) { layer->Destroy(); }
-        for (auto& layer: m_Layers) { Deallocate(layer); }
+        for (auto& layer: m_Layers) { Engine::Allocator::Deallocate(layer); }
 
         m_Layers.clear();
     }

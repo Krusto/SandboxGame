@@ -11,7 +11,7 @@ namespace Engine
                                            const std::unordered_map<CubemapTextureFace, std::string>& Path)
     {
         CubemapTexture* ptr = 
-        Allocate(CubemapTexture);
+        Engine::Allocator::Allocate < CubemapTexture>();
         ptr->Load(cubemapName, Path);
         return ptr;
     }
