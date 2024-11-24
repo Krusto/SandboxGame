@@ -40,10 +40,10 @@ namespace Engine
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     }
 
-    void OpenGLStorageBuffer::Bind() const
+    void OpenGLStorageBuffer::Bind(size_t location) const
     {
         assert(m_ID != 0);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_ID);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, location, m_ID);
     }
 
     void OpenGLStorageBuffer::Unbind() const { glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0); }

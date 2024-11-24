@@ -51,7 +51,7 @@ namespace Engine
         Init(width, height);
     }
 
-    void OpenGLFramebuffer::Bind()
+    void OpenGLFramebuffer::Bind() const
     {
         glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
         glViewport(0, 0, (GLsizei) m_width, (GLsizei) m_height);

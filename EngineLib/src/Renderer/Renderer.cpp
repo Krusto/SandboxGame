@@ -59,7 +59,10 @@ namespace Engine
 
     void Renderer::ClearColor(glm::vec4 color)
     {
+        Renderer::Submit(RendererCommand([=]() {
         if (s_RendererAPI) s_RendererAPI->ClearColor(color);
+
+            }));
     }
 
     GraphicsContext* Renderer::CreateGraphicsContext(GLFWwindow* handle) { return GraphicsContext::Create(handle); }

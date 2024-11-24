@@ -11,4 +11,9 @@ namespace Engine
         if (framebufferPtr) framebufferPtr->Init(width, height);
         return framebufferPtr;
     }
+
+    RendererCommand Framebuffer::BindCommand() const
+    {
+        return RendererCommand([=]() { Bind(); });
+    }
 }// namespace Engine

@@ -25,14 +25,14 @@ namespace Engine
     public:
         virtual void Init(uint8_t* data, size_t size, StorageBufferType type) = 0;
 
-        virtual void Bind() const = 0;
+        virtual void Bind(size_t location) const = 0;
 
         virtual void Unbind() const = 0;
 
         virtual void Destroy() = 0;
 
     public:
-        uint32_t id() { return m_ID; }
+        uint32_t id() const { return m_ID; }
 
     protected:
         uint32_t m_ID{};
