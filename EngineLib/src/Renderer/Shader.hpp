@@ -7,8 +7,10 @@
 #include <glm/glm.hpp>
 
 #include <Core/Ref.hpp>
+
+#include <Renderer/RendererCommand.hpp>
 #include <Renderer/ShaderUniform.hpp>
-#include "ShaderDataType.hpp"
+#include <Renderer/ShaderDataType.hpp>
 
 namespace Engine
 {
@@ -46,6 +48,9 @@ namespace Engine
         virtual void SetUniform(const std::string& fullname, const glm::vec4& value) const = 0;
         virtual void SetUniform(const std::string& fullname, const glm::mat3& value) const = 0;
         virtual void SetUniform(const std::string& fullname, const glm::mat4& value) const = 0;
+
+    public:
+        RendererCommand BindCommand() const;
 
     public:
         uint32_t offset = 0;

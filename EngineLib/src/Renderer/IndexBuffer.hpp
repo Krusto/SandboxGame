@@ -3,15 +3,16 @@
 
 namespace Engine
 {
+    class VertexArray;
     class IndexBuffer
     {
     public:
-        static IndexBuffer* Create(const uint32_t* data, uint32_t length);
+        static IndexBuffer* Create(VertexArray* va, const uint32_t* data, uint32_t length);
 
     public:
         virtual ~IndexBuffer() = default;
 
-        virtual void Init(const uint32_t* data, uint32_t length) = 0;
+        virtual void Init(VertexArray* va, const uint32_t* data, uint32_t length) = 0;
 
         virtual void Destroy() = 0;
 

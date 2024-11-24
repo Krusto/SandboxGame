@@ -8,16 +8,9 @@ namespace Engine
 
     VertexArray* VertexArray::Create(uint32_t indexCount)
     {
-        VertexArray* ptr=Engine::Allocator::Allocate<OpenGLVertexArray>();
+        VertexArray* ptr = Engine::Allocator::Allocate<OpenGLVertexArray>();
         ptr->Init(indexCount);
         return ptr;
     }
 
-    void VertexArray::AddVertexBuffer(VertexBuffer* vertexBuffer)
-    {
-        Bind();
-        m_VertexBuffer = vertexBuffer;
-    }
-
-    void VertexArray::AddIndexBuffer(IndexBuffer* indexBuffer) { m_IndexBuffer = indexBuffer; }
 }// namespace Engine

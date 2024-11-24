@@ -18,9 +18,9 @@
 
 namespace Engine
 {
-#ifdef _DEBUG
+//#ifdef _DEBUG
 
-    struct PointerMetaData {
+    /*struct PointerMetaData {
         PointerMetaData(std::source_location location = std::source_location::current()) : location(location) {}
 
         std::source_location location;
@@ -180,8 +180,8 @@ namespace Engine
         Engine::PointerMetaData metaData(location);                                                                    \
         metaData.ptr = pptr;                                                                                           \
         return Engine::Allocator::_IsLive<type>(metaData);                                                             \
-    })
-#else
+    })*/
+//#else
 
     class Allocator
     {
@@ -217,7 +217,7 @@ namespace Engine
         static constexpr T* AllocateArray(size_t count, Args&&... args) noexcept
         {
             if (count <= 0) return {};
-            return _AllocateArray<T, TypeSize, Args...>(count, std::forward<Args...>(args)...);
+            return _AllocateArray<T, TypeSize, Args...>(count, std::forward<Args>(args)...);
         }
 
         template <typename T, size_t TypeSize = sizeof(T), typename l = std::enable_if_t<std::is_pointer<T>::value>,
@@ -289,7 +289,26 @@ namespace Engine
             printf("============================================\n");
         }
 
+        static void DeallocateAll() noexcept { _DeallocateAll(); }
+
     private:
+        static void _DeallocateAll() noexcept
+        {
+            std::for_each(s_Allocations.begin(), s_Allocations.end(), [](auto& p) {
+                size_t elementSize = p.second.size;
+                size_t count = p.second.count;
+                for (size_t i = 0; i < count; i++)
+                {
+                    char* newptr = (char*) p.first;
+                    newptr += i * elementSize;
+                    if (std::invoke(p.second.destructor, newptr)) { s_AllocatedMemorySize -= elementSize; }
+                }
+                std::free(p.first);
+            });
+
+            s_Allocations.clear();
+        }
+
         template <typename T, typename l = std::enable_if_t<!std::is_pointer<T>::value>>
         static constexpr void _Deallocate(T* ptr) noexcept
         {
@@ -336,8 +355,8 @@ namespace Engine
 
             std::unique_lock<std::recursive_mutex> lock(Allocator::s_Mutex);
             s_AllocatedMemorySize += TypeSize * count;
-            s_Allocations.emplace(
-                    (void*) ptr, PointerMetaData{.size = TypeSize, .count = count, .destructor = &_Destructor<T>});
+            s_Allocations.emplace((void*) ptr,
+                                  PointerMetaData{.size = TypeSize, .count = count, .destructor = &_Destructor<T>});
             return ptr;
         }
 
@@ -350,8 +369,8 @@ namespace Engine
 
             std::unique_lock<std::recursive_mutex> lock(Allocator::s_Mutex);
             s_AllocatedMemorySize += TypeSize;
-            s_Allocations.emplace(
-                    {(void*) ptr, PointerMetaData{.size = TypeSize, .count = 1, .destructor = &_Destructor<T>}});
+            s_Allocations.emplace((void*) ptr,
+                                  PointerMetaData{.size = TypeSize, .count = 1, .destructor = &_Destructor<T>});
             return ptr;
         }
 
@@ -362,8 +381,8 @@ namespace Engine
             if (!s_Allocations.contains((void*) ptr))
             {
                 s_AllocatedMemorySize += sizeof(T);
-                s_Allocations.emplace(
-                        (void*) ptr, PointerMetaData{.size = sizeof(T), .count = 1, .destructor = &_Destructor<T>});
+                s_Allocations.emplace((void*) ptr,
+                                      PointerMetaData{.size = sizeof(T), .count = 1, .destructor = &_Destructor<T>});
             }
         }
 
@@ -412,7 +431,7 @@ namespace Engine
         inline static size_t s_AllocatedMemorySize{};
     };
 
-#endif
+//#endif
 
 }// namespace Engine
 

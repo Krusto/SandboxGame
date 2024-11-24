@@ -6,10 +6,10 @@
 namespace Engine
 {
 
-    VertexBuffer* VertexBuffer::Create(const VertexLayout& layout, float* data, uint32_t length)
+    VertexBuffer* VertexBuffer::Create(VertexArray* va, const VertexLayout& layout, float* data, uint32_t length)
     {
-        VertexBuffer* ptr = Engine::Allocator::Allocate < OpenGLVertexBuffer>();
-        ptr->Init(layout, data, length);
+        VertexBuffer* ptr = Engine::Allocator::Allocate<OpenGLVertexBuffer>();
+        ptr->Init(va, layout, data, length);
         return ptr;
     }
 

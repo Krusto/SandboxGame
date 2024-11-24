@@ -89,9 +89,8 @@ namespace Engine
     void Camera::Rotate(glm::vec3 rot) { m_Rotation += rot; }
 
     void Camera::Upload(Shader* shader, std::string_view uProjection, std::string_view uView,
-                        std::string_view uPosition)
+                        std::string_view uPosition) const
     {
-        shader->Bind();
         shader->SetUniform(std::string(uProjection), m_Projection);
         shader->SetUniform(std::string(uView), m_View);
         shader->SetUniform(std::string(uPosition), m_Position);
@@ -137,5 +136,10 @@ namespace Engine
     }
 
     void Camera::ProcessMouseScroll(float y, double speed) { m_ScrollValue = y * speed; }
+
+    RendererCommand Camera::UploadCommand(Shader* shader) const
+    {
+        return RendererCommand([=]() { Upload(shader); });
+    }
 
 }// namespace Engine

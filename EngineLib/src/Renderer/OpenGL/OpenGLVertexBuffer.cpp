@@ -5,6 +5,8 @@
 #include <utility>
 #include <cassert>
 
+#include <Renderer/OpenGL/OpenGLVertexArray.hpp>
+
 namespace glm
 {
     template <typename T>
@@ -19,87 +21,71 @@ namespace glm
 
 namespace Engine
 {
-    void OpenGLVertexBuffer::Init(const VertexLayout& layout, float* data, uint32_t length)
+    void OpenGLVertexBuffer::Init(VertexArray* va, const VertexLayout& layout, float* data, uint32_t length)
     {
-        glGenBuffers(1, &m_ID);
-        glBindBuffer(GL_ARRAY_BUFFER, m_ID);
-        glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizei>(length) * static_cast<GLsizei>(layout.stride), data,
-                     GL_STATIC_DRAW);
+        glCreateBuffers(1, &m_ID);
+        glNamedBufferStorage(m_ID, static_cast<GLsizei>(length) * static_cast<GLsizei>(layout.stride), data,
+                             GL_DYNAMIC_STORAGE_BIT);
 
         uint32_t index = 0;
         uint32_t offset = 0;
-        for (auto attr: layout.attributes)
+        for (auto& attr: layout.attributes)
         {
+            glEnableVertexArrayAttrib(va->id(), index);
+            glVertexArrayAttribBinding(va->id(), index, 0);
             switch (attr.type)
             {
                 case ShaderUniformType::Float:
-                    glVertexAttribIPointer(index, 1, GL_FLOAT, static_cast<GLsizei>(layout.stride),
-                                          reinterpret_cast<void*>(attr.offset));
+                    glVertexArrayAttribIFormat(va->id(), index, 1, GL_FLOAT, attr.offset);
                     offset += sizeof(float);
                     break;
                 case ShaderUniformType::Int:
-                    glVertexAttribIPointer(index, 1, GL_INT, static_cast<GLsizei>(layout.stride),
-                                           reinterpret_cast<void*>(attr.offset));
+                    glVertexArrayAttribIFormat(va->id(), index, 1, GL_INT, attr.offset);
                     offset += sizeof(int32_t);
                     break;
                 case ShaderUniformType::UInt:
-                    glVertexAttribIPointer(index, 1, GL_UNSIGNED_INT, static_cast<GLsizei>(layout.stride),
-                                           reinterpret_cast<void*>(attr.offset));
+                    glVertexArrayAttribIFormat(va->id(), index, 1, GL_UNSIGNED_INT, attr.offset);
                     offset += sizeof(uint32_t);
                     break;
                 case ShaderUniformType::Bool:
-                    glVertexAttribIPointer(index, 1, GL_BOOL, static_cast<GLsizei>(layout.stride),
-                                          reinterpret_cast<void*>(attr.offset));
+                    glVertexArrayAttribIFormat(va->id(), index, 1, GL_BOOL, attr.offset);
                     offset += sizeof(bool);
                     break;
                 case ShaderUniformType::Vec2:
-                    glVertexAttribPointer(index, glm::vec2::length(), glm::valtypeToGLtype<glm::vec2::value_type>(),
-                                          GL_FALSE, static_cast<GLsizei>(layout.stride),
-                                          reinterpret_cast<void*>(attr.offset));
+                    glVertexArrayAttribFormat(va->id(), index, 2, GL_FLOAT, GL_FALSE, attr.offset);
                     offset += sizeof(glm::vec2::value_type) * glm::vec2::length();
                     break;
                 case ShaderUniformType::Vec3:
-                    glVertexAttribPointer(index, glm::vec3::length(), glm::valtypeToGLtype<glm::vec3::value_type>(),
-                                          GL_FALSE, static_cast<GLsizei>(layout.stride),
-                                          reinterpret_cast<void*>(attr.offset));
+                    glVertexArrayAttribFormat(va->id(), index, 3, GL_FLOAT, GL_FALSE, attr.offset);
                     offset += sizeof(glm::vec3::value_type) * glm::vec3::length();
                     break;
                 case ShaderUniformType::Vec4:
-                    glVertexAttribPointer(index, glm::vec4::length(), glm::valtypeToGLtype<glm::vec4::value_type>(),
-                                          GL_FALSE, static_cast<GLsizei>(layout.stride),
-                                          reinterpret_cast<void*>(attr.offset));
+                    glVertexArrayAttribFormat(va->id(), index, 4, GL_FLOAT, GL_FALSE, attr.offset);
                     offset += sizeof(glm::vec4::value_type) * glm::vec4::length();
                     break;
                 case ShaderUniformType::Mat3:
-                    glVertexAttribPointer(index, glm::mat3::length(), glm::valtypeToGLtype<glm::mat3::value_type>(),
-                                          GL_FALSE, static_cast<GLsizei>(layout.stride),
-                                          reinterpret_cast<void*>(attr.offset));
+                    glVertexArrayAttribFormat(va->id(), index, glm::mat3::length(), GL_FLOAT, GL_FALSE, attr.offset);
                     offset += sizeof(glm::mat3::value_type);
                     break;
                 case ShaderUniformType::Mat4:
-                    glVertexAttribPointer(index, 1, glm::valtypeToGLtype<glm::mat4::value_type>(), GL_FALSE,
-                                          static_cast<GLsizei>(layout.stride), reinterpret_cast<void*>(attr.offset));
+                    glVertexArrayAttribFormat(va->id(), index, glm::mat4::length(), GL_FLOAT, GL_FALSE, attr.offset);
                     offset += sizeof(glm::mat4::value_type);
                     break;
                 case ShaderUniformType::IVec2:
-                    glVertexAttribPointer(index, 1, glm::valtypeToGLtype<glm::ivec2::value_type>(), GL_FALSE,
-                                          static_cast<GLsizei>(layout.stride), reinterpret_cast<void*>(attr.offset));
+                    glVertexArrayAttribIFormat(va->id(), index, 2, GL_INT, attr.offset);
                     offset += sizeof(glm::ivec2::value_type);
                     break;
                 case ShaderUniformType::IVec3:
-                    glVertexAttribPointer(index, 1, glm::valtypeToGLtype<glm::vec3::value_type>(), GL_FALSE,
-                                          static_cast<GLsizei>(layout.stride), reinterpret_cast<void*>(attr.offset));
+                    glVertexArrayAttribIFormat(va->id(), index, 3, GL_INT, attr.offset);
                     offset += sizeof(glm::ivec3::value_type);
                     break;
                 case ShaderUniformType::IVec4:
-                    glVertexAttribPointer(index, 1, glm::valtypeToGLtype<glm::vec4::value_type>(), GL_FALSE,
-                                          static_cast<GLsizei>(layout.stride), reinterpret_cast<void*>(attr.offset));
+                    glVertexArrayAttribIFormat(va->id(), index, 4, GL_INT, attr.offset);
                     offset += sizeof(glm::ivec4::value_type);
                     break;
                 case ShaderUniformType::None:
                     break;
             }
-            glEnableVertexAttribArray(index);
             index++;
         }
     }

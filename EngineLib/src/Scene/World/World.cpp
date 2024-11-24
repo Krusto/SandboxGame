@@ -60,39 +60,24 @@ namespace Engine
         }
     };
 
-    void World::Draw(Shader* shader) const
+    RendererCommand World::RenderWorldCommand(Shader* shader) const
     {
-        if (shader)
-        {
-            Renderer::Submit(BeginRenderingWorld(shader, &m_BlockTextures));
-
+        return RendererCommand([shader, this]() {
+            m_BlockTextures.Bind();
             for (auto& [pos, chunk]: m_Chunks)
             {
                 auto& mesh = chunk.mesh;
-                Renderer::Submit(RenderChunk(shader, mesh->GetVertexArray(), mesh->GetBuffer(), pos));
+                if (mesh->GetVertexArray() != nullptr)
+                {
+                    mesh->GetBuffer()->Bind();
+                    glm::mat4 model(1.0);
+                    shader->SetUniform("model", model);
+                    shader->SetUniform("offset", glm::vec3{pos.x * CHUNK_SIZE, pos.y * CHUNK_SIZE, pos.z * CHUNK_SIZE});
+                    mesh->GetVertexArray()->Bind();
+                    glDrawElements(GL_TRIANGLES, mesh->GetVertexArray()->IndexCount, GL_UNSIGNED_INT, nullptr);
+                    mesh->GetVertexArray()->Unbind();
+                }
             }
-        }
-    }
-
-    RendererCommand World::BeginRenderingWorld(const Shader* shader, const TextureArray* textures) const
-    {
-        return RendererCommand([shader, textures]() {
-            shader->Bind();
-            textures->Bind();
-        });
-    }
-
-    RendererCommand World::RenderChunk(const Shader* shader, const VertexArray* va, const StorageBuffer* blocks,
-                                       glm::vec3 pos) const
-    {
-        return RendererCommand([shader, va, pos, blocks]() {
-            blocks->Bind();
-            glm::mat4 model(1.0);
-            shader->SetUniform("model", model);
-            shader->SetUniform("offset", glm::vec3{pos.x * CHUNK_SIZE, pos.y * CHUNK_SIZE, pos.z * CHUNK_SIZE});
-            va->Bind();
-            glDrawElements(GL_TRIANGLES, va->IndexCount, GL_UNSIGNED_INT, nullptr);
-            va->Unbind();
         });
     }
 

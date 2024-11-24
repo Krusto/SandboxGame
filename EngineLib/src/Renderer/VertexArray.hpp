@@ -1,11 +1,13 @@
 #pragma once
 #include <cstdint>
 #include <Core/Ref.hpp>
-#include "VertexBuffer.hpp"
-#include "IndexBuffer.hpp"
+#include <Renderer/VertexLayout.hpp>
 
 namespace Engine
 {
+
+    class VertexBuffer;
+    class IndexBuffer;
 
     class VertexArray
     {
@@ -23,11 +25,13 @@ namespace Engine
 
         virtual void Destroy() = 0;
 
-    public:
-        uint32_t id() { return m_ID; }
+        virtual void AddVertexBuffer(const VertexLayout& layout, float* data, uint32_t length) = 0;
 
-        void AddVertexBuffer(VertexBuffer* vertexBuffer);
-        void AddIndexBuffer(IndexBuffer* indexBuffer);
+        virtual void AddIndexBuffer(const uint32_t* data, uint32_t length) = 0;
+
+    public:
+        uint32_t id() const { return m_ID; }
+
 
     public:
         uint32_t IndexCount{};

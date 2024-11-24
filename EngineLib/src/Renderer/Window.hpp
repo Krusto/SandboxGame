@@ -75,7 +75,7 @@ namespace Engine
         static void _WindowMouseScrollCallback(GLFWwindow* window, double x, double y);
 
         static void GLAPIENTRY _MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
-                                                const GLchar* message, const void* userParam);
+                                                GLchar const* message, void const* user_param);
 
         static void _ErrorCallback(int code, const char* err_str);
 

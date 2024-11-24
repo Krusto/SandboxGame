@@ -18,5 +18,8 @@ namespace Engine
         void Unbind() const override;
 
         void Destroy() override;
+
+        void AddVertexBuffer(const VertexLayout& layout, float* data, uint32_t length) override;
+        void AddIndexBuffer(const uint32_t* data, uint32_t length) override;
     };
 }// namespace Engine
