@@ -19,6 +19,7 @@ void SandboxLayer::Init(Engine::Window* window)
     m_Window = window;
     std::string worldShaderPath = m_ShadersDirectory.string() + "/World";
     std::string skyboxShaderPath = m_ShadersDirectory.string() + "/Skybox";
+    std::string lightShaderPath = m_ShadersDirectory.string() + "/Light";
 
     m_Shader = Ref<Engine::Shader>(Engine::Shader::Load(worldShaderPath));
 
@@ -37,7 +38,7 @@ void SandboxLayer::Init(Engine::Window* window)
 
     Engine::TerrainGenerationSettings settings = {.Seed = 0,
                                                   .AssetsDirectory = m_AssetsDirectory,
-                                                  .GenerationDistance = 50};
+                                                  .GenerationDistance = 3};
     m_World->Init(settings, m_TexturesDirectory);
 
     m_Camera.Init(Engine::CameraSpec({m_AppSpec.width, m_AppSpec.height}, 45.0f, 0.1f, 1000.0f));
@@ -51,6 +52,11 @@ void SandboxLayer::Init(Engine::Window* window)
     std::string cubeShaderPath = m_ShadersDirectory.string() + "/Cube";
 
     m_CubeShader = Ref<Engine::Shader>(Engine::Shader::Load(cubeShaderPath));
+    m_LightShader = Ref<Engine::Shader>(Engine::Shader::Load(lightShaderPath));
+
+    m_Light = Engine::Allocator::Allocate<LightObject>();
+    m_Light->Init();
+    m_Light->position = glm::vec3(0, 0, 0);
 }
 
 void SandboxLayer::OnAttach() {}
@@ -62,10 +68,14 @@ void SandboxLayer::Destroy()
     m_World->Destroy();
     m_Shader->Destroy();
     m_CubeShader->Destroy();
+    m_LightShader->Destroy();
     m_Skybox->Destroy();
     Engine::Allocator::Deallocate(m_Skybox);
-    for (int i = 0; i < m_Cubes.size(); i++) { Engine::Allocator::Deallocate(m_Cubes[i]); }
-    m_Cubes.clear();
+
+    Engine::Allocator::Deallocate(m_Light);
+
+    // for (int i = 0; i < m_Cubes.size(); i++) { Engine::Allocator::Deallocate(m_Cubes[i]); }
+    // m_Cubes.clear();
 }
 
 void SandboxLayer::OnUpdate(double dt)
@@ -157,21 +167,36 @@ void SandboxLayer::OnUpdate(double dt)
 
     Engine::Renderer::ClearColor(glm::vec4{1, 1, 1, 1.0});
 
-    m_Skybox->Draw(&m_Camera);
-    m_Shader->Bind();
-    m_Skybox->BindTexture(1);
-    m_Camera.Upload(m_Shader.Raw());
-    m_World->Draw(m_Shader.Raw());
+    //Render Skybox
+    Engine::Renderer::Submit(m_Skybox->RenderCommand(&m_Camera));
 
-    //for (int i = 0; i < m_Cubes.size(); i++) {
-    //m_Cubes[i]->Draw(m_CubeShader.Raw(), &m_Camera);
-    //}
-    //m_Cubes.back()->position += glm::vec3(0.5, 0.5, 0.5);
-    //m_Cubes.back()->Draw(axis, m_CubeShader.Raw(), &m_Camera);
+    //Render World
+    Engine::Renderer::Submit(m_Shader->BindCommand());
+    Engine::Renderer::Submit(m_Skybox->BindTexture(1));
+    Engine::Renderer::Submit(m_Camera.UploadCommand(m_Shader.Raw()));
+
+    if (m_DisableLighting)
+    {
+        Engine::Renderer::Submit(Engine::RendererCommand([=]() { m_Shader->SetUniform("light.intensity", 0.0f); }));
+    }
+    else
+    {
+        Engine::Renderer::Submit(m_Light->UploadLight(m_Shader.Raw()));
+        Engine::Renderer::Submit(
+                Engine::RendererCommand([=]() { m_Shader->SetUniform("light.shininess", (float) m_WorldShininess); }));
+    }
+    Engine::Renderer::Submit(m_World->RenderWorldCommand(m_Shader.Raw()));
+
+    if (!m_DisableLighting)
+    {
+        //Render light debug object
+        Engine::Renderer::Submit(m_LightShader->BindCommand());
+        Engine::Renderer::Submit(m_Camera.UploadCommand(m_LightShader.Raw()));
+        Engine::Renderer::Submit(m_Light->Render(m_LightShader.Raw()));
+    }
+
     Engine::Renderer::Flush();
 
-    // for (int i = 0; i < m_Cubes.size(); i++) { Deallocate(m_Cubes[i]); }
-    // m_Cubes.clear();
     Engine::Renderer::EndFrame();
 
     if (shouldReloadWorld)
@@ -185,16 +210,39 @@ void SandboxLayer::OnWindowResizeEvent(int width, int height) {}
 
 void SandboxLayer::OnImGuiBegin() {}
 
-void SandboxLayer::OnImGuiDraw() { ImGui::Text("%.3fms %.2ffps", m_DeltaTime, 1000.0f / m_DeltaTime); }
+void SandboxLayer::OnImGuiDraw()
+{
+    ImGui::Text("%.3fms %.2ffps", m_DeltaTime, 1000.0f / m_DeltaTime);
+    ImGui::Checkbox("Disable Lighting", &m_DisableLighting);
+    if (!m_DisableLighting)
+    {
+        ImGui::SliderFloat3("lightPos", (float*) &m_Light->position, 0, 360);
+        ImGui::SliderFloat3("lightRot", (float*) &m_Light->rotation, 0, 360);
+        ImGui::ColorEdit3("Ambient", (float*) &m_Light->ambient);
+        ImGui::ColorEdit3("Diffuse", (float*) &m_Light->diffuse);
+        ImGui::ColorEdit3("Specular", (float*) &m_Light->specular);
+        ImGui::SliderInt("Shininess", &m_WorldShininess, 0, 100);
+        ImGui::SliderFloat("Intensity", &m_Light->intensity, 0.1, 10.0);
+    }
+
+    ImGui::Checkbox("Lock", &m_LockCamera);
+}
 
 void SandboxLayer::OnImGuiEnd() {}
 
-void SandboxLayer::OnMouseMoveEvent(int width, int height) { m_Camera.ProcessMouseMovement(width, height, 0.1f, true); }
+void SandboxLayer::OnMouseMoveEvent(int width, int height)
+{
+    if (m_LockCamera == false) { m_Camera.ProcessMouseMovement(width, height, 0.1f, true); }
+}
 
-void SandboxLayer::OnMouseScrollEvent(double x, double y) { m_Camera.ProcessMouseScroll(y, 0.1); }
+void SandboxLayer::OnMouseScrollEvent(double x, double y)
+{
+    if (m_LockCamera == false) { m_Camera.ProcessMouseScroll(y, 0.1); }
+}
 
 void SandboxLayer::OnKeyboardEvent(int action, int key)
 {
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) { m_LockCamera = !m_LockCamera; }
     if (key == GLFW_KEY_C && action == GLFW_PRESS) { Engine::Renderer::SwitchFillMode(); }
     else if (key == GLFW_KEY_V && action == GLFW_PRESS) { Engine::Renderer::SwitchWireframeMode(); }
     else if (key == GLFW_KEY_R && action == GLFW_PRESS)
@@ -205,7 +253,11 @@ void SandboxLayer::OnKeyboardEvent(int action, int key)
     else if (key == GLFW_KEY_T && action == GLFW_PRESS) { shouldReloadWorld = true; }
     else
     {
-        m_Camera.ProcessKeyboardInput(action, key, glfwGetKey(m_Window->GetRawHandler(), GLFW_KEY_SPACE) == GLFW_PRESS,
-                                      glfwGetKey(m_Window->GetRawHandler(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS);
+        if (m_LockCamera == false)
+        {
+            m_Camera.ProcessKeyboardInput(action, key,
+                                          glfwGetKey(m_Window->GetRawHandler(), GLFW_KEY_SPACE) == GLFW_PRESS,
+                                          glfwGetKey(m_Window->GetRawHandler(), GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS);
+        }
     }
 }

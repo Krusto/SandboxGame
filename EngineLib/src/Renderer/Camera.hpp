@@ -7,6 +7,7 @@
 
 #include <Core/Ref.hpp>
 #include <Renderer/Viewport.hpp>
+#include <Renderer/RendererCommand.hpp>
 #include <Renderer/Shader.hpp>
 
 namespace Engine
@@ -72,7 +73,7 @@ namespace Engine
         void Rotate(glm::vec3 rot);
 
         void Upload(Shader* shader, std::string_view uProjection = "camera.projection",
-                    std::string_view uView = "camera.view", std::string_view uPosition = "camera.position");
+                    std::string_view uView = "camera.view", std::string_view uPosition = "camera.position") const;
 
         glm::vec3 GetVectorUP() { return m_VectorUP; }
 
@@ -84,9 +85,11 @@ namespace Engine
 
         void ProcessMouseMovement(float x, float y, float sensitivity = 1, bool constrainPitch = true);
 
-        void ProcessKeyboardInput(int action, int key, bool spacePressed,bool shiftPressed);
+        void ProcessKeyboardInput(int action, int key, bool spacePressed, bool shiftPressed);
 
         void ProcessMouseScroll(float y, double speed = 1);
+
+        RendererCommand UploadCommand(Shader* shader) const;
 
     private:
         glm::vec3 m_VectorUP{};

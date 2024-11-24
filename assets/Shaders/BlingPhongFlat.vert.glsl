@@ -9,8 +9,8 @@ struct Material {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
-}; 
-  
+};
+
 struct Light {
     vec3 position;
     vec3 ambient;
@@ -19,14 +19,14 @@ struct Light {
     float intensity;
 };
 
-struct VertexData{
+struct VertexData {
     vec3 vertNormal;
     vec2 texCoord;
     vec3 worldPos;
     vec3 viewPos;
 };
 
-struct Camera{
+struct Camera {
     mat4 projection;
     mat4 view;
     mat4 model;
@@ -43,13 +43,13 @@ layout(location = 9) out VertexData outVertexData;
 
 void main()
 {
-    
-    outVertexData.worldPos = vec3(camera.model *vec4(aPosition,1.0));
+
+    outVertexData.worldPos = vec3(camera.model * vec4(aPosition, 1.0));
     outVertexData.vertNormal = mat3(transpose(inverse(camera.model))) * aNormal;
     outVertexData.texCoord = aTexCoord;
     outVertexData.viewPos = camera.position;
     outLight = light;
     outMaterial = material;
 
-    gl_Position = camera.projection * camera.view * vec4(outVertexData.worldPos,1.0);
+    gl_Position = camera.projection * camera.view * vec4(outVertexData.worldPos, 1.0);
 }

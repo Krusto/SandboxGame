@@ -12,8 +12,7 @@ namespace Engine
     Skybox* Skybox::Create(std::string_view cubemapName, const std::string& shaderPath,
                            const std::unordered_map<CubemapTextureFace, std::string>& Path)
     {
-        Skybox* ptr = 
-        Engine::Allocator::Allocate < Skybox>();
+        Skybox* ptr = Engine::Allocator::Allocate<Skybox>();
         ptr->Load(cubemapName, shaderPath, Path);
         return ptr;
     }
@@ -50,8 +49,8 @@ namespace Engine
         VertexLayout layout({{"Position", ShaderUniformType::Vec3}});
 
         m_VertexArray->Bind();
-        m_VertexArray->AddVertexBuffer(Engine::VertexBuffer::Create(layout, (float*) skyboxVertices, 8));
-        m_VertexArray->AddIndexBuffer(Engine::IndexBuffer::Create(skyboxIndices, 36));
+        m_VertexArray->AddVertexBuffer(layout, (float*) skyboxVertices, 8);
+        m_VertexArray->AddIndexBuffer(skyboxIndices, 36);
     }
 
     void Skybox::Destroy()
@@ -78,11 +77,12 @@ namespace Engine
 
     void Skybox::Reload() { m_Shader->Reload(); }
 
-    void Skybox::Draw(Camera* camera) const { Renderer::Submit(BeginRendering(camera)); }
+    RendererCommand Skybox::BindTexture(uint32_t slot) const
+    {
+        return RendererCommand([cubemap = m_Cubemap, slot]() { cubemap->Bind(slot); });
+    }
 
-    void Skybox::BindTexture(uint32_t slot) const { m_Cubemap->Bind(slot); }
-
-    RendererCommand Skybox::BeginRendering(Camera* camera) const
+    RendererCommand Skybox::RenderCommand(Camera* camera) const
     {
         return RendererCommand([shader = m_Shader, cubemap = m_Cubemap, va = m_VertexArray, camera]() {
             GLint depthFunc;

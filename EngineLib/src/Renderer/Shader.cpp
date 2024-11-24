@@ -11,4 +11,9 @@ namespace Engine
         Shader* ptr = Engine::Allocator::Allocate<OpenGLShader>(path, false);
         return ptr;
     }
+
+    RendererCommand Shader::BindCommand() const
+    {
+        return RendererCommand([=]() { Bind(); });
+    }
 }// namespace Engine

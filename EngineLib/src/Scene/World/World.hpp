@@ -21,19 +21,13 @@ namespace Engine
 
         void OnUpdate(double dt);
 
-        void Draw(Shader* shader) const;
+        RendererCommand RenderWorldCommand(Shader* shader) const;
 
         void Generate();
 
         void Reload();
 
         uint8_t GetBlock(glm::ivec3 position) const;
-
-    private:
-        RendererCommand BeginRenderingWorld(const Shader* shader, const TextureArray* textures) const;
-
-        RendererCommand RenderChunk(const Shader* shader, const VertexArray* va, const StorageBuffer* blocks,
-                                    glm::vec3 pos) const;
 
     private:
         TerrainGenerationSettings m_Settings;

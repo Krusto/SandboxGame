@@ -19,7 +19,7 @@ namespace Engine
         ~OpenGLVertexBuffer() = default;
 
     public:
-        void Init(const VertexLayout& layout, float* data, uint32_t length) override;
+        void Init(VertexArray* va, const VertexLayout& layout, float* data, uint32_t length) override;
 
         void Bind() const override;
 
@@ -27,7 +27,5 @@ namespace Engine
 
         void Destroy() override;
 
-    private:
-        uint32_t m_ID{};
     };
 }// namespace Engine

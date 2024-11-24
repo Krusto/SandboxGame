@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <memory>
 #include <Engine.hpp>
-#include "Cube.hpp"
+#include "LightObject.hpp"
 
 class SandboxLayer: public Engine::Layer
 {
@@ -45,7 +45,11 @@ protected:
     Engine::Window* m_Window;
     Ref<Engine::Shader> m_Shader;
     Ref<Engine::Shader> m_CubeShader;
+    Ref<Engine::Shader> m_LightShader;
     Engine::Skybox* m_Skybox{};
+
+    LightObject* m_Light;
+
     std::unique_ptr<Engine::World> m_World;
     bool shouldReloadWorld{};
 
@@ -60,5 +64,7 @@ protected:
     std::filesystem::path m_TexturesDirectory;
     std::filesystem::path m_SkyboxDirectory;
 
-    std::vector<Cube*> m_Cubes;
+    int m_WorldShininess{30};
+    bool m_DisableLighting{true};
+    bool m_LockCamera{};
 };

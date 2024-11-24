@@ -26,15 +26,17 @@ namespace Engine
 
     void ChunkMesh::UploadData(ChunkMesh* mesh)
     {
-        mesh->m_VertexArray = Engine::VertexArray::Create(mesh->m_Mesh.indices.size());
-        mesh->m_VertexArray->Bind();
-        mesh->m_VertexArray->AddVertexBuffer(Engine::VertexBuffer::Create(
-                VoxelVertex::GetLayout(), (float*) mesh->m_Mesh.vertices.data(), mesh->m_Mesh.vertices.size()));
-        mesh->m_VertexArray->AddIndexBuffer(
-                Engine::IndexBuffer::Create(mesh->m_Mesh.indices.data(), mesh->m_Mesh.indices.size()));
+        if (mesh->m_Mesh.vertices.size() != 0)
+        {
+            mesh->m_VertexArray = Engine::VertexArray::Create(mesh->m_Mesh.indices.size());
+            mesh->m_VertexArray->Bind();
+            mesh->m_VertexArray->AddVertexBuffer(VoxelVertex::GetLayout(), (float*) mesh->m_Mesh.vertices.data(),
+                                                 mesh->m_Mesh.vertices.size());
+            mesh->m_VertexArray->AddIndexBuffer(mesh->m_Mesh.indices.data(), mesh->m_Mesh.indices.size());
 
-        mesh->m_Buffer = Engine::StorageBuffer::Create(mesh->m_Mesh.blocks.data(), mesh->m_Mesh.blocks.size(),
-                                                       StorageBufferType::MapCoherent);
+            mesh->m_Buffer = Engine::StorageBuffer::Create(mesh->m_Mesh.blocks.data(), mesh->m_Mesh.blocks.size(),
+                                                           StorageBufferType::MapCoherent);
+        }
     }
 
     void ChunkMesh::GenerateFaceLayer(const BlockData* blockData, uint32_t axis, uint32_t* data)
@@ -61,7 +63,7 @@ namespace Engine
     {
 
 
-        uint32_t* face_layers = Engine::Allocator::AllocateArray < uint32_t>( CHUNK_SIZE_SQUARE * 3);
+        uint32_t* face_layers = Engine::Allocator::AllocateArray<uint32_t>(CHUNK_SIZE_SQUARE * 3);
         std::memset(face_layers, 0, (size_t) CHUNK_SIZE_SQUARE * 3 * 4);
         GenerateFaceLayer(blockData, 0, face_layers);
 
@@ -216,11 +218,14 @@ namespace Engine
 
     void ChunkMesh::Destroy()
     {
-        m_VertexArray->Destroy();
-        m_Buffer->Destroy();
-        Engine::Allocator::Deallocate(m_VertexArray);
-        Engine::Allocator::Deallocate(m_Buffer);
-        m_VertexArray = nullptr;
-        m_Buffer = nullptr;
+        if (m_VertexArray != nullptr)
+        {
+            m_VertexArray->Destroy();
+            m_Buffer->Destroy();
+            Engine::Allocator::Deallocate(m_VertexArray);
+            Engine::Allocator::Deallocate(m_Buffer);
+            m_VertexArray = nullptr;
+            m_Buffer = nullptr;
+        }
     }
 }// namespace Engine

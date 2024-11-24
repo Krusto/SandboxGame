@@ -21,9 +21,21 @@ namespace Engine
         inline constexpr uint32_t MAX = 10;
     }// namespace BlockType
 
+    namespace TextureType
+    {
+        inline constexpr uint32_t TOP = 0;
+        inline constexpr uint32_t BOTTOM = 1 << 1;
+        inline constexpr uint32_t LEFT = 1 << 2;
+        inline constexpr uint32_t RIGHT = 1 << 3;
+        inline constexpr uint32_t FRONT = 1 << 4;
+        inline constexpr uint32_t BACK = 1 << 5;
+        inline constexpr uint32_t SIDES = 1 << 6;
+    }// namespace TextureType
+
     struct BlockTextures {
         size_t numTextures = 0;
-        const char* data[6] = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
+        size_t flags = 0;
+        size_t textureIDs[6] = {0, 0, 0, 0, 0, 0};
     };
 
     struct BlockInfo {
@@ -51,6 +63,7 @@ namespace Engine
 
     private:
         static std::array<BlockInfo, 256> s_BlockInfos;
+        static std::unordered_map<size_t, const char*> s_Textures;
         static std::unordered_map<std::string, uint32_t> s_BlockIDs;
     };
 }// namespace Engine

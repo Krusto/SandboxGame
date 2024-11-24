@@ -7,12 +7,11 @@ namespace Engine
 {
 
 
-    void OpenGLIndexBuffer::Init(const uint32_t* data, uint32_t length)
+    void OpenGLIndexBuffer::Init(VertexArray* va, const uint32_t* data, uint32_t length)
     {
-        glGenBuffers(1, &m_ID);
+        glCreateBuffers(1, &m_ID);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * length, data, GL_STATIC_DRAW);
+        glNamedBufferStorage(m_ID, sizeof(uint32_t) * length, data, GL_DYNAMIC_STORAGE_BIT);
 
         indexCount = length;
     }

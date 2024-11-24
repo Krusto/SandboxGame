@@ -5,15 +5,17 @@
 
 namespace Engine
 {
+    class VertexArray;
+
     class VertexBuffer
     {
     public:
-        static VertexBuffer* Create(const VertexLayout& layout, float* data, uint32_t length);
+        static VertexBuffer* Create(VertexArray* va, const VertexLayout& layout, float* data, uint32_t length);
 
     public:
         virtual ~VertexBuffer(){};
 
-        virtual void Init(const VertexLayout& layout, float* data, uint32_t length) = 0;
+        virtual void Init(VertexArray* va, const VertexLayout& layout, float* data, uint32_t length) = 0;
 
         virtual void Bind() const = 0;
 

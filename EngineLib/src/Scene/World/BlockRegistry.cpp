@@ -5,26 +5,36 @@ namespace Engine
 {
     std::array<BlockInfo, 256> BlockRegistry::s_BlockInfos{};
     std::unordered_map<std::string, uint32_t> BlockRegistry::s_BlockIDs{};
+    std::unordered_map<size_t, const char*> BlockRegistry::s_Textures{
+            {0, "Air"},       {1, "Stone.png"},      {2, "Dirt.png"},
+            {3, "Grass.png"}, {4, "Grass_Side.png"}, {5, "Cobblestone.png"},
+            {6, "Wood.png"},  {7, "Sapling.png"},    {8, "Bedrock.png"},
+            {9, "Water.png"}, {10, "Sand.png"}};
 
-    inline constexpr BlockInfo Air_Block = BlockInfo{BlockType::AIR, "Air", {.numTextures = 1, .data = {"Air"}}};
+    inline constexpr BlockInfo Air_Block =
+            BlockInfo{BlockType::AIR, "Air", {.numTextures = 1, .flags = TextureType::TOP, .textureIDs = {0}}};
     inline constexpr BlockInfo Stone_Block =
-            BlockInfo{BlockType::STONE, "Stone", {.numTextures = 1, .data = {"Stone.png"}}};
+            BlockInfo{BlockType::STONE, "Stone", {.numTextures = 1, .flags = TextureType::TOP, .textureIDs = {1}}};
     inline constexpr BlockInfo Dirt_Block =
-            BlockInfo{BlockType::DIRT, "Dirt", {.numTextures = 1, .data = {"Dirt.png"}}};
+            BlockInfo{BlockType::DIRT, "Dirt", {.numTextures = 1, .flags = TextureType::TOP, .textureIDs = {2}}};
     inline constexpr BlockInfo Grass_Block =
-            BlockInfo{BlockType::GRASS, "Grass", {.numTextures = 1, .data = {"Grass2.png"}}};
+            BlockInfo{BlockType::GRASS,
+                      "Grass",
+                      {.numTextures = 2, .flags = TextureType::TOP | TextureType::SIDES, .textureIDs = {3, 4}}};
     inline constexpr BlockInfo Cobblestone_Block =
-            BlockInfo{BlockType::COBBLESTONE, "Cobblestone", {.numTextures = 1, .data = {"Cobblestone.png"}}};
+            BlockInfo{BlockType::COBBLESTONE,
+                      "Cobblestone",
+                      {.numTextures = 1, .flags = TextureType::TOP, .textureIDs = {5}}};
     inline constexpr BlockInfo Wood_Block =
-            BlockInfo{BlockType::WOOD, "Wood", {.numTextures = 1, .data = {"Wood.png"}}};
+            BlockInfo{BlockType::WOOD, "Wood", {.numTextures = 1, .flags = TextureType::TOP, .textureIDs = {6}}};
     inline constexpr BlockInfo Sapling_Block =
-            BlockInfo{BlockType::SAPLING, "Sapling", {.numTextures = 1, .data = {"Sapling.png"}}};
+            BlockInfo{BlockType::SAPLING, "Sapling", {.numTextures = 1, .flags = TextureType::TOP, .textureIDs = {7}}};
     inline constexpr BlockInfo Bedrock_Block =
-            BlockInfo{BlockType::BEDROCK, "Bedrock", {.numTextures = 1, .data = {"Bedrock.png"}}};
+            BlockInfo{BlockType::BEDROCK, "Bedrock", {.numTextures = 1, .flags = TextureType::TOP, .textureIDs = {8}}};
     inline constexpr BlockInfo Water_Block =
-            BlockInfo{BlockType::WATER, "Water", {.numTextures = 1, .data = {"Water.png"}}};
+            BlockInfo{BlockType::WATER, "Water", {.numTextures = 1, .flags = TextureType::TOP, .textureIDs = {9}}};
     inline constexpr BlockInfo Sand_Block =
-            BlockInfo{BlockType::SAND, "Sand", {.numTextures = 1, .data = {"Sand.png"}}};
+            BlockInfo{BlockType::SAND, "Sand", {.numTextures = 1, .flags = TextureType::TOP, .textureIDs = {10}}};
 
     void BlockRegistry::Init()
     {
@@ -56,18 +66,16 @@ namespace Engine
     std::unordered_map<uint32_t, std::string> BlockRegistry::AssignTexturesToIndices()
     {
         std::unordered_map<uint32_t, std::string> textureIndices;
+
+        size_t currentIndex = 0;
         for (auto& blockInfo: s_BlockInfos)
         {
             if (blockInfo.Name != "Null" && blockInfo.Name != "Air" && blockInfo.Textures.numTextures > 0)
             {
-                /*for (uint32_t textureIndex = 0; textureIndex < blockInfo.Textures.numTextures; textureIndex++)
-                {*/
-                    //if (blockInfo.Textures.numTextures == 1)
-                    //{
-                        textureIndices[blockInfo.Type-1] = blockInfo.Textures.data[0];
-                        //break;
-                    //}
-                //}
+                for (size_t i = 0; i < blockInfo.Textures.numTextures; i++)
+                {
+                    textureIndices[blockInfo.Textures.textureIDs[i]-1] = s_Textures[blockInfo.Textures.textureIDs[i]];
+                }
             }
         }
         return textureIndices;

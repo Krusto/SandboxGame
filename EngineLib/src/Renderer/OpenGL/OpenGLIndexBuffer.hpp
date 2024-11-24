@@ -16,7 +16,7 @@ namespace Engine
 
         void Destroy() override;
 
-        void Init(const uint32_t* data, uint32_t length) override;
+        void Init(VertexArray* va, const uint32_t* data, uint32_t length) override;
 
     private:
     };

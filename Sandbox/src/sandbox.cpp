@@ -32,5 +32,7 @@ int main()
         sandbox.Destroy();
     }
     Engine::Allocator::AnalyzeMemory();
+    Engine::Allocator::DeallocateAll();
+    Engine::Allocator::AnalyzeMemory();
     return 0;
 }

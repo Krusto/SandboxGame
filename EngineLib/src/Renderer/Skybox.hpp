@@ -27,15 +27,14 @@ namespace Engine
 
         void Draw(Camera* camera) const;
 
-        void BindTexture(uint32_t slot = 0) const;
+        RendererCommand BindTexture(uint32_t slot = 0) const;
+        RendererCommand RenderCommand(Camera* camera) const;
 
     private:
-        RendererCommand BeginRendering(Camera* camera) const;
-
     private:
-        CubemapTexture* m_Cubemap;
-        VertexArray* m_VertexArray;
-        Shader* m_Shader;
-        std::string m_CubemapName;
+        CubemapTexture* m_Cubemap{};
+        VertexArray* m_VertexArray{};
+        Shader* m_Shader{};
+        std::string m_CubemapName{};
     };
 }// namespace Engine

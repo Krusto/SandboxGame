@@ -2,13 +2,13 @@
 
 layout(location = 0) in uint aCompressedData;
 
-layout(location = 0) out vec3 outColor;
-layout(location = 1) out vec2 texCoord;
-layout(location = 2) out vec3 cameraPos;
-layout(location = 3) out vec3 vertPosition;
-layout(location = 4) out vec3 normal;
-layout(location = 5) out float visibility;
-layout(location = 6) flat out float textureIndex;
+struct VertexData {
+    vec3 vertNormal;
+    vec2 texCoord;
+    vec3 worldPos;
+    vec3 viewPos;
+    vec3 aoColor;
+};
 
 struct Camera {
     mat4 projection;
@@ -16,7 +16,23 @@ struct Camera {
     vec3 position;
 };
 
+struct Light {
+    vec3 position;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+    float intensity;
+    float shininess;
+};
+
+layout(location = 0) out VertexData vertDataOut;
+layout(location = 5) out Light outLight;
+layout(location = 12) flat out float textureIndex;
+layout(location = 13) out float fogVisibility;
+
 uniform Camera camera;
+uniform Light light;
+
 uniform mat4 model;
 uniform vec3 offset;
 
@@ -45,10 +61,10 @@ vec2 getTexCoord(uint axis, uint vertexID, uint width, uint height)
     }
     if (axis == 4 || axis == 5)
     {
-        if (vertexID == 0) { coords = vec2(0, 0); }
-        if (vertexID == 1) { coords = vec2(1, 0); }
-        if (vertexID == 2) { coords = vec2(1, 1); }
-        if (vertexID == 3) { coords = vec2(0, 1); }
+        if (vertexID == 2) { coords = vec2(0, 0); }
+        if (vertexID == 3) { coords = vec2(1, 0); }
+        if (vertexID == 0) { coords = vec2(1, 1); }
+        if (vertexID == 1) { coords = vec2(0, 1); }
         coords.x *= width;
         coords.y *= height;
     }
@@ -98,7 +114,7 @@ uint getBlock()
     uint row = quadIndex / 4;
     uint byteIndex = quadIndex % 4;
 
-    return (blocks[row] >> (byteIndex * 8)) & 0xF + 4;
+    return (blocks[row] >> (byteIndex * 8)) & 0xF + 4 - 1;
 }
 
 vec3 getAO(uint axis)
@@ -117,8 +133,8 @@ uint getAxis() { return (aCompressedData >> 25); }
 
 vec3 getNormal(uint axis)
 {
-    if (axis == 0) { return vec3(0, -1, 0); }
-    else if (axis == 1) { return vec3(0, 1, 0); }
+    if (axis == 0) { return vec3(0, 1, 0); }
+    else if (axis == 1) { return vec3(0, -1, 0); }
     else if (axis == 2) { return vec3(1, 0, 0); }
     else if (axis == 3) { return vec3(-1, 0, 0); }
     else if (axis == 4) { return vec3(0, 0, 1); }
@@ -128,6 +144,7 @@ vec3 getNormal(uint axis)
 
 void main()
 {
+    outLight = light;
     uint width = getTilingFactorX();
     uint height = getTilingFactorY();
 
@@ -140,18 +157,21 @@ void main()
 
     gl_Position = camera.projection * posRelToCamera;
 
-    outColor = getAO(axis);
+    vertDataOut.aoColor = getAO(axis);
 
-    texCoord = getTexCoord(axis, getVertexID(), width, height);
-    // texCoord.z = getBlock();
-    textureIndex = float(getBlock());
-    cameraPos = camera.position;
+    vertDataOut.texCoord = getTexCoord(axis, getVertexID(), width, height);
+
+    uint currentBlock = getBlock();
+
+    if (currentBlock == 2 && axis > 1) { textureIndex = 3; }
+    else { textureIndex = float(getBlock()); }
+
+    vertDataOut.viewPos = camera.position;
 
     float density = 0.002;
     float gradient = 5;
-    visibility = exp(-pow(density * length(posRelToCamera.xyz), gradient));
-    // visibility = 1;
+    fogVisibility = exp(-pow(density * length(posRelToCamera.xyz), gradient));
 
-    normal = mat3(transpose(inverse(model))) * vec3(0, -1, 0);
-    vertPosition = worldPosition.xyz;
+    vertDataOut.vertNormal = mat3(transpose(inverse(model))) * vec3(0, -1, 0);
+    vertDataOut.worldPos = worldPosition.xyz;
 }
