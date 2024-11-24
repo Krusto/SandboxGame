@@ -21,6 +21,8 @@ void SandboxLayer::Init(Engine::Window* window)
     std::string skyboxShaderPath = m_ShadersDirectory.string() + "/Skybox";
     std::string lightShaderPath = m_ShadersDirectory.string() + "/Light";
 
+    m_Framebuffer = Engine::Framebuffer::Create(window->GetSpec()->width, window->GetSpec()->height);
+
     m_Shader = Ref<Engine::Shader>(Engine::Shader::Load(worldShaderPath));
 
     std::string skyboxName = "skybox_day";
@@ -38,7 +40,7 @@ void SandboxLayer::Init(Engine::Window* window)
 
     Engine::TerrainGenerationSettings settings = {.Seed = 0,
                                                   .AssetsDirectory = m_AssetsDirectory,
-                                                  .GenerationDistance = 3};
+                                                  .GenerationDistance = 10};
     m_World->Init(settings, m_TexturesDirectory);
 
     m_Camera.Init(Engine::CameraSpec({m_AppSpec.width, m_AppSpec.height}, 45.0f, 0.1f, 1000.0f));
@@ -73,6 +75,8 @@ void SandboxLayer::Destroy()
     Engine::Allocator::Deallocate(m_Skybox);
 
     Engine::Allocator::Deallocate(m_Light);
+    m_Framebuffer->Destroy();
+    Engine::Allocator::Deallocate(m_Framebuffer);
 
     // for (int i = 0; i < m_Cubes.size(); i++) { Engine::Allocator::Deallocate(m_Cubes[i]); }
     // m_Cubes.clear();
@@ -81,90 +85,92 @@ void SandboxLayer::Destroy()
 void SandboxLayer::OnUpdate(double dt)
 {
     m_DeltaTime = dt;
+    {
+        //m_Cube.position = m_Camera.GetPosition();
 
-    //m_Cube.position = m_Camera.GetPosition();
+        // float maxDistance = 10;
 
-    // float maxDistance = 10;
+        // glm::vec3 rot = glm::radians(m_Camera.GetRotation());
 
-    // glm::vec3 rot = glm::radians(m_Camera.GetRotation());
+        // glm::vec3 dir(-cos(rot.y), -sin(rot.x), -sin(rot.y));
 
-    // glm::vec3 dir(-cos(rot.y), -sin(rot.x), -sin(rot.y));
+        // glm::vec3 _pos1 = m_Camera.GetPosition();
+        // glm::vec3 _pos2 = _pos1 + dir * glm::vec1{maxDistance};
 
-    // glm::vec3 _pos1 = m_Camera.GetPosition();
-    // glm::vec3 _pos2 = _pos1 + dir * glm::vec1{maxDistance};
+        // glm::ivec3 pos = _pos1;
+        // glm::ivec3 end = _pos2;
 
-    // glm::ivec3 pos = _pos1;
-    // glm::ivec3 end = _pos2;
+        // glm::ivec3 d = glm::ivec3(((_pos1.x < _pos2.x) ? 1 : ((_pos1.x > _pos2.x) ? -1 : 0)),
+        //                           ((_pos1.y < _pos2.y) ? 1 : ((_pos1.y > _pos2.y) ? -1 : 0)),
+        //                           ((_pos1.z < _pos2.z) ? 1 : ((_pos1.z > _pos2.z) ? -1 : 0)));
 
-    // glm::ivec3 d = glm::ivec3(((_pos1.x < _pos2.x) ? 1 : ((_pos1.x > _pos2.x) ? -1 : 0)),
-    //                           ((_pos1.y < _pos2.y) ? 1 : ((_pos1.y > _pos2.y) ? -1 : 0)),
-    //                           ((_pos1.z < _pos2.z) ? 1 : ((_pos1.z > _pos2.z) ? -1 : 0)));
+        // glm::vec3 deltat = glm::vec3(1.0f / glm::abs(_pos2.x - _pos1.x), 1.0f / glm::abs(_pos2.y - _pos1.y),
+        //                              1.0f / glm::abs(_pos2.z - _pos1.z));
 
-    // glm::vec3 deltat = glm::vec3(1.0f / glm::abs(_pos2.x - _pos1.x), 1.0f / glm::abs(_pos2.y - _pos1.y),
-    //                              1.0f / glm::abs(_pos2.z - _pos1.z));
+        // glm::vec3 min = pos;
+        // glm::vec3 max = min + glm::vec3(1.f, 1.f, 1.f);
 
-    // glm::vec3 min = pos;
-    // glm::vec3 max = min + glm::vec3(1.f, 1.f, 1.f);
+        // glm::vec3 t = glm::vec3(((_pos1.x > _pos2.x) ? (_pos1.x - min.x) : (max.x - _pos1.x)) * deltat.x,
+        //                         ((_pos1.y > _pos2.y) ? (_pos1.y - min.y) : (max.y - _pos1.y)) * deltat.y,
+        //                         ((_pos1.z > _pos2.z) ? (_pos1.z - min.z) : (max.z - _pos1.z)) * deltat.z);
 
-    // glm::vec3 t = glm::vec3(((_pos1.x > _pos2.x) ? (_pos1.x - min.x) : (max.x - _pos1.x)) * deltat.x,
-    //                         ((_pos1.y > _pos2.y) ? (_pos1.y - min.y) : (max.y - _pos1.y)) * deltat.y,
-    //                         ((_pos1.z > _pos2.z) ? (_pos1.z - min.z) : (max.z - _pos1.z)) * deltat.z);
+        // glm::ivec3 normal = glm::ivec3(0, 0, 0);
+        // uint32_t axis{};
+        // double count = 0;
+        // glm::ivec3 outPosition{};
+        // uint8_t outBlock{};
+        // glm::ivec3 outNormal{};
+        // while ((count++) < maxDistance)
+        // {
+        //Allocate(Cube, ptr);
+        //m_Cubes.emplace_back(ptr);
+        //m_Cubes.back()->Init();
+        //m_Cubes.back()->position = pos;
+        // uint8_t currentBlock = m_World->GetBlock(pos);
+        // if (currentBlock != Engine::BlockType::AIR)
+        // {
+        //     outPosition = pos;
+        //     outBlock = currentBlock;
+        //     outNormal = normal;
+        // LOG("BlockPos: %d %d %d  Block: %d   Normal: %d %d %d\n", outPosition.x, outPosition.y, outPosition.z,
+        // outBlock, outNormal.x, outNormal.y, outNormal.z);
+        //         break;
+        //     }
 
-    // glm::ivec3 normal = glm::ivec3(0, 0, 0);
-    // uint32_t axis{};
-    // double count = 0;
-    // glm::ivec3 outPosition{};
-    // uint8_t outBlock{};
-    // glm::ivec3 outNormal{};
-    // while ((count++) < maxDistance)
-    // {
-    //Allocate(Cube, ptr);
-    //m_Cubes.emplace_back(ptr);
-    //m_Cubes.back()->Init();
-    //m_Cubes.back()->position = pos;
-    // uint8_t currentBlock = m_World->GetBlock(pos);
-    // if (currentBlock != Engine::BlockType::AIR)
-    // {
-    //     outPosition = pos;
-    //     outBlock = currentBlock;
-    //     outNormal = normal;
-    // LOG("BlockPos: %d %d %d  Block: %d   Normal: %d %d %d\n", outPosition.x, outPosition.y, outPosition.z,
-    // outBlock, outNormal.x, outNormal.y, outNormal.z);
-    //         break;
-    //     }
-
-    //     if (t.x <= t.y && t.x <= t.z)
-    //     {
-    //         if (pos.x == end.x) break;
-    //         t.x += deltat.x;
-    //         pos.x += d.x;
-    //         axis = 2;
-    //         normal = glm::ivec3(-d.x, 0, 0);
-    //     }
-    //     else if (t.y <= t.z)
-    //     {
-    //         if (pos.y == end.y) break;
-    //         t.y += deltat.y;
-    //         pos.y += d.y;
-    //         axis = 0;
-    //         normal = glm::ivec3(0, -d.y, 0);
-    //     }
-    //     else
-    //     {
-    //         if (pos.z == end.z) break;
-    //         t.z += deltat.z;
-    //         pos.z += d.z;
-    //         axis = 4;
-    //         normal = glm::ivec3(0, 0, -d.z);
-    //     }
-    // }
-
+        //     if (t.x <= t.y && t.x <= t.z)
+        //     {
+        //         if (pos.x == end.x) break;
+        //         t.x += deltat.x;
+        //         pos.x += d.x;
+        //         axis = 2;
+        //         normal = glm::ivec3(-d.x, 0, 0);
+        //     }
+        //     else if (t.y <= t.z)
+        //     {
+        //         if (pos.y == end.y) break;
+        //         t.y += deltat.y;
+        //         pos.y += d.y;
+        //         axis = 0;
+        //         normal = glm::ivec3(0, -d.y, 0);
+        //     }
+        //     else
+        //     {
+        //         if (pos.z == end.z) break;
+        //         t.z += deltat.z;
+        //         pos.z += d.z;
+        //         axis = 4;
+        //         normal = glm::ivec3(0, 0, -d.z);
+        //     }
+        // }
+    }
 
     m_World->OnUpdate(dt);
     m_Camera.Update(dt, 10.0f, 10.0f);
 
     Engine::Renderer::BeginFrame();
+    Engine::Renderer::ClearColor(glm::vec4{1, 1, 1, 1.0});
 
+    Engine::Renderer::Submit(m_Framebuffer->BindCommand());
     Engine::Renderer::ClearColor(glm::vec4{1, 1, 1, 1.0});
 
     //Render Skybox
@@ -194,9 +200,8 @@ void SandboxLayer::OnUpdate(double dt)
         Engine::Renderer::Submit(m_Camera.UploadCommand(m_LightShader.Raw()));
         Engine::Renderer::Submit(m_Light->Render(m_LightShader.Raw()));
     }
-
+    Engine::Renderer::Submit(Engine::RendererCommand([=]() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }));
     Engine::Renderer::Flush();
-
     Engine::Renderer::EndFrame();
 
     if (shouldReloadWorld)
@@ -206,12 +211,13 @@ void SandboxLayer::OnUpdate(double dt)
     }
 }
 
-void SandboxLayer::OnWindowResizeEvent(int width, int height) {}
+void SandboxLayer::OnWindowResizeEvent(int width, int height) { m_Framebuffer->Resize(width, height); }
 
 void SandboxLayer::OnImGuiBegin() {}
 
 void SandboxLayer::OnImGuiDraw()
 {
+    ImGui::Begin("a");
     ImGui::Text("%.3fms %.2ffps", m_DeltaTime, 1000.0f / m_DeltaTime);
     ImGui::Checkbox("Disable Lighting", &m_DisableLighting);
     if (!m_DisableLighting)
@@ -226,6 +232,14 @@ void SandboxLayer::OnImGuiDraw()
     }
 
     ImGui::Checkbox("Lock", &m_LockCamera);
+    ImGui::End();
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{0, 0});
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
+
+    ImGui::Begin("Framebuffer");
+    ImGui::Image((void*) m_Framebuffer->GetColorAttachmentID(),
+                 {(float) m_Framebuffer->width(), (float) m_Framebuffer->height()}, {0, 1}, {1, 0});
+    ImGui::End();
 }
 
 void SandboxLayer::OnImGuiEnd() {}

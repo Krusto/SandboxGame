@@ -60,5 +60,6 @@ void main()
     //add fog
     vec4 fogColor = vec4(texture(skybox, reflectDir).rgb, 1.0);
     outputColor = mix(fogColor, outputColor, fogVisibility);
-    FragColor = outputColor;
+    float gamma = 1.4;
+    FragColor = vec4(pow(outputColor.rgb, vec3(1.0 / gamma)), outputColor.a);
 }

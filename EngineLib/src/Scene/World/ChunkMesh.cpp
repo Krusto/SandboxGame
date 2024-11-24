@@ -13,10 +13,7 @@ namespace Engine
 {
     void ChunkMesh::Generate(const BlockData* blockData)
     {
-        //ScopedTimer timer("ChunkMesh::Generate");
         GenerateVertexData(blockData, m_Mesh.blocks, m_Mesh.vertices, m_Mesh.indices);
-
-        //Renderer::Submit(GetGenerateCommand(this));
     }
 
     RendererCommand ChunkMesh::GetGenerateCommand(ChunkMesh* mesh)
@@ -30,12 +27,16 @@ namespace Engine
         {
             mesh->m_VertexArray = Engine::VertexArray::Create(mesh->m_Mesh.indices.size());
             mesh->m_VertexArray->Bind();
-            mesh->m_VertexArray->AddVertexBuffer(VoxelVertex::GetLayout(), (float*) mesh->m_Mesh.vertices.data(),
-                                                 mesh->m_Mesh.vertices.size());
+            // mesh->m_VertexArray->AddVertexBuffer(VoxelVertex::GetLayout(), (float*) mesh->m_Mesh.vertices.data(),
+            //                                      mesh->m_Mesh.vertices.size());
+
             mesh->m_VertexArray->AddIndexBuffer(mesh->m_Mesh.indices.data(), mesh->m_Mesh.indices.size());
 
-            mesh->m_Buffer = Engine::StorageBuffer::Create(mesh->m_Mesh.blocks.data(), mesh->m_Mesh.blocks.size(),
-                                                           StorageBufferType::MapCoherent);
+            mesh->m_BlocksBuffer = Engine::StorageBuffer::Create(mesh->m_Mesh.blocks.data(), mesh->m_Mesh.blocks.size(),
+                                                                 StorageBufferType::MapCoherent);
+            mesh->m_QuadsBuffer = Engine::StorageBuffer::Create((uint8_t*) mesh->m_Mesh.vertices.data(),
+                                                                mesh->m_Mesh.vertices.size() * sizeof(VoxelVertex),
+                                                                StorageBufferType::MapCoherent);
         }
     }
 
@@ -136,7 +137,7 @@ namespace Engine
             }
         }
 
-        GenerateIndices(indices, vertices.size() / 4);
+        GenerateIndices(indices, vertices.size());
 
         Engine::Allocator::Deallocate(face_layers);
     }
@@ -175,7 +176,7 @@ namespace Engine
     void ChunkMesh::InsertFace(std::vector<VoxelVertex>& vertices, uint32_t axis, const Quad& quad, uint32_t z)
     {
 
-        for (uint32_t i = 0; i < 4; i++)
+        for (uint32_t i = 0; i < 1; i++)
         {
             VoxelVertex vertex{};
 
@@ -221,11 +222,13 @@ namespace Engine
         if (m_VertexArray != nullptr)
         {
             m_VertexArray->Destroy();
-            m_Buffer->Destroy();
+            m_BlocksBuffer->Destroy();
             Engine::Allocator::Deallocate(m_VertexArray);
-            Engine::Allocator::Deallocate(m_Buffer);
+            Engine::Allocator::Deallocate(m_QuadsBuffer);
+            Engine::Allocator::Deallocate(m_BlocksBuffer);
             m_VertexArray = nullptr;
-            m_Buffer = nullptr;
+            m_QuadsBuffer = nullptr;
+            m_BlocksBuffer = nullptr;
         }
     }
 }// namespace Engine

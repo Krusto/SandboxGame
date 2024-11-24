@@ -69,7 +69,8 @@ namespace Engine
                 auto& mesh = chunk.mesh;
                 if (mesh->GetVertexArray() != nullptr)
                 {
-                    mesh->GetBuffer()->Bind();
+                    mesh->GetBlocksBuffer()->Bind(3);
+                    mesh->GetQuadsBuffer()->Bind(4);
                     glm::mat4 model(1.0);
                     shader->SetUniform("model", model);
                     shader->SetUniform("offset", glm::vec3{pos.x * CHUNK_SIZE, pos.y * CHUNK_SIZE, pos.z * CHUNK_SIZE});

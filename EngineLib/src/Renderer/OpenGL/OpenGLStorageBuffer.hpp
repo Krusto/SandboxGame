@@ -14,7 +14,7 @@ namespace Engine
     public:
         void Init(uint8_t* data, size_t size, StorageBufferType type) override;
 
-        void Bind() const override;
+        void Bind(size_t location) const override;
 
         void Unbind() const override;
 

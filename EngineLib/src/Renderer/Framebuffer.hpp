@@ -1,5 +1,6 @@
 #pragma once
 #include <Renderer/Viewport.hpp>
+#include <Renderer/RendererCommand.hpp>
 
 namespace Engine
 {
@@ -12,6 +13,9 @@ namespace Engine
         static Framebuffer* Create(uint32_t width, uint32_t height);
 
     public:
+        RendererCommand BindCommand() const;
+
+    public:
         virtual uint32_t GetID() = 0;
 
         virtual uint32_t& GetColorAttachmentID() = 0;
@@ -20,7 +24,7 @@ namespace Engine
 
         virtual void Destroy() = 0;
 
-        virtual void Bind() = 0;
+        virtual void Bind() const = 0;
 
         virtual void Unbind() = 0;
 

@@ -1,5 +1,7 @@
 #version 450 core
 
+layout(location = 0) in uint aCompressedData;
+
 struct VertexData {
     vec3 vertNormal;
     vec2 texCoord;
@@ -37,10 +39,6 @@ layout(std430, binding = 3) buffer blockBuffer { uint blocks[]; };
 
 layout(std430, binding = 4) buffer quadsBuffer { uint quads[]; };
 
-uint getCurrentCompressedQuad() { return quads[gl_VertexID / 4]; }
-
-uint getVertexID() { return gl_VertexID % 4; }
-
 vec2 getTexCoord(uint axis, uint vertexID, uint width, uint height)
 {
     vec2 coords;
@@ -74,15 +72,14 @@ vec2 getTexCoord(uint axis, uint vertexID, uint width, uint height)
     return coords;
 }
 
-vec3 getPosition()
-{
-    return vec3(getCurrentCompressedQuad() & 0x1F, getCurrentCompressedQuad() >> 5 & 0x1F,
-                getCurrentCompressedQuad() >> 10 & 0x1F);
-}
+uint getVertexID() { return gl_VertexID % 4; }
+
+vec3 getPosition() { return vec3(aCompressedData & 0x1F, aCompressedData >> 5 & 0x1F, aCompressedData >> 10 & 0x1F); }
 
 vec3 getBlockPosition(uint axis, uint width, uint height)
 {
     vec3 blockPosition = vec3(0, 0, 0);
+    uint vert = gl_VertexID;
     uint vertexID = getVertexID();
     vec3 position = getPosition();
 
@@ -129,11 +126,11 @@ vec3 getAO(uint axis)
     return vec3(1, 1, 1);
 }
 
-uint getTilingFactorX() { return (getCurrentCompressedQuad() >> 15 & 31) + 1; }
+uint getTilingFactorX() { return (aCompressedData >> 15 & 31) + 1; }
 
-uint getTilingFactorY() { return (getCurrentCompressedQuad() >> 20 & 31) + 1; }
+uint getTilingFactorY() { return (aCompressedData >> 20 & 31) + 1; }
 
-uint getAxis() { return (getCurrentCompressedQuad() >> 25); }
+uint getAxis() { return (aCompressedData >> 25); }
 
 vec3 getNormal(uint axis)
 {

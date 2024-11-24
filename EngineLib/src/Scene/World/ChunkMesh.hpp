@@ -34,7 +34,9 @@ namespace Engine
 
         const Engine::VertexArray* GetVertexArray() const { return m_VertexArray; }
 
-        const Engine::StorageBuffer* GetBuffer() const { return m_Buffer; }
+        const Engine::StorageBuffer* GetBlocksBuffer() const { return m_BlocksBuffer; }
+
+        const Engine::StorageBuffer* GetQuadsBuffer() const { return m_QuadsBuffer; }
 
         static void UploadData(ChunkMesh* mesh);
 
@@ -59,6 +61,7 @@ namespace Engine
         ChunkMeshRaw m_Mesh{};
 
         VertexArray* m_VertexArray{};
-        StorageBuffer* m_Buffer{};
+        StorageBuffer* m_QuadsBuffer{};
+        StorageBuffer* m_BlocksBuffer{};
     };
 }// namespace Engine

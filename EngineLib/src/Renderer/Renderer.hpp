@@ -16,6 +16,8 @@
 #include "TextureArray.hpp"
 #include "CubemapTexture.hpp"
 #include "Skybox.hpp"
+#include "Framebuffer.hpp"
+#include "VertexArray.hpp"
 
 #include <Renderer/GraphicsContext.hpp>
 #include <Renderer/RendererCommand.hpp>

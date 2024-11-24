@@ -46,6 +46,7 @@ protected:
     Ref<Engine::Shader> m_Shader;
     Ref<Engine::Shader> m_CubeShader;
     Ref<Engine::Shader> m_LightShader;
+    Engine::Framebuffer* m_Framebuffer;
     Engine::Skybox* m_Skybox{};
 
     LightObject* m_Light;
