@@ -6,6 +6,7 @@ struct VertexData {
     vec3 worldPos;
     vec3 viewPos;
     vec3 aoColor;
+    vec4 lightPosWorldPos;
 };
 
 struct Camera {
@@ -16,6 +17,7 @@ struct Camera {
 
 struct Light {
     vec3 position;
+    // vec3 rotation;
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
@@ -24,14 +26,15 @@ struct Light {
 };
 
 layout(location = 0) out VertexData vertDataOut;
-layout(location = 5) out Light outLight;
-layout(location = 12) flat out float textureIndex;
-layout(location = 13) out float fogVisibility;
+layout(location = 6) out Light outLight;
+layout(location = 13) flat out float textureIndex;
+layout(location = 14) out float fogVisibility;
 
 layout(location = 0) uniform Camera camera;
 layout(location = 3) uniform Light light;
-layout(location = 9) uniform mat4 model;
-layout(location = 10) uniform vec3 offset;
+layout(location = 10) uniform mat4 lightSpaceMatrix;
+layout(location = 11) uniform mat4 model;
+layout(location = 12) uniform vec3 offset;
 
 layout(std430, binding = 3) buffer blockBuffer { uint blocks[]; };
 
@@ -137,12 +140,12 @@ uint getAxis() { return (getCurrentCompressedQuad() >> 25); }
 
 vec3 getNormal(uint axis)
 {
-    if (axis == 0) { return vec3(0, 1, 0); }
-    else if (axis == 1) { return vec3(0, -1, 0); }
-    else if (axis == 2) { return vec3(1, 0, 0); }
-    else if (axis == 3) { return vec3(-1, 0, 0); }
-    else if (axis == 4) { return vec3(0, 0, 1); }
-    else if (axis == 5) { return vec3(0, 0, -1); }
+    if (axis == 0) { return vec3(0, -1, 0); }
+    else if (axis == 1) { return vec3(0, 1, 0); }
+    else if (axis == 2) { return vec3(-1, 0, 0); }
+    else if (axis == 3) { return vec3(1, 0, 0); }
+    else if (axis == 4) { return vec3(0, 0, -1); }
+    else if (axis == 5) { return vec3(0, 0, 1); }
     return vec3(0, 0, 0);
 }
 
@@ -176,6 +179,9 @@ void main()
     float gradient = 5;
     fogVisibility = exp(-pow(density * length(posRelToCamera.xyz), gradient));
 
-    vertDataOut.vertNormal = mat3(transpose(inverse(model))) * vec3(0, -1, 0);
+    vertDataOut.vertNormal = mat3(transpose(inverse(model))) * getNormal(axis);
+    // vertDataOut.vertNormal = getNormal(axis);
     vertDataOut.worldPos = worldPosition.xyz;
+
+    vertDataOut.lightPosWorldPos = lightSpaceMatrix * worldPosition;
 }

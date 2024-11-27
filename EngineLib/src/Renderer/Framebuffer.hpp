@@ -10,7 +10,7 @@ namespace Engine
         virtual ~Framebuffer() = default;
 
     public:
-        static Framebuffer* Create(uint32_t width, uint32_t height);
+        static Framebuffer* Create(uint32_t width, uint32_t height, bool isDepthMap = false);
 
     public:
         RendererCommand BindCommand() const;
@@ -18,7 +18,9 @@ namespace Engine
     public:
         virtual uint32_t GetID() = 0;
 
-        virtual uint32_t& GetColorAttachmentID() = 0;
+        virtual uint32_t GetColorAttachmentID() = 0;
+
+        virtual uint32_t GetDepthAttachmentID() = 0;
 
         virtual void Resize(uint32_t width, uint32_t height) = 0;
 

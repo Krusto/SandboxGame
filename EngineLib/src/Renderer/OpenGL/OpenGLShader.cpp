@@ -10,8 +10,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#define NO_STD_LOG
-#include <CFilesystem.h>
+// #define NO_STD_LOG
+// #include <CFilesystem.h>
 
 #ifdef __cplusplus
 }
@@ -31,7 +31,7 @@ namespace Engine
 
     OpenGLShader* OpenGLShader::CreateFromString(const std::string& source)
     {
-        OpenGLShader* shader = Engine::Allocator::Allocate < OpenGLShader>();
+        OpenGLShader* shader = Engine::Allocator::Allocate<OpenGLShader>();
         shader->Load(source, true);
         return shader;
     }
@@ -122,21 +122,21 @@ namespace Engine
 
     void OpenGLShader::Bind() const { glUseProgram(m_RendererID); }
 
-    // static bool file_read_string(const int8_t* path, size_t* len, std::string* buffer)
-    // {
-    //     std::ifstream f(std::string((const char*) path), std::ios::in);
-    //     if (f)
-    //     {
-    //         f.seekg(0, std::ios::end);
-    //         *len = f.tellg();
-    //         f.seekg(0, std::ios::beg);
-    //         buffer->resize(*len, '\n');
-    //         f.read((char*) buffer->data(), *len);
-    //         f.close();
-    //         return buffer->size() > 0;
-    //     }
-    //     return false;
-    // }
+    static bool file_read_string(const int8_t* path, size_t* len, std::string* buffer)
+    {
+        std::ifstream f(std::string((const char*) path), std::ios::in);
+        if (f)
+        {
+            f.seekg(0, std::ios::end);
+            *len = f.tellg();
+            f.seekg(0, std::ios::beg);
+            buffer->resize(*len, '\n');
+            f.read((char*) buffer->data(), *len);
+            f.close();
+            return buffer->size() > 0;
+        }
+        return false;
+    }
 
     std::string OpenGLShader::ReadShaderFromFile(const std::string& filepath, ShaderType shaderType) const
     {
@@ -148,7 +148,7 @@ namespace Engine
 
         try
         {
-            int8_t* buffer;
+            std::string buffer;
             size_t bufferLen;
             std::string path;
             std::unordered_map<ShaderType, std::string> extensions;
@@ -160,11 +160,11 @@ namespace Engine
             path = filepath + extensions[shaderType];
 
             auto resultStatus = file_read_string((const int8_t*) path.c_str(), &bufferLen, &buffer);
-            if (resultStatus != false) { result = std::string((const char*) buffer); }
+            if (resultStatus != false) { result = buffer; }
         }
         catch (std::ios_base::failure& e)
         {
-            LOG_ERROR("%s %s", e.what(), filepath.c_str());
+            LOG_ERROR("%s %s\n", e.what(), filepath.c_str());
         }
         return result;
     }

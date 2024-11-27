@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <cstdint>
 #include <Renderer/Framebuffer.hpp>
+#include <Renderer/Image.hpp>
 
 namespace Engine
 {
@@ -12,12 +13,14 @@ namespace Engine
         ~OpenGLFramebuffer() = default;
 
     public:
-        void Init(uint32_t width, uint32_t height);
+        void Init(uint32_t width, uint32_t height, bool isDepthMap = false);
 
     public:
         virtual uint32_t GetID() override;
 
-        virtual uint32_t& GetColorAttachmentID() override;
+        virtual uint32_t GetColorAttachmentID() override;
+
+        virtual uint32_t GetDepthAttachmentID() override;
 
         virtual void Resize(uint32_t width, uint32_t height) override;
 
@@ -37,7 +40,7 @@ namespace Engine
         uint32_t m_width{};
         uint32_t m_height{};
         uint32_t m_fbo{};
-        uint32_t m_color_texture{};
-        uint32_t m_depth_texture{};
+        Image* m_color_attachment{};
+        Image* m_depth_attachment{};
     };
 }// namespace Engine

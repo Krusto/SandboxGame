@@ -1,43 +1,16 @@
 #version 450 core
 
-layout(location = 0) in uint aCompressedData;
-
-struct VertexData {
-    vec3 vertNormal;
-    vec2 texCoord;
-    vec3 worldPos;
-    vec3 viewPos;
-    vec3 aoColor;
-};
-
-struct Camera {
-    mat4 projection;
-    mat4 view;
-    vec3 position;
-};
-
-struct Light {
-    vec3 position;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-    float intensity;
-    float shininess;
-};
-
-layout(location = 0) out VertexData vertDataOut;
-layout(location = 5) out Light outLight;
-layout(location = 12) flat out float textureIndex;
-layout(location = 13) out float fogVisibility;
-
-layout(location = 0) uniform Camera camera;
-layout(location = 3) uniform Light light;
-layout(location = 9) uniform mat4 model;
-layout(location = 10) uniform vec3 offset;
+layout(location = 0) uniform mat4 lightSpaceMatrix;
+layout(location = 1) uniform mat4 model;
+layout(location = 2) uniform vec3 offset;
 
 layout(std430, binding = 3) buffer blockBuffer { uint blocks[]; };
 
 layout(std430, binding = 4) buffer quadsBuffer { uint quads[]; };
+
+uint getCurrentCompressedQuad() { return quads[gl_VertexID / 4]; }
+
+uint getVertexID() { return gl_VertexID % 4; }
 
 vec2 getTexCoord(uint axis, uint vertexID, uint width, uint height)
 {
@@ -72,14 +45,15 @@ vec2 getTexCoord(uint axis, uint vertexID, uint width, uint height)
     return coords;
 }
 
-uint getVertexID() { return gl_VertexID % 4; }
-
-vec3 getPosition() { return vec3(aCompressedData & 0x1F, aCompressedData >> 5 & 0x1F, aCompressedData >> 10 & 0x1F); }
+vec3 getPosition()
+{
+    return vec3(getCurrentCompressedQuad() & 0x1F, getCurrentCompressedQuad() >> 5 & 0x1F,
+                getCurrentCompressedQuad() >> 10 & 0x1F);
+}
 
 vec3 getBlockPosition(uint axis, uint width, uint height)
 {
     vec3 blockPosition = vec3(0, 0, 0);
-    uint vert = gl_VertexID;
     uint vertexID = getVertexID();
     vec3 position = getPosition();
 
@@ -126,11 +100,11 @@ vec3 getAO(uint axis)
     return vec3(1, 1, 1);
 }
 
-uint getTilingFactorX() { return (aCompressedData >> 15 & 31) + 1; }
+uint getTilingFactorX() { return (getCurrentCompressedQuad() >> 15 & 31) + 1; }
 
-uint getTilingFactorY() { return (aCompressedData >> 20 & 31) + 1; }
+uint getTilingFactorY() { return (getCurrentCompressedQuad() >> 20 & 31) + 1; }
 
-uint getAxis() { return (aCompressedData >> 25); }
+uint getAxis() { return (getCurrentCompressedQuad() >> 25); }
 
 vec3 getNormal(uint axis)
 {
@@ -145,7 +119,6 @@ vec3 getNormal(uint axis)
 
 void main()
 {
-    outLight = light;
     uint width = getTilingFactorX();
     uint height = getTilingFactorY();
 
@@ -154,25 +127,5 @@ void main()
     vec3 blockPosition = getBlockPosition(axis, width, height);
     vec4 worldPosition = model * vec4(blockPosition + offset, 1.0);
 
-    vec4 posRelToCamera = camera.view * worldPosition;
-
-    gl_Position = camera.projection * posRelToCamera;
-
-    vertDataOut.aoColor = getAO(axis);
-
-    vertDataOut.texCoord = getTexCoord(axis, getVertexID(), width, height);
-
-    uint currentBlock = getBlock();
-
-    if (currentBlock == 2 && axis > 1) { textureIndex = 3; }
-    else { textureIndex = float(getBlock()); }
-
-    vertDataOut.viewPos = camera.position;
-
-    float density = 0.002;
-    float gradient = 5;
-    fogVisibility = exp(-pow(density * length(posRelToCamera.xyz), gradient));
-
-    vertDataOut.vertNormal = mat3(transpose(inverse(model))) * vec3(0, -1, 0);
-    vertDataOut.worldPos = worldPosition.xyz;
+    gl_Position = lightSpaceMatrix * worldPosition;
 }
