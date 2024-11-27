@@ -1,11 +1,11 @@
 #include <glad/glad.h>
-
+#include <Core/Allocator.hpp>
 #include "OpenGLFramebuffer.hpp"
 
 namespace Engine
 {
 
-    void OpenGLFramebuffer::Init(uint32_t width, uint32_t height)
+    void OpenGLFramebuffer::Init(uint32_t width, uint32_t height, bool isDepthMap)
     {
         this->m_width = width;
         this->m_height = height;
@@ -13,37 +13,34 @@ namespace Engine
         glGenFramebuffers(1, &m_fbo);
         glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-        glGenTextures(1, &m_color_texture);
-        glBindTexture(GL_TEXTURE_2D, m_color_texture);
+        if (!isDepthMap)
+        {
+            m_color_attachment = Image::Create(nullptr, width, height, ImageType::RGB);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, (GLsizei) width, (GLsizei) height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_color_attachment->GetID(), 0);
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            m_depth_attachment = Image::Create(nullptr, width, height, ImageType::Depth);
 
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_color_texture, 0);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth_attachment->GetID(), 0);
+        }
+        else
+        {
 
-        glGenTextures(1, &m_depth_texture);
-        glBindTexture(GL_TEXTURE_2D, m_depth_texture);
+            m_depth_attachment = Image::Create(nullptr, width, height, ImageType::Depth);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, (GLsizei) width, (GLsizei) height, 0, GL_DEPTH_COMPONENT,
-                     GL_FLOAT, nullptr);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth_attachment->GetID(), 0);
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth_texture, 0);
-
+            glDrawBuffer(GL_NONE);
+            glReadBuffer(GL_NONE);
+        }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
     uint32_t OpenGLFramebuffer::GetID() { return m_fbo; }
 
-    uint32_t& OpenGLFramebuffer::GetColorAttachmentID() { return m_color_texture; }
+    uint32_t OpenGLFramebuffer::GetColorAttachmentID() { return m_color_attachment->GetID(); }
+
+    uint32_t OpenGLFramebuffer::GetDepthAttachmentID() { return m_depth_attachment->GetID(); }
 
     void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height)
     {
@@ -61,8 +58,18 @@ namespace Engine
 
     void OpenGLFramebuffer::Destroy()
     {
-        glDeleteTextures(1, &m_color_texture);
-        glDeleteTextures(1, &m_depth_texture);
+        if (m_color_attachment)
+        {
+            m_color_attachment->Destroy();
+            Allocator::Deallocate(m_color_attachment);
+            m_color_attachment = nullptr;
+        }
+        if (m_depth_attachment)
+        {
+            m_depth_attachment->Destroy();
+            Allocator::Deallocate(m_depth_attachment);
+            m_depth_attachment = nullptr;
+        }
         glDeleteFramebuffers(1, &m_fbo);
     }
 

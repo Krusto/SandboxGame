@@ -36,7 +36,7 @@ namespace Engine
 
     void Renderer::Init(RendererSpec rendererSpec, ApplicationSpec applicationSpec)
     {
-        s_RendererAPI = Engine::Allocator::Allocate < OpenGLRenderer>();
+        s_RendererAPI = Engine::Allocator::Allocate<OpenGLRenderer>();
 
         if (s_RendererAPI) s_RendererAPI->Init(rendererSpec, applicationSpec);
     }
@@ -60,9 +60,8 @@ namespace Engine
     void Renderer::ClearColor(glm::vec4 color)
     {
         Renderer::Submit(RendererCommand([=]() {
-        if (s_RendererAPI) s_RendererAPI->ClearColor(color);
-
-            }));
+            if (s_RendererAPI) s_RendererAPI->ClearColor(color);
+        }));
     }
 
     GraphicsContext* Renderer::CreateGraphicsContext(GLFWwindow* handle) { return GraphicsContext::Create(handle); }

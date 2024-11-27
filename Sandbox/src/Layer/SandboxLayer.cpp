@@ -2,6 +2,7 @@
 #include <Scene/World/ChunkConstraints.hpp>
 #include <algorithm>
 #include <imgui.h>
+#include <glad/glad.h>
 
 SandboxLayer::SandboxLayer(const Engine::ApplicationSpec& spec)
 {
@@ -12,6 +13,7 @@ SandboxLayer::SandboxLayer(const Engine::ApplicationSpec& spec)
     m_ShadersDirectory = (m_AssetsDirectory.string() + "/Shaders");
     m_TexturesDirectory = (m_AssetsDirectory.string() + "/Textures");
     m_SkyboxDirectory = (m_TexturesDirectory.string() + "/Skybox");
+    m_ViewportSize = {spec.width, spec.height};
 }
 
 void SandboxLayer::Init(Engine::Window* window)
@@ -20,10 +22,13 @@ void SandboxLayer::Init(Engine::Window* window)
     std::string worldShaderPath = m_ShadersDirectory.string() + "/World";
     std::string skyboxShaderPath = m_ShadersDirectory.string() + "/Skybox";
     std::string lightShaderPath = m_ShadersDirectory.string() + "/Light";
+    std::string depthShaderPath = m_ShadersDirectory.string() + "/WorldDepth";
 
     m_Framebuffer = Engine::Framebuffer::Create(window->GetSpec()->width, window->GetSpec()->height);
+    m_DepthFramebuffer = Engine::Framebuffer::Create(5000, 5000, true);
 
     m_Shader = Ref<Engine::Shader>(Engine::Shader::Load(worldShaderPath));
+    m_DepthBufferShader = Ref<Engine::Shader>(Engine::Shader::Load(depthShaderPath));
 
     std::string skyboxName = "skybox_day";
     std::unordered_map<Engine::CubemapTextureFace, std::string> faces = {
@@ -59,6 +64,26 @@ void SandboxLayer::Init(Engine::Window* window)
     m_Light = Engine::Allocator::Allocate<LightObject>();
     m_Light->Init();
     m_Light->position = glm::vec3(0, 0, 0);
+
+
+    m_DepthBufferVA = Engine::VertexArray::Create(6);
+    float vertices[] = {
+            -1, 1,  0.0, 0, 1,//
+            -1, -1, 0.0, 0, 0,//
+            1,  -1, 0.0, 1, 0,//
+            1,  1,  0.0, 1, 1,//
+    };
+    uint32_t length = sizeof(vertices) / sizeof(float);
+    Engine::VertexLayout layout =
+            Engine::VertexLayout({Engine::VertexAttribute{"Position", Engine::ShaderUniformType::Vec3},
+                                  Engine::VertexAttribute{"TextureCoord", Engine::ShaderUniformType::Vec2}});
+
+    m_DepthBufferVA->AddVertexBuffer(layout, vertices, length);
+
+    uint32_t indices[] = {0, 1, 2, 0, 2, 3};
+    m_DepthBufferVA->AddIndexBuffer(indices, 6);
+
+    m_DebugShader = Ref<Engine::Shader>(Engine::Shader::Load(m_ShadersDirectory.string() + "/Debug"));
 }
 
 void SandboxLayer::OnAttach() {}
@@ -69,6 +94,7 @@ void SandboxLayer::Destroy()
 {
     m_World->Destroy();
     m_Shader->Destroy();
+    m_DepthBufferShader->Destroy();
     m_CubeShader->Destroy();
     m_LightShader->Destroy();
     m_Skybox->Destroy();
@@ -77,9 +103,86 @@ void SandboxLayer::Destroy()
     Engine::Allocator::Deallocate(m_Light);
     m_Framebuffer->Destroy();
     Engine::Allocator::Deallocate(m_Framebuffer);
-
+    m_DepthFramebuffer->Destroy();
+    Engine::Allocator::Deallocate(m_DepthFramebuffer);
     // for (int i = 0; i < m_Cubes.size(); i++) { Engine::Allocator::Deallocate(m_Cubes[i]); }
     // m_Cubes.clear();
+}
+
+void SandboxLayer::RenderWorld()
+{
+    Engine::Renderer::Submit(
+            Engine::RendererCommand([=]() { glViewport(0, 0, m_ViewportSize.width, m_ViewportSize.height); }));
+    Engine::Renderer::Submit(m_Framebuffer->BindCommand());
+    Engine::Renderer::ClearColor(glm::vec4{1, 1, 1, 1.0});
+    //Render Skybox
+    Engine::Renderer::Submit(m_Skybox->RenderCommand(&m_Camera));
+    //Render World
+    Engine::Renderer::Submit(m_Shader->BindCommand());
+    Engine::Renderer::Submit(m_Skybox->BindTexture(1));
+    Engine::Renderer::Submit(Engine::RendererCommand([=]() {
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, m_DepthFramebuffer->GetDepthAttachmentID());
+    }));
+    Engine::Renderer::Submit(m_Camera.UploadCommand(m_Shader.Raw()));
+
+    float near_plane = 1.0f, far_plane = 1000.0f;
+
+    glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+    glm::mat4 lightView = glm::lookAt(m_Light->position, glm::radians(m_Light->rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+
+
+    glm::mat4 lightMatrix = lightProjection * lightView;
+    Engine::Renderer::Submit(Engine::RendererCommand([=]() { m_Shader->SetUniform("lightSpaceMatrix", lightMatrix); }));
+
+    Engine::Renderer::Submit(m_Light->UploadLight(m_Shader.Raw()));
+    Engine::Renderer::Submit(
+            Engine::RendererCommand([=]() { m_Shader->SetUniform("light.shininess", (float) m_WorldShininess); }));
+
+    Engine::Renderer::Submit(m_World->RenderWorldCommand(m_Shader.Raw()));
+
+    if (!m_DisableLighting)
+    {
+        //Render light debug object
+        Engine::Renderer::Submit(m_LightShader->BindCommand());
+        Engine::Renderer::Submit(m_Camera.UploadCommand(m_LightShader.Raw()));
+        Engine::Renderer::Submit(m_Light->Render(m_LightShader.Raw()));
+    }
+
+    Engine::Renderer::Submit(Engine::RendererCommand([=]() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }));
+}
+
+void SandboxLayer::RenderDepthWorld()
+{
+    Engine::Renderer::Submit(Engine::RendererCommand([=]() { glViewport(0, 0, 1000, 1000); }));
+    Engine::Renderer::Submit(m_DepthFramebuffer->BindCommand());
+    Engine::Renderer::Submit(Engine::RendererCommand([=]() { glClear(GL_DEPTH_BUFFER_BIT); }));
+    //Render World
+    float near_plane = 1.0f, far_plane = 1000.0f;
+
+    glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+    glm::mat4 lightView = glm::lookAt(m_Light->position, glm::radians(m_Light->rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    glm::mat4 lightMatrix = lightProjection * lightView;
+    Engine::Renderer::Submit(Engine::RendererCommand([=]() {
+        ;
+        m_DepthBufferShader->Bind();
+        m_DepthBufferShader->SetUniform("lightSpaceMatrix", lightMatrix);
+    }));
+
+    Engine::Renderer::Submit(m_World->RenderWorldCommand(m_DepthBufferShader.Raw()));
+    // Engine::Renderer::Submit(Engine::RendererCommand([=]() { m_Framebuffer->Bind(); }));
+    // Engine::Renderer::Submit(Engine::RendererCommand([=]() {
+    //     glViewport(0, 0, m_ViewportSize.width, m_ViewportSize.height);
+    //     glClearColor(0, 0, 0, 1);
+    //     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //     m_DebugShader->Bind();
+    //     glActiveTexture(GL_TEXTURE0);
+    //     glBindTexture(GL_TEXTURE_2D, m_DepthFramebuffer->GetDepthAttachmentID());
+    //     m_DepthBufferVA->Bind();
+    //     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+    //     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    // }));
 }
 
 void SandboxLayer::OnUpdate(double dt)
@@ -168,39 +271,10 @@ void SandboxLayer::OnUpdate(double dt)
     m_Camera.Update(dt, 10.0f, 10.0f);
 
     Engine::Renderer::BeginFrame();
-    Engine::Renderer::ClearColor(glm::vec4{1, 1, 1, 1.0});
 
-    Engine::Renderer::Submit(m_Framebuffer->BindCommand());
-    Engine::Renderer::ClearColor(glm::vec4{1, 1, 1, 1.0});
+    RenderDepthWorld();
+    RenderWorld();
 
-    //Render Skybox
-    Engine::Renderer::Submit(m_Skybox->RenderCommand(&m_Camera));
-
-    //Render World
-    Engine::Renderer::Submit(m_Shader->BindCommand());
-    Engine::Renderer::Submit(m_Skybox->BindTexture(1));
-    Engine::Renderer::Submit(m_Camera.UploadCommand(m_Shader.Raw()));
-
-    if (m_DisableLighting)
-    {
-        Engine::Renderer::Submit(Engine::RendererCommand([=]() { m_Shader->SetUniform("light.intensity", 0.0f); }));
-    }
-    else
-    {
-        Engine::Renderer::Submit(m_Light->UploadLight(m_Shader.Raw()));
-        Engine::Renderer::Submit(
-                Engine::RendererCommand([=]() { m_Shader->SetUniform("light.shininess", (float) m_WorldShininess); }));
-    }
-    Engine::Renderer::Submit(m_World->RenderWorldCommand(m_Shader.Raw()));
-
-    if (!m_DisableLighting)
-    {
-        //Render light debug object
-        Engine::Renderer::Submit(m_LightShader->BindCommand());
-        Engine::Renderer::Submit(m_Camera.UploadCommand(m_LightShader.Raw()));
-        Engine::Renderer::Submit(m_Light->Render(m_LightShader.Raw()));
-    }
-    Engine::Renderer::Submit(Engine::RendererCommand([=]() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }));
     Engine::Renderer::Flush();
     Engine::Renderer::EndFrame();
 
@@ -217,28 +291,36 @@ void SandboxLayer::OnImGuiBegin() {}
 
 void SandboxLayer::OnImGuiDraw()
 {
-    ImGui::Begin("a");
+    ImGui::Begin("debug");
     ImGui::Text("%.3fms %.2ffps", m_DeltaTime, 1000.0f / m_DeltaTime);
     ImGui::Checkbox("Disable Lighting", &m_DisableLighting);
-    if (!m_DisableLighting)
-    {
-        ImGui::SliderFloat3("lightPos", (float*) &m_Light->position, 0, 360);
-        ImGui::SliderFloat3("lightRot", (float*) &m_Light->rotation, 0, 360);
-        ImGui::ColorEdit3("Ambient", (float*) &m_Light->ambient);
-        ImGui::ColorEdit3("Diffuse", (float*) &m_Light->diffuse);
-        ImGui::ColorEdit3("Specular", (float*) &m_Light->specular);
-        ImGui::SliderInt("Shininess", &m_WorldShininess, 0, 100);
-        ImGui::SliderFloat("Intensity", &m_Light->intensity, 0.1, 10.0);
-    }
+    // // if (!m_DisableLighting)
+    // // {
+    ImGui::SliderFloat3("lightPos", (float*) &m_Light->position, 0, 360);
+    ImGui::SliderFloat3("lightRot", (float*) &m_Light->rotation, 0, 360);
+    ImGui::ColorEdit3("Ambient", (float*) &m_Light->ambient);
+    ImGui::ColorEdit3("Diffuse", (float*) &m_Light->diffuse);
+    ImGui::ColorEdit3("Specular", (float*) &m_Light->specular);
+    ImGui::SliderInt("Shininess", &m_WorldShininess, 0, 100);
+    ImGui::SliderFloat("Intensity", &m_Light->intensity, 0.0, 10.0);
+    // // }
 
     ImGui::Checkbox("Lock", &m_LockCamera);
+    ImGui::Checkbox("Show Depth Buffer", &m_ShowDepthBuffer);
     ImGui::End();
-    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{0, 0});
-    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0);
+
 
     ImGui::Begin("Framebuffer");
-    ImGui::Image((void*) m_Framebuffer->GetColorAttachmentID(),
-                 {(float) m_Framebuffer->width(), (float) m_Framebuffer->height()}, {0, 1}, {1, 0});
+    if (m_ShowDepthBuffer)
+    {
+        ImGui::Image((void*) m_DepthFramebuffer->GetDepthAttachmentID(),
+                     {(float) m_DepthFramebuffer->width(), (float) m_DepthFramebuffer->height()}, {0, 1}, {1, 0});
+    }
+    else
+    {
+        ImGui::Image((void*) m_Framebuffer->GetColorAttachmentID(),
+                     {(float) m_Framebuffer->width(), (float) m_Framebuffer->height()}, {0, 1}, {1, 0});
+    }
     ImGui::End();
 }
 
@@ -262,8 +344,11 @@ void SandboxLayer::OnKeyboardEvent(int action, int key)
     else if (key == GLFW_KEY_R && action == GLFW_PRESS)
     {
         m_Shader->Reload();
+        m_DepthBufferShader->Reload();
+        m_CubeShader->Reload();
         m_Skybox->Reload();
     }
+    else if (key == GLFW_KEY_L && action == GLFW_PRESS) { m_Light->position = m_Camera.GetPosition(); }
     else if (key == GLFW_KEY_T && action == GLFW_PRESS) { shouldReloadWorld = true; }
     else
     {

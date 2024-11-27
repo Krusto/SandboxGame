@@ -41,12 +41,20 @@ public:
 
     void End() override {}
 
+    void RenderWorld();
+    void RenderDepthWorld();
+
 protected:
     Engine::Window* m_Window;
     Ref<Engine::Shader> m_Shader;
     Ref<Engine::Shader> m_CubeShader;
     Ref<Engine::Shader> m_LightShader;
+    Ref<Engine::Shader> m_DepthBufferShader;
+    Ref<Engine::Shader> m_DebugShader;
+
     Engine::Framebuffer* m_Framebuffer;
+    Engine::Framebuffer* m_DepthFramebuffer;
+    Engine::VertexArray* m_DepthBufferVA;
     Engine::Skybox* m_Skybox{};
 
     LightObject* m_Light;
@@ -66,6 +74,7 @@ protected:
     std::filesystem::path m_SkyboxDirectory;
 
     int m_WorldShininess{30};
-    bool m_DisableLighting{true};
+    bool m_DisableLighting{false};
+    bool m_ShowDepthBuffer{false};
     bool m_LockCamera{};
 };
