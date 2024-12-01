@@ -49,7 +49,7 @@ namespace Engine
         if constexpr (OPENGL_VERSION_MAJOR == 4 && OPENGL_VERSION_MINOR >= 3)
         {
             glEnable(GL_DEBUG_OUTPUT);
-            glDebugMessageCallback(_MessageCallback, 0);
+            glDebugMessageCallback(Engine::Window::_MessageCallback, 0);
         }
         glfwSetWindowCloseCallback(this->s_WindowPtr, _CloseCallback);
         glfwSetWindowSizeCallback(this->s_WindowPtr, _WindowSizeCallback);
@@ -144,6 +144,7 @@ namespace Engine
                 case GL_DEBUG_SOURCE_OTHER:
                     return "OTHER";
             }
+            return "";
         }();
 
         auto const type_str = [type]() {
@@ -164,6 +165,7 @@ namespace Engine
                 case GL_DEBUG_TYPE_OTHER:
                     return "OTHER";
             }
+            return "";
         }();
 
         auto const severity_str = [severity]() {
@@ -178,6 +180,7 @@ namespace Engine
                 case GL_DEBUG_SEVERITY_HIGH:
                     return "HIGH";
             }
+            return "";
         }();
         LOG("%s, %s, %s, %u: %s\n", src_str, type_str, severity_str, id, message);
     }

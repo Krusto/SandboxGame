@@ -15,8 +15,5 @@ void main()
 {
     vec4 pos = camera.projection * camera.view * vec4(aPos, 1.0);
     gl_Position = vec4(pos.x, pos.y, pos.w, pos.w);
-    // texCoords = vec3(aPos.x, aPos.y, -aPos.z);
     texCoords = aPos;
-    // gl_Position = vec4(aPos, 1.0);
 }
- 

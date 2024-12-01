@@ -11,13 +11,6 @@ namespace Engine
         ~OpenGLImage() = default;
 
     public:
-        /**
-         * @brief 
-         * @param data 
-         * @param width 
-         * @param height 
-         * @param type 
-         */
         void Init(uint8_t* data, size_t width, size_t height, ImageType type) override;
         void Bind(size_t location) const override;
         void Destroy() override;

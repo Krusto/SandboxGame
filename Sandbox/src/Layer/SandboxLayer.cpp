@@ -11,8 +11,8 @@ SandboxLayer::SandboxLayer(const Engine::ApplicationSpec& spec)
     m_AppSpec.WorkingDirectory = std::filesystem::absolute(spec.WorkingDirectory);
     m_AssetsDirectory = m_AppSpec.WorkingDirectory.append("Assets");
     m_ShadersDirectory = (m_AssetsDirectory.string() + "/Shaders");
-    m_TexturesDirectory = (m_AssetsDirectory.string() + "/Textures");
-    m_SkyboxDirectory = (m_TexturesDirectory.string() + "/Skybox");
+    m_TexturesDirectory = (m_AssetsDirectory.string() + "/Textures/Tiles");
+    m_SkyboxDirectory = (m_AssetsDirectory.string() + "/Textures/Skybox");
     m_ViewportSize = {spec.width, spec.height};
 }
 
@@ -25,7 +25,8 @@ void SandboxLayer::Init(Engine::Window* window)
     std::string depthShaderPath = m_ShadersDirectory.string() + "/WorldDepth";
 
     m_Framebuffer = Engine::Framebuffer::Create(window->GetSpec()->width, window->GetSpec()->height);
-    m_DepthFramebuffer = Engine::Framebuffer::Create(5000, 5000, true);
+    m_DepthFramebuffer = Engine::Framebuffer::Create(3000, 3000, true);
+    m_DebugFramebuffer = Engine::Framebuffer::Create(3000, 3000);
 
     m_Shader = Ref<Engine::Shader>(Engine::Shader::Load(worldShaderPath));
     m_DepthBufferShader = Ref<Engine::Shader>(Engine::Shader::Load(depthShaderPath));
@@ -45,7 +46,7 @@ void SandboxLayer::Init(Engine::Window* window)
 
     Engine::TerrainGenerationSettings settings = {.Seed = 0,
                                                   .AssetsDirectory = m_AssetsDirectory,
-                                                  .GenerationDistance = 10};
+                                                  .GenerationDistance = 50};
     m_World->Init(settings, m_TexturesDirectory);
 
     m_Camera.Init(Engine::CameraSpec({m_AppSpec.width, m_AppSpec.height}, 45.0f, 0.1f, 1000.0f));
@@ -64,6 +65,8 @@ void SandboxLayer::Init(Engine::Window* window)
     m_Light = Engine::Allocator::Allocate<LightObject>();
     m_Light->Init();
     m_Light->position = glm::vec3(0, 0, 0);
+    m_Light->ambient = glm::vec3(1.0, 0.73, 0.0);
+    m_Light->diffuse = glm::vec3(0.78, 0.63, 0.16);
 
 
     m_DepthBufferVA = Engine::VertexArray::Create(6);
@@ -126,20 +129,11 @@ void SandboxLayer::RenderWorld()
     }));
     Engine::Renderer::Submit(m_Camera.UploadCommand(m_Shader.Raw()));
 
-    float near_plane = 1.0f, far_plane = 1000.0f;
-
-    glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-    glm::mat4 lightView = glm::lookAt(m_Light->position, glm::radians(m_Light->rotation), glm::vec3(0.0f, 1.0f, 0.0f));
-
-
-    glm::mat4 lightMatrix = lightProjection * lightView;
-    Engine::Renderer::Submit(Engine::RendererCommand([=]() { m_Shader->SetUniform("lightSpaceMatrix", lightMatrix); }));
-
     Engine::Renderer::Submit(m_Light->UploadLight(m_Shader.Raw()));
     Engine::Renderer::Submit(
             Engine::RendererCommand([=]() { m_Shader->SetUniform("light.shininess", (float) m_WorldShininess); }));
 
-    Engine::Renderer::Submit(m_World->RenderWorldCommand(m_Shader.Raw()));
+    Engine::Renderer::Submit(m_World->RenderWorldCommand(m_Shader.Raw(), m_Light->position));
 
     if (!m_DisableLighting)
     {
@@ -161,28 +155,28 @@ void SandboxLayer::RenderDepthWorld()
     float near_plane = 1.0f, far_plane = 1000.0f;
 
     glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-    glm::mat4 lightView = glm::lookAt(m_Light->position, glm::radians(m_Light->rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 lightView =
+            glm::lookAt(m_Light->position, glm::radians(m_Camera.GetPosition()), glm::vec3(0.0f, 1.0f, 0.0f));
 
     glm::mat4 lightMatrix = lightProjection * lightView;
     Engine::Renderer::Submit(Engine::RendererCommand([=]() {
-        ;
         m_DepthBufferShader->Bind();
         m_DepthBufferShader->SetUniform("lightSpaceMatrix", lightMatrix);
     }));
 
-    Engine::Renderer::Submit(m_World->RenderWorldCommand(m_DepthBufferShader.Raw()));
-    // Engine::Renderer::Submit(Engine::RendererCommand([=]() { m_Framebuffer->Bind(); }));
-    // Engine::Renderer::Submit(Engine::RendererCommand([=]() {
-    //     glViewport(0, 0, m_ViewportSize.width, m_ViewportSize.height);
-    //     glClearColor(0, 0, 0, 1);
-    //     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //     m_DebugShader->Bind();
-    //     glActiveTexture(GL_TEXTURE0);
-    //     glBindTexture(GL_TEXTURE_2D, m_DepthFramebuffer->GetDepthAttachmentID());
-    //     m_DepthBufferVA->Bind();
-    //     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-    //     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    // }));
+    Engine::Renderer::Submit(m_World->RenderWorldCommand(m_DepthBufferShader.Raw(), m_Light->position));
+    Engine::Renderer::Submit(Engine::RendererCommand([=]() { m_DebugFramebuffer->Bind(); }));
+    Engine::Renderer::Submit(Engine::RendererCommand([=]() {
+        glViewport(0, 0, m_DebugFramebuffer->width(), m_DebugFramebuffer->height());
+        glClearColor(0, 0, 0, 1);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        m_DebugShader->Bind();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, m_DepthFramebuffer->GetDepthAttachmentID());
+        m_DepthBufferVA->Bind();
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }));
 }
 
 void SandboxLayer::OnUpdate(double dt)
@@ -269,10 +263,10 @@ void SandboxLayer::OnUpdate(double dt)
 
     m_World->OnUpdate(dt);
     m_Camera.Update(dt, 10.0f, 10.0f);
+    m_Skybox->Update(dt);
 
     Engine::Renderer::BeginFrame();
 
-    RenderDepthWorld();
     RenderWorld();
 
     Engine::Renderer::Flush();
@@ -313,8 +307,8 @@ void SandboxLayer::OnImGuiDraw()
     ImGui::Begin("Framebuffer");
     if (m_ShowDepthBuffer)
     {
-        ImGui::Image((void*) m_DepthFramebuffer->GetDepthAttachmentID(),
-                     {(float) m_DepthFramebuffer->width(), (float) m_DepthFramebuffer->height()}, {0, 1}, {1, 0});
+        ImGui::Image((void*) m_DebugFramebuffer->GetColorAttachmentID(),
+                     {(float) m_DebugFramebuffer->width(), (float) m_DebugFramebuffer->height()}, {0, 1}, {1, 0});
     }
     else
     {

@@ -21,7 +21,7 @@ namespace Engine
 
         void OnUpdate(double dt);
 
-        RendererCommand RenderWorldCommand(Shader* shader) const;
+        RendererCommand RenderWorldCommand(Shader* shader, glm::vec3 cameraPos) const;
 
         void Generate();
 

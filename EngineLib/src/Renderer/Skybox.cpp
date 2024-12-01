@@ -77,6 +77,8 @@ namespace Engine
 
     void Skybox::Reload() { m_Shader->Reload(); }
 
+    void Skybox::Update(float dt) { m_Rotation += m_RotationSpeed * dt; }
+
     RendererCommand Skybox::BindTexture(uint32_t slot) const
     {
         return RendererCommand([cubemap = m_Cubemap, slot]() { cubemap->Bind(slot); });
@@ -84,21 +86,23 @@ namespace Engine
 
     RendererCommand Skybox::RenderCommand(Camera* camera) const
     {
-        return RendererCommand([shader = m_Shader, cubemap = m_Cubemap, va = m_VertexArray, camera]() {
-            GLint depthFunc;
-            glGetIntegerv(GL_DEPTH_FUNC, &depthFunc);
-            glDepthFunc(GL_LEQUAL);
-            shader->Bind();
-            shader->SetUniform("skybox", 0);
-            shader->SetUniform("camera.projection", camera->GetProjection());
-            auto view = glm::mat4(glm::mat3(camera->GetView()));
-            shader->SetUniform("camera.view", view);
+        return RendererCommand(
+                [shader = m_Shader, cubemap = m_Cubemap, va = m_VertexArray, camera, rotation = m_Rotation]() {
+                    GLint depthFunc;
+                    glGetIntegerv(GL_DEPTH_FUNC, &depthFunc);
+                    glDepthFunc(GL_LEQUAL);
+                    shader->Bind();
+                    shader->SetUniform("skybox", 0);
+                    shader->SetUniform("camera.projection", camera->GetProjection());
+                    auto view = glm::mat4(glm::mat3(camera->GetView()));
+                    view = glm::rotate(view, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+                    shader->SetUniform("camera.view", view);
 
-            cubemap->Bind(0);
-            va->Bind();
-            glDrawElements(GL_TRIANGLES, va->IndexCount, GL_UNSIGNED_INT, nullptr);
-            glDepthFunc(GL_LESS);
-        });
+                    cubemap->Bind(0);
+                    va->Bind();
+                    glDrawElements(GL_TRIANGLES, va->IndexCount, GL_UNSIGNED_INT, nullptr);
+                    glDepthFunc(GL_LESS);
+                });
     }
 
 }// namespace Engine

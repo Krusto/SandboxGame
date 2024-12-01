@@ -27,14 +27,17 @@ namespace Engine
 
         void Draw(Camera* camera) const;
 
+        void Update(float dt);
+
         RendererCommand BindTexture(uint32_t slot = 0) const;
         RendererCommand RenderCommand(Camera* camera) const;
 
-    private:
     private:
         CubemapTexture* m_Cubemap{};
         VertexArray* m_VertexArray{};
         Shader* m_Shader{};
         std::string m_CubemapName{};
+        const float m_RotationSpeed{0.001f};
+        glm::vec3 m_Rotation{};
     };
 }// namespace Engine

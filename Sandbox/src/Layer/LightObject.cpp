@@ -55,8 +55,8 @@ Engine::RendererCommand LightObject::Render(Engine::Shader* shader) const
         m_VertexArray->Bind();
         glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
         model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-        model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0, 1, 0));
-        model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0, 0, 1));
+        model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
         model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
         shader->SetUniform("model", model);
         glDrawElements(GL_TRIANGLES, m_VertexArray->IndexCount, GL_UNSIGNED_INT, nullptr);
@@ -67,8 +67,8 @@ Engine::RendererCommand LightObject::UploadLight(Engine::Shader* shader) const
 {
     return Engine::RendererCommand([=]() {
         shader->Bind();
-        shader->SetUniform("light.position", position);
-        shader->SetUniform("light.rotation", rotation);
+        shader->SetUniform("light.pos", position);
+        shader->SetUniform("rotation", rotation);
         shader->SetUniform("light.diffuse", diffuse);
         shader->SetUniform("light.specular", specular);
         shader->SetUniform("light.ambient", ambient);

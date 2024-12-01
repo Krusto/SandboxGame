@@ -1,11 +1,10 @@
 
 #define GLFW_INCLUDE_NONE
 
-
 #include <Engine.hpp>
 #include <Layer/SandboxLayer.hpp>
 #include <Layer/GUILayer.hpp>
-#include <iostream>
+
 
 using namespace Engine;
 
@@ -18,7 +17,7 @@ public:
         Engine::LayerStack::ConstructAndPushLayer<SandboxLayer>(spec);
     }
 
-    ~Sandbox() {  }
+    ~Sandbox() {}
 };
 
 int main()
