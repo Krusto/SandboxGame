@@ -53,6 +53,7 @@ protected:
     Ref<Engine::Shader> m_DebugShader;
 
     Engine::Framebuffer* m_Framebuffer;
+    Engine::Framebuffer* m_DebugFramebuffer;
     Engine::Framebuffer* m_DepthFramebuffer;
     Engine::VertexArray* m_DepthBufferVA;
     Engine::Skybox* m_Skybox{};

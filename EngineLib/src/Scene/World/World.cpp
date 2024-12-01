@@ -60,12 +60,21 @@ namespace Engine
         }
     };
 
-    RendererCommand World::RenderWorldCommand(Shader* shader) const
+    RendererCommand World::RenderWorldCommand(Shader* shader, glm::vec3 cameraPos) const
     {
-        return RendererCommand([shader, this]() {
+        return RendererCommand([shader, cameraPos, this]() {
             m_BlockTextures.Bind();
             for (auto& [pos, chunk]: m_Chunks)
             {
+                //float dist = length(light.position - vertDataIn.worldPos);
+                float dist =
+                        glm::distance(cameraPos, glm::vec3{pos.x * CHUNK_SIZE, pos.y * CHUNK_SIZE, pos.z * CHUNK_SIZE});
+                float constant = 1.0f;
+                float linear = 0.02f;
+                float quadratic = 0.02f;
+                float attenuation = 4.0 / (constant + linear * dist + quadratic * (dist * dist));
+                if (attenuation < 0.001) { continue; }
+
                 auto& mesh = chunk.mesh;
                 if (mesh->GetVertexArray() != nullptr)
                 {

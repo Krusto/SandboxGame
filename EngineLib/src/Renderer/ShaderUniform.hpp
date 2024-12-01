@@ -1,9 +1,17 @@
 ﻿#pragma once
+#include "ShaderDataType.hpp"
+
 #include <string>
 #include <cstdint>
 
 namespace Engine
 {
+    struct ShaderUniformDeclaration {
+        std::string Name;
+        uint32_t Location;
+        ShaderUniformType Type;
+    };
+
     class ShaderResourceDeclaration
     {
     public:
