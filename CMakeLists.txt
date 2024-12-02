@@ -127,6 +127,7 @@ target_include_directories(Sandbox PRIVATE "${CMAKE_SOURCE_DIR}/EngineLib/src")
 target_include_directories(Sandbox PRIVATE "${CMAKE_SOURCE_DIR}/Sandbox/src")
 target_link_libraries(Sandbox EngineLib)
 
-add_executable(ShaderReflectionTest ./ShaderReflectionTest/main.cpp ./EngineLib/src/Renderer/Reflection/GLSLReflection.cpp)
+add_executable(ShaderReflectionTest ./ShaderReflectionTest/main.cpp )
+target_link_libraries(ShaderReflectionTest EngineLib)
 target_include_directories(ShaderReflectionTest PRIVATE ./EngineLib/src/Renderer/Reflection)
 target_include_directories(ShaderReflectionTest PRIVATE ./EngineLib/src/)

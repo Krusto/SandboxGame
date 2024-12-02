@@ -1,38 +1,95 @@
 ﻿#pragma once
-#include "ShaderDataType.hpp"
-
 #include <string>
 #include <cstdint>
+#include <vector>
+#include <string_view>
 
 namespace Engine
 {
-    struct ShaderUniformDeclaration {
-        std::string Name;
-        uint32_t Location;
-        ShaderUniformType Type;
+    enum class ShaderUniformType
+    {
+        None = 0,
+        Bool,
+        Int,
+        UInt,
+        Float,
+        Vec2,
+        Vec3,
+        Vec4,
+        Mat3,
+        Mat4,
+        IVec2,
+        IVec3,
+        IVec4
     };
 
-    class ShaderResourceDeclaration
+    enum class ShaderBlockMemoryLayout : uint8_t
+    {
+        None = 0,
+        Packed,
+        Shared,
+        Std140,
+        Std430
+    };
+
+    class ShaderDataType
     {
     public:
-        ShaderResourceDeclaration() = default;
+        ShaderDataType() = delete;
+        ~ShaderDataType() = delete;
 
-        explicit ShaderResourceDeclaration(std::string_view name, uint32_t resourceRegister, uint32_t count)
-            : m_Name(name), m_Register(resourceRegister), m_Count(count)
-        {}
+        static ShaderUniformType ShaderDataTypeFromString(std::string_view type);
 
-        ~ShaderResourceDeclaration() = default;
+        static std::string ShaderBlockMemoryLayoutString(ShaderBlockMemoryLayout layout);
 
-    public:
-        virtual const std::string& GetName() const { return m_Name; }
+        static std::string ShaderDataTypeString(ShaderUniformType type);
 
-        virtual uint32_t GetRegister() const { return m_Register; }
+        static size_t Size(ShaderUniformType Type)
+        {
+            switch (Type)
+            {
+                case ShaderUniformType::Bool:
+                    return sizeof(bool);
+                case ShaderUniformType::Int:
+                    return sizeof(int);
+                case ShaderUniformType::UInt:
+                    return sizeof(uint32_t);
+                case ShaderUniformType::Float:
+                    return sizeof(float);
+                case ShaderUniformType::Vec2:
+                    return 2 * sizeof(float);
+                case ShaderUniformType::Vec3:
+                    return 3 * sizeof(float);
+                case ShaderUniformType::Vec4:
+                    return 4 * sizeof(float);
+                case ShaderUniformType::Mat3:
+                    return 3 * 3 * sizeof(float);
+                case ShaderUniformType::Mat4:
+                    return 4 * 4 * sizeof(float);
+                case ShaderUniformType::IVec2:
+                    return 2 * sizeof(int);
+                case ShaderUniformType::IVec3:
+                    return 3 * sizeof(int);
+                case ShaderUniformType::IVec4:
+                    return 4 * sizeof(int);
+                default:
+                    return 0;
+            }
+        }
+    };
 
-        virtual uint32_t GetCount() const { return m_Count; }
+    struct ShaderUniformDeclaration {
+        std::string Name{};
+        uint32_t Offset{};
+        ShaderUniformType Type{};
+    };
 
-    private:
-        std::string m_Name;
-        uint32_t m_Register = 0;
-        uint32_t m_Count = 0;
+    struct ShaderUniformBlockLayout {
+        std::string Name{};
+        uint32_t Binding{};
+        uint32_t Index{};
+        ShaderBlockMemoryLayout Layout{};
+        size_t Alignment{};
+        std::vector<ShaderUniformDeclaration> Uniforms{};
     };
 }// namespace Engine
