@@ -16,7 +16,6 @@ struct Camera {
 
 struct Light {
     vec3 pos;
-    // vec3 rot;
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;

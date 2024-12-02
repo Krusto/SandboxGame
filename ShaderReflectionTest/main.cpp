@@ -23,7 +23,6 @@ static bool file_read_string(const char* path, size_t* len, std::string* buffer)
 
 int main()
 {
-
     std::string source;
     size_t len;
 
@@ -34,9 +33,24 @@ int main()
         Engine::GLSLReflection reflection;
         reflection.Init(source);
 
-        auto uniforms = reflection.GetUniforms();
+        auto uniformBlocksLayout = reflection.GetUniformBlocksLayout();
 
-        for (auto& uniform: uniforms) { LOG_INFO("%s %d\n", uniform.Name.c_str(), uniform.Type); }
+        for (auto& uniformBlockLayout: uniformBlocksLayout)
+        {
+
+            LOG_INFO("Uniform block: %s\n", uniformBlockLayout.Name.c_str());
+            LOG_INFO("    Binding: %d\n", uniformBlockLayout.Binding);
+            LOG_INFO("    Layout: %s\n",
+                     Engine::ShaderDataType::ShaderBlockMemoryLayoutString(uniformBlockLayout.Layout).c_str());
+
+            LOG_INFO("    Uniforms:\n");
+            for (auto& uniform: uniformBlockLayout.Uniforms)
+            {
+                LOG_INFO("        %s: %s (Offset %d)\n",
+                         Engine::ShaderDataType::ShaderDataTypeString(uniform.Type).c_str(), uniform.Name.c_str(),
+                         uniform.Offset);
+            }
+        }
     }
     else { LOG_ERROR("File %s does not exist!\n", path.c_str()); }
     return 0;
