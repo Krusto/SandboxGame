@@ -101,14 +101,21 @@ void SandboxLayer::Destroy()
     m_DepthBufferShader->Destroy();
     m_CubeShader->Destroy();
     m_LightShader->Destroy();
+    m_DebugShader->Destroy();
+
     m_Skybox->Destroy();
     Engine::Allocator::Deallocate(m_Skybox);
 
     Engine::Allocator::Deallocate(m_Light);
+
     m_Framebuffer->Destroy();
     Engine::Allocator::Deallocate(m_Framebuffer);
     m_DepthFramebuffer->Destroy();
     Engine::Allocator::Deallocate(m_DepthFramebuffer);
+    m_DebugFramebuffer->Destroy();
+    Engine::Allocator::Deallocate(m_DebugFramebuffer);
+    m_DepthBufferVA->Destroy();
+    Engine::Allocator::Deallocate(m_DepthBufferVA);
 }
 
 void SandboxLayer::RenderWorld()
@@ -121,6 +128,7 @@ void SandboxLayer::RenderWorld()
 
     //Render Skybox
     Renderer::Submit(m_Skybox->RenderCommand(&m_Camera));
+
     //Render World
     Renderer::Submit(m_Shader->BindCommand());
     Renderer::Submit(m_Skybox->BindTexture(1));
@@ -132,13 +140,11 @@ void SandboxLayer::RenderWorld()
 
     Renderer::Submit(m_World->RenderWorldCommand(m_Shader.Raw(), m_Light->position));
 
-    if (!m_DisableLighting)
-    {
-        //Render light debug object
-        Renderer::Submit(m_LightShader->BindCommand());
-        Renderer::Submit(m_Camera.UploadCommand(m_LightShader.Raw()));
-        Renderer::Submit(m_Light->Render(m_LightShader.Raw()));
-    }
+    //Render light debug object
+    Renderer::Submit(m_LightShader->BindCommand());
+    Renderer::Submit(m_Camera.UploadCommand(m_LightShader.Raw()));
+    Renderer::Submit(m_Light->Render(m_LightShader.Raw()));
+
     Renderer::BindDefaultFramebuffer();
 }
 
@@ -280,20 +286,15 @@ void SandboxLayer::OnImGuiDraw()
 {
     ImGui::Begin("debug");
     ImGui::Text("%.3fms %.2ffps", m_DeltaTime, 1000.0f / m_DeltaTime);
-    ImGui::Checkbox("Disable Lighting", &m_DisableLighting);
-    // // if (!m_DisableLighting)
-    // // {
-    ImGui::SliderFloat3("lightPos", (float*) &m_Light->position, 0, 360);
-    ImGui::SliderFloat3("lightRot", (float*) &m_Light->rotation, 0, 360);
-    ImGui::ColorEdit3("Ambient", (float*) &m_Light->ambient);
-    ImGui::ColorEdit3("Diffuse", (float*) &m_Light->diffuse);
-    ImGui::ColorEdit3("Specular", (float*) &m_Light->specular);
+    ImGui::SliderFloat3("Light Position", (float*) &m_Light->position, 0, 360);
+    ImGui::SliderFloat3("Light Rotation", (float*) &m_Light->rotation, 0, 360);
+    ImGui::ColorEdit3("Ambient Color", (float*) &m_Light->ambient);
+    ImGui::ColorEdit3("Diffuse Color", (float*) &m_Light->diffuse);
+    ImGui::ColorEdit3("Specular Color", (float*) &m_Light->specular);
     ImGui::SliderInt("Shininess", &m_WorldShininess, 0, 100);
     ImGui::SliderFloat("Intensity", &m_Light->intensity, 0.0, 10.0);
-    // // }
 
     ImGui::Checkbox("Lock", &m_LockCamera);
-    ImGui::Checkbox("Show Depth Buffer", &m_ShowDepthBuffer);
     ImGui::End();
 
 
