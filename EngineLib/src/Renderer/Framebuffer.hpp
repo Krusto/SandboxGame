@@ -2,6 +2,7 @@
 #include <Renderer/Viewport.hpp>
 #include <Renderer/RendererCommand.hpp>
 
+#include <glm/glm.hpp>
 namespace Engine
 {
     class Framebuffer
@@ -14,6 +15,10 @@ namespace Engine
 
     public:
         RendererCommand BindCommand() const;
+        RendererCommand BindColorTextureCommand(uint32_t slot) const;
+        RendererCommand BindDepthTextureCommand(uint32_t slot) const;
+        RendererCommand ClearColorCommand(glm::vec4 color) const;
+        RendererCommand ClearDepthCommand() const;
 
     public:
         virtual uint32_t GetID() = 0;
@@ -27,6 +32,14 @@ namespace Engine
         virtual void Destroy() = 0;
 
         virtual void Bind() const = 0;
+
+        virtual void BindColorTexture(uint32_t slot) const = 0;
+
+        virtual void BindDepthTexture(uint32_t slot) const = 0;
+
+        virtual void ClearColor(glm::vec4 color) const = 0;
+
+        virtual void ClearDepth() const = 0;
 
         virtual void Unbind() = 0;
 

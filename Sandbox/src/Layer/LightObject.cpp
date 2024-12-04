@@ -67,8 +67,8 @@ Engine::RendererCommand LightObject::UploadLight(Engine::Shader* shader) const
 {
     return Engine::RendererCommand([=]() {
         shader->Bind();
-        shader->SetUniform("light.pos", position);
-        shader->SetUniform("rotation", rotation);
+        shader->SetUniform("light.position", position);
+        shader->SetUniform("light.rotation", rotation);
         shader->SetUniform("light.diffuse", diffuse);
         shader->SetUniform("light.specular", specular);
         shader->SetUniform("light.ambient", ambient);

@@ -5,12 +5,12 @@ layout(location = 0) in vec3 texCoords;
 
 layout(binding = 0) uniform samplerCube skybox;
 
-const float lowerLimit = 0.0;
-const float upperLimit = 2.0;
+const float lowerLimit = -0.5;
+const float upperLimit = 1.4;
 
 void main()
 {
-    vec3 fogColor = vec3(0.3);
+    vec3 fogColor = vec3(0.7);
     vec3 coord = vec3(texCoords.x, texCoords.y, texCoords.z);
     vec4 finalColor = texture(skybox, coord);
 

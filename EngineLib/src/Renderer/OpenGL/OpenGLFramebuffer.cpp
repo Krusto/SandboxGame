@@ -54,6 +54,26 @@ namespace Engine
         glViewport(0, 0, (GLsizei) m_width, (GLsizei) m_height);
     }
 
+    void OpenGLFramebuffer::BindColorTexture(uint32_t slot) const
+    {
+        glActiveTexture(GL_TEXTURE0 + slot);
+        glBindTexture(GL_TEXTURE_2D, m_color_attachment->GetID());
+    }
+
+    void OpenGLFramebuffer::BindDepthTexture(uint32_t slot) const
+    {
+        glActiveTexture(GL_TEXTURE0 + slot);
+        glBindTexture(GL_TEXTURE_2D, m_depth_attachment->GetID());
+    }
+
+    void OpenGLFramebuffer::ClearColor(glm::vec4 color) const
+    {
+        glClear(GL_COLOR_BUFFER_BIT);
+        glClearColor(color.r, color.g, color.b, color.a);
+    }
+
+    void OpenGLFramebuffer::ClearDepth() const { glClear(GL_DEPTH_BUFFER_BIT); }
+
     void OpenGLFramebuffer::Unbind() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 
     void OpenGLFramebuffer::Destroy()

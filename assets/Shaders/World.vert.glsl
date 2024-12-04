@@ -14,24 +14,11 @@ struct Camera {
     vec3 position;
 };
 
-struct Light {
-    vec3 pos;
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-    float intensity;
-    float shininess;
-};
-
 layout(location = 0) out VertexData vertDataOut;
-layout(location = 5) out Light outLight;
-layout(location = 11) out vec3 outRotation;
 layout(location = 12) flat out float textureIndex;
 layout(location = 13) out float fogVisibility;
 
 layout(location = 0) uniform Camera camera;
-layout(location = 3) uniform Light light;
-layout(location = 9) uniform vec3 rotation;
 layout(location = 10) uniform mat4 model;
 layout(location = 11) uniform vec3 offset;
 
@@ -150,7 +137,6 @@ vec3 getNormal(uint axis)
 
 void main()
 {
-    outLight = light;
     uint width = getTilingFactorX();
     uint height = getTilingFactorY();
 
@@ -174,12 +160,11 @@ void main()
 
     vertDataOut.viewPos = camera.position;
 
-    float density = 0.004;
-    float gradient = 5;
+    float density = 0.0015;
+    float gradient = 3;
     fogVisibility = exp(-pow(density * length(posRelToCamera.xyz), gradient));
 
     vertDataOut.vertNormal = mat3(transpose(inverse(model))) * getNormal(axis);
     // vertDataOut.vertNormal = getNormal(axis);
     vertDataOut.worldPos = worldPosition.xyz;
-    outRotation = rotation;
 }

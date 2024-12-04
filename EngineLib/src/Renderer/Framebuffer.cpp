@@ -16,4 +16,24 @@ namespace Engine
     {
         return RendererCommand([=]() { Bind(); });
     }
+
+    RendererCommand Framebuffer::BindColorTextureCommand(uint32_t slot) const
+    {
+        return RendererCommand([=]() { BindColorTexture(slot); });
+    }
+
+    RendererCommand Framebuffer::BindDepthTextureCommand(uint32_t slot) const
+    {
+        return RendererCommand([=]() { BindDepthTexture(slot); });
+    }
+
+    RendererCommand Framebuffer::ClearColorCommand(glm::vec4 color) const
+    {
+        return RendererCommand([=]() { ClearColor(color); });
+    }
+
+    RendererCommand Framebuffer::ClearDepthCommand() const
+    {
+        return RendererCommand([=]() { ClearDepth(); });
+    }
 }// namespace Engine

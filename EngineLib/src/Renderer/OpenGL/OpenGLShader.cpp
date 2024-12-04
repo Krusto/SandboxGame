@@ -122,6 +122,8 @@ namespace Engine
 
     void OpenGLShader::Bind() const { glUseProgram(m_RendererID); }
 
+    uint32_t OpenGLShader::ID() const { return m_RendererID; }
+
     static bool file_read_string(const int8_t* path, size_t* len, std::string* buffer)
     {
         std::ifstream f(std::string((const char*) path), std::ios::in);

@@ -46,7 +46,7 @@ void SandboxLayer::Init(Engine::Window* window)
 
     Engine::TerrainGenerationSettings settings = {.Seed = 0,
                                                   .AssetsDirectory = m_AssetsDirectory,
-                                                  .GenerationDistance = 50};
+                                                  .GenerationDistance = 30};
     m_World->Init(settings, m_TexturesDirectory);
 
     m_Camera.Init(Engine::CameraSpec({m_AppSpec.width, m_AppSpec.height}, 45.0f, 0.1f, 1000.0f));
@@ -65,6 +65,7 @@ void SandboxLayer::Init(Engine::Window* window)
     m_Light = Engine::Allocator::Allocate<LightObject>();
     m_Light->Init();
     m_Light->position = glm::vec3(0, 0, 0);
+    m_Light->rotation = glm::vec3(220, 70, 0);
     m_Light->ambient = glm::vec3(1.0, 0.73, 0.0);
     m_Light->diffuse = glm::vec3(0.78, 0.63, 0.16);
 
@@ -108,49 +109,44 @@ void SandboxLayer::Destroy()
     Engine::Allocator::Deallocate(m_Framebuffer);
     m_DepthFramebuffer->Destroy();
     Engine::Allocator::Deallocate(m_DepthFramebuffer);
-    // for (int i = 0; i < m_Cubes.size(); i++) { Engine::Allocator::Deallocate(m_Cubes[i]); }
-    // m_Cubes.clear();
 }
 
 void SandboxLayer::RenderWorld()
 {
-    Engine::Renderer::Submit(
-            Engine::RendererCommand([=]() { glViewport(0, 0, m_ViewportSize.width, m_ViewportSize.height); }));
-    Engine::Renderer::Submit(m_Framebuffer->BindCommand());
-    Engine::Renderer::ClearColor(glm::vec4{1, 1, 1, 1.0});
+    using namespace Engine;
+    Renderer::SetViewport(m_ViewportSize);
+    Renderer::Submit(m_Framebuffer->BindCommand());
+    Renderer::Submit(m_Framebuffer->ClearDepthCommand());
+    Renderer::Submit(m_Framebuffer->ClearColorCommand(glm::vec4{0.0, 0.0, 0.0, 1.0}));
+
     //Render Skybox
-    Engine::Renderer::Submit(m_Skybox->RenderCommand(&m_Camera));
+    Renderer::Submit(m_Skybox->RenderCommand(&m_Camera));
     //Render World
-    Engine::Renderer::Submit(m_Shader->BindCommand());
-    Engine::Renderer::Submit(m_Skybox->BindTexture(1));
-    Engine::Renderer::Submit(Engine::RendererCommand([=]() {
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, m_DepthFramebuffer->GetDepthAttachmentID());
-    }));
-    Engine::Renderer::Submit(m_Camera.UploadCommand(m_Shader.Raw()));
+    Renderer::Submit(m_Shader->BindCommand());
+    Renderer::Submit(m_Skybox->BindTexture(1));
 
-    Engine::Renderer::Submit(m_Light->UploadLight(m_Shader.Raw()));
-    Engine::Renderer::Submit(
-            Engine::RendererCommand([=]() { m_Shader->SetUniform("light.shininess", (float) m_WorldShininess); }));
+    Renderer::Submit(m_Camera.UploadCommand(m_Shader.Raw()));
 
-    Engine::Renderer::Submit(m_World->RenderWorldCommand(m_Shader.Raw(), m_Light->position));
+    Renderer::Submit(m_Light->UploadLight(m_Shader.Raw()));
+    Renderer::Submit(RendererCommand([=]() { m_Shader->SetUniform("light.shininess", (float) m_WorldShininess); }));
+
+    Renderer::Submit(m_World->RenderWorldCommand(m_Shader.Raw(), m_Light->position));
 
     if (!m_DisableLighting)
     {
         //Render light debug object
-        Engine::Renderer::Submit(m_LightShader->BindCommand());
-        Engine::Renderer::Submit(m_Camera.UploadCommand(m_LightShader.Raw()));
-        Engine::Renderer::Submit(m_Light->Render(m_LightShader.Raw()));
+        Renderer::Submit(m_LightShader->BindCommand());
+        Renderer::Submit(m_Camera.UploadCommand(m_LightShader.Raw()));
+        Renderer::Submit(m_Light->Render(m_LightShader.Raw()));
     }
-
-    Engine::Renderer::Submit(Engine::RendererCommand([=]() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }));
+    Renderer::BindDefaultFramebuffer();
 }
 
 void SandboxLayer::RenderDepthWorld()
 {
-    Engine::Renderer::Submit(Engine::RendererCommand([=]() { glViewport(0, 0, 1000, 1000); }));
+    Engine::Renderer::SetViewport(m_ViewportSize);
     Engine::Renderer::Submit(m_DepthFramebuffer->BindCommand());
-    Engine::Renderer::Submit(Engine::RendererCommand([=]() { glClear(GL_DEPTH_BUFFER_BIT); }));
+    Engine::Renderer::Submit(m_DepthFramebuffer->ClearDepthCommand());
     //Render World
     float near_plane = 1.0f, far_plane = 1000.0f;
 
@@ -165,18 +161,15 @@ void SandboxLayer::RenderDepthWorld()
     }));
 
     Engine::Renderer::Submit(m_World->RenderWorldCommand(m_DepthBufferShader.Raw(), m_Light->position));
+
     Engine::Renderer::Submit(Engine::RendererCommand([=]() { m_DebugFramebuffer->Bind(); }));
-    Engine::Renderer::Submit(Engine::RendererCommand([=]() {
-        glViewport(0, 0, m_DebugFramebuffer->width(), m_DebugFramebuffer->height());
-        glClearColor(0, 0, 0, 1);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        m_DebugShader->Bind();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, m_DepthFramebuffer->GetDepthAttachmentID());
-        m_DepthBufferVA->Bind();
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }));
+    Engine::Renderer::SetViewport({m_DebugFramebuffer->width(), m_DebugFramebuffer->height()});
+    Engine::Renderer::Submit(m_DebugFramebuffer->ClearDepthCommand());
+    Engine::Renderer::Submit(m_DebugFramebuffer->ClearColorCommand(glm::vec4{0.0, 0.0, 0.0, 1.0}));
+    Engine::Renderer::Submit(m_DebugShader->BindCommand());
+    Engine::Renderer::Submit(m_DepthFramebuffer->BindDepthTextureCommand(0));
+    Engine::Renderer::RenderIndexed(m_DepthBufferVA, 6);
+    Engine::Renderer::BindDefaultFramebuffer();
 }
 
 void SandboxLayer::OnUpdate(double dt)

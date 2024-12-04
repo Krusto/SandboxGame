@@ -31,6 +31,8 @@ namespace Engine
         virtual void Bind() override;
         virtual void Bind() const override;
 
+        virtual uint32_t ID() const override;
+
         virtual void SetUniform(const std::string& fullname, float value) const override;
         virtual void SetUniform(const std::string& fullname, int value) const override;
         virtual void SetUniform(const std::string& fullname, const glm::ivec2& value) const override;
@@ -64,6 +66,7 @@ namespace Engine
         std::string m_Name, m_AssetPath;
 
         std::unordered_map<GLenum, std::string> m_ShaderSource;
+        std::vector<ShaderUniformBlockLayout> m_UniformBlocks;
     };
 
 }// namespace Engine

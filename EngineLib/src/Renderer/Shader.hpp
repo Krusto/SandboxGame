@@ -37,6 +37,7 @@ namespace Engine
         virtual void Reload(bool forceCompile = true) = 0;
         virtual void Bind() = 0;
         virtual void Bind() const = 0;
+        virtual uint32_t ID() const = 0;
         virtual void SetUniform(const std::string& fullname, float value) const = 0;
         virtual void SetUniform(const std::string& fullname, int value) const = 0;
         virtual void SetUniform(const std::string& fullname, const glm::ivec2& value) const = 0;
