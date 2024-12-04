@@ -42,12 +42,16 @@ namespace Engine
         static void Shutdown();
         static void BeginFrame();
         static void EndFrame();
-        static void ClearColor(glm::vec4 color);
+        static void SetViewport(ViewportSize size);
+        static void BindDefaultFramebuffer();
+
         static GraphicsContext* CreateGraphicsContext(GLFWwindow* handle);
         static RendererAPI* GetAPIInstance();
 
         static void SwitchWireframeMode();
         static void SwitchFillMode();
+
+        static void RenderIndexed(VertexArray* vertexArray, uint32_t indexCount = 0);
 
         static void Submit(RendererCommand command);
 

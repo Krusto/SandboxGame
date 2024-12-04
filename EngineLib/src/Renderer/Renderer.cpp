@@ -20,6 +20,30 @@ namespace Engine
         if (s_RendererAPI) s_RendererAPI->SwitchMode(0);
     }
 
+    void Renderer::RenderIndexed(VertexArray* vertexArray, uint32_t indexCount)
+    {
+        if (s_RendererAPI)
+        {
+            Renderer::Submit(RendererCommand([=]() { s_RendererAPI->RenderIndexed(vertexArray, indexCount); }));
+        }
+    }
+
+    void Renderer::SetViewport(ViewportSize size)
+    {
+        if (s_RendererAPI)
+        {
+            Renderer::Submit(RendererCommand([=]() { s_RendererAPI->SetViewport(size); }));
+        }
+    }
+
+    void Renderer::BindDefaultFramebuffer()
+    {
+        if (s_RendererAPI)
+        {
+            Renderer::Submit(RendererCommand([=]() { s_RendererAPI->BindDefaultFramebuffer(); }));
+        }
+    }
+
     void Renderer::Submit(RendererCommand command) { s_CommandContainer.push_back(command); }
 
     void Renderer::SubmitAndFlush(RendererCommand command)
@@ -56,13 +80,6 @@ namespace Engine
     void Renderer::BeginFrame(){};
 
     void Renderer::EndFrame(){};
-
-    void Renderer::ClearColor(glm::vec4 color)
-    {
-        Renderer::Submit(RendererCommand([=]() {
-            if (s_RendererAPI) s_RendererAPI->ClearColor(color);
-        }));
-    }
 
     GraphicsContext* Renderer::CreateGraphicsContext(GLFWwindow* handle) { return GraphicsContext::Create(handle); }
 }// namespace Engine

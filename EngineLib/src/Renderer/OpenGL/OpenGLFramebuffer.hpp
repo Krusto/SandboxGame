@@ -3,6 +3,8 @@
 #include <Renderer/Framebuffer.hpp>
 #include <Renderer/Image.hpp>
 
+#include <glm/glm.hpp>
+
 namespace Engine
 {
 
@@ -25,6 +27,14 @@ namespace Engine
         virtual void Resize(uint32_t width, uint32_t height) override;
 
         virtual void Bind() const override;
+
+        virtual void BindColorTexture(uint32_t slot) const override;
+
+        virtual void BindDepthTexture(uint32_t slot) const override;
+
+        virtual void ClearColor(glm::vec4 color) const override;
+
+        virtual void ClearDepth() const override;
 
         virtual void Unbind() override;
 

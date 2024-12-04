@@ -22,5 +22,8 @@ namespace Engine
         virtual void EndFrame() override;
         virtual void ClearColor(glm::vec4 color) override;
         virtual void SwitchMode(uint32_t mode) override;
+        virtual void SetViewport(ViewportSize size) override;
+        virtual void BindDefaultFramebuffer() const override;
+        virtual void RenderIndexed(VertexArray* vertexArray, uint32_t indexCount) const override;
     };
 }// namespace Engine

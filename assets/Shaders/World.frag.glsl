@@ -12,6 +12,7 @@ struct VertexData {
 
 struct Light {
     vec3 position;
+    vec3 rotation;
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
@@ -19,9 +20,9 @@ struct Light {
     float shininess;
 };
 
+layout(location = 3) uniform Light light;
+
 layout(location = 0) in VertexData vertDataIn;
-layout(location = 5) in Light light;
-layout(location = 11) in vec3 rotation;
 layout(location = 12) flat in float textureIndex;
 layout(location = 13) in float fogVisibility;
 
@@ -37,18 +38,19 @@ void main()
     float quadratic = 0.02f;
     float attenuation = 10.0 / (constant + linear * dist + quadratic * (dist * dist));
 
-    if (attenuation < 0.01) { discard; }
+    // if (attenuation < 0.01) { discard; }
 
     float ambientStrength = 0.1;
     vec3 ambient = ambientStrength * light.ambient;
 
     vec3 norm = normalize(vertDataIn.vertNormal);
     //POINT LIGHT
-    // vec3 lightDir = normalize(light.position - vertDataIn.worldPos);
+    // vec3 lightDir = normalize(light.pos - vertDataIn.worldPos);
     //DIRECTIONAL LIGHT
-    vec3 lightDir = normalize(radians(rotation));
+    vec3 lightDir = normalize(radians(light.rotation));
+    // vec3 lightDir = normalize(1.0);
     lightDir = clamp(lightDir, 0.1f, 1.0);
-    // rotation.y = clamp(radians(rotation.y), 0.1, 1.0);
+    // lightDir.y = clamp(radians(light.rotation.y), 0.3, 1.0);
     // rotation.z = clamp(radians(rotation.z), 0.1, 1.0);
 
     vec3 viewDir = normalize(vertDataIn.viewPos - vertDataIn.worldPos);
@@ -75,8 +77,7 @@ void main()
     vec4 outputColor;
 
     outputColor = vec4(light.intensity * ((ambient + specular + vertDataIn.aoColor * diffuse)), 1.0);
-    // vec4 fogColor = vec4(texture(skybox, reflectDir).rgb, 1.0);
-    vec4 fogColor = vec4(vec3(0.3), 1);
+    vec4 fogColor = vec4(vec3(0.7), 1);
     outputColor = mix(fogColor, outputColor, fogVisibility);
 
     // Apply gamma correction
