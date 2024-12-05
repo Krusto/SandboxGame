@@ -16,6 +16,8 @@ public:
 
     void OnUpdate(double dt) override;
 
+    void OnFixedUpdate(double dt) override;
+
     void OnDetach() override;
 
     void Destroy() override;

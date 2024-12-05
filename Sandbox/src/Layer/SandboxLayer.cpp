@@ -48,7 +48,7 @@ void SandboxLayer::Init(Engine::Window* window)
 
     Engine::TerrainGenerationSettings settings = {.Seed = 0,
                                                   .AssetsDirectory = m_AssetsDirectory,
-                                                  .GenerationDistance = 2};
+                                                  .GenerationDistance = 10};
     m_World->Init(settings, m_TexturesDirectory);
 
     m_Camera.Init(Engine::CameraSpec({m_AppSpec.width, m_AppSpec.height}, 45.0f, 0.1f, 1000.0f));
@@ -207,32 +207,30 @@ void SandboxLayer::RenderDepthWorld()
     Engine::Renderer::BindDefaultFramebuffer();
 }
 
+void SandboxLayer::OnFixedUpdate(double dt) {}
+
 void SandboxLayer::OnUpdate(double dt)
 {
     m_DeltaTime = dt;
     m_PassedTime += 0.01;
     if (m_PassedTime > 100.0) { m_PassedTime = 0; }
     m_World->OnUpdate(dt);
-    
 
-    if (m_World->GetBlock(m_Camera.GetPosition() - glm::vec3(0,1.75,0)) == Engine::BlockType::AIR)
-    { 
-        if (m_World->GetBlock(m_Camera.GetPosition() - glm::vec3(0, 1.75, 0) - glm::vec3(0, 1/velocity, 0)) ==
-            Engine::BlockType::AIR)
+    if (!m_DisableGravity)
+    {
+        if (m_World->GetBlock(m_Camera.GetPosition() - glm::vec3(0, 1.75, 0)) == Engine::BlockType::AIR)
         {
-            m_Camera.Move(glm::vec3(0, -velocity, 0));
-            velocity += (1000 / ((m_PassedTime/100) * dt));
-            if (velocity > 0.6)
-            { 
-                velocity = 0.6;
+            if (m_World->GetBlock(m_Camera.GetPosition() - glm::vec3(0, 1.75, 0) - glm::vec3(0, 1 / velocity, 0)) ==
+                Engine::BlockType::AIR)
+            {
+                m_Camera.Move(glm::vec3(0, -velocity, 0));
+                velocity += (1000 / ((m_PassedTime / 100) * dt));
+                if (velocity > 0.6) { velocity = 0.6; }
             }
-        }
-        else
-        { 
-            velocity = 0;
+            else { velocity = 0; }
         }
     }
-    m_Camera.Update(dt, 10.0f, 10.0f);
+    m_Camera.Update(dt, 30.0f, 10.0f);
     m_Skybox->Update(dt);
 
     Engine::Renderer::BeginFrame();
@@ -247,9 +245,10 @@ void SandboxLayer::OnUpdate(double dt)
 
         glm::vec3 rot = glm::radians(m_Camera.GetRotation());
 
-        glm::vec3 dir = glm::vec3(glm::cos(rot.x) * (-glm::cos(rot.y)), -glm::sin(rot.x),glm::cos(rot.x) *  (-glm::sin(rot.y)));
+        glm::vec3 dir =
+                glm::vec3(glm::cos(rot.x) * (-glm::cos(rot.y)), -glm::sin(rot.x), glm::cos(rot.x) * (-glm::sin(rot.y)));
 
-        glm::vec3 _pos1 = m_Camera.GetPosition() + glm::vec3(0.5,1.5,0.5);
+        glm::vec3 _pos1 = m_Camera.GetPosition() + glm::vec3(0.5, 1.5, 0.5);
         glm::vec3 _pos2 = _pos1 + dir * glm::vec1{maxDistance};
         glm::ivec3 pos = _pos1;
         glm::ivec3 end = _pos2;
@@ -282,8 +281,8 @@ void SandboxLayer::OnUpdate(double dt)
                 outPosition = pos;
                 outBlock = currentBlock;
                 outNormal = normal;
-                LOG("BlockPos: %d %d %d  Block: %d  Axis %d Normal: %d %d %d\n", outPosition.x, outPosition.y,
-                    outPosition.z, outBlock, axis, outNormal.x, outNormal.y, outNormal.z);
+                //LOG("BlockPos: %d %d %d  Block: %d  Axis %d Normal: %d %d %d\n", outPosition.x, outPosition.y,
+                    //outPosition.z, outBlock, axis, outNormal.x, outNormal.y, outNormal.z);
                 break;
             }
 
@@ -320,7 +319,7 @@ void SandboxLayer::OnUpdate(double dt)
         //Render debug cube object
         Engine::Renderer::Submit(m_HitboxShader->BindCommand());
         Engine::Renderer::Submit(m_Camera.UploadCommand(m_HitboxShader.Raw()));
-        Engine::Renderer::Submit(m_DebugCube->Render(m_HitboxShader.Raw(),m_PassedTime, axis));
+        Engine::Renderer::Submit(m_DebugCube->Render(m_HitboxShader.Raw(), m_PassedTime, axis));
     }
 
     Engine::Renderer::BindDefaultFramebuffer();
@@ -350,7 +349,7 @@ void SandboxLayer::OnImGuiDraw()
     ImGui::ColorEdit3("Specular Color", (float*) &m_Light->specular);
     ImGui::SliderInt("Shininess", &m_WorldShininess, 0, 100);
     ImGui::SliderFloat("Intensity", &m_Light->intensity, 0.0, 10.0);
-
+    ImGui::Checkbox("Disable Gravity", &m_DisableGravity);
     ImGui::Checkbox("Lock", &m_LockCamera);
     ImGui::End();
 

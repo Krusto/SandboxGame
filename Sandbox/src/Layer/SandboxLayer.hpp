@@ -19,6 +19,8 @@ public:
 
     void OnUpdate(double dt) override;
 
+    void OnFixedUpdate(double dt) override;
+
     void OnDetach() override;
 
     void Destroy() override;
@@ -79,7 +81,7 @@ protected:
     std::filesystem::path m_SkyboxDirectory;
 
     int m_WorldShininess{30};
-    bool m_DisableLighting{false};
+    bool m_DisableGravity{false};
     bool m_ShowDepthBuffer{false};
     bool m_LockCamera{};
 
