@@ -16,8 +16,6 @@ GUILayer::GUILayer(const Engine::ApplicationSpec& spec)
 
 void GUILayer::Init(Engine::Window* window)
 {
-
-
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -45,6 +43,8 @@ void GUILayer::Destroy()
 }
 
 void GUILayer::OnUpdate(double dt) { m_DeltaTime = dt; }
+
+void GUILayer::OnFixedUpdate(double dt) {}
 
 void GUILayer::OnWindowResizeEvent(int width, int height) {}
 

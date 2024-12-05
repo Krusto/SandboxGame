@@ -20,6 +20,8 @@ namespace Engine
 
         virtual void OnUpdate(double dt) = 0;
 
+        virtual void OnFixedUpdate(double dt) = 0;
+
         virtual void OnDetach() = 0;
 
         virtual void Destroy() = 0;

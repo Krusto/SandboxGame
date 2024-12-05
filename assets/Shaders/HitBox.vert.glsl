@@ -16,7 +16,7 @@ vec3 getBlockPosition(uint axis, uint width, uint height)
     uint vertexID = gl_VertexID % 4;
     vec3 position = vec3(0, 0, 0);
 
-    if (axis == 1 || axis == 3 || axis == 5) { position.z += 1; }
+    if (axis == 1 || axis == 3 || axis == 5) { position.z += 1.0; }
     if (axis == 0 || axis == 1)
     {
         if (vertexID == 3) { blockPosition = vec3(position.x + width, position.z, position.y + height); }
@@ -44,7 +44,22 @@ vec3 getBlockPosition(uint axis, uint width, uint height)
 
 void main()
 {
-    vec3 worldPos = vec3(model * vec4(getBlockPosition(axis, 1, 1), 1.0));
+    uint blockAxis = gl_VertexID / 4;
+    vec3 blockPosition = getBlockPosition(blockAxis, 1, 1);
+
+    float dist = distance(camera.position, blockPosition);
+    float minOffset = 0.002;
+    float maxOffset = 0.1;
+    float offset = mix(maxOffset, minOffset, normalize(dist));
+
+    if (blockAxis == 0) { blockPosition.y -= offset; }
+    else if (blockAxis == 1) { blockPosition.y += offset; }
+    else if (blockAxis == 2) { blockPosition.x -= offset; }
+    else if (blockAxis == 3) { blockPosition.x += offset; }
+    else if (blockAxis == 4) { blockPosition.z -= offset; }
+    else if (blockAxis == 5) { blockPosition.z += offset; }
+
+    vec3 worldPos = vec3(model * vec4(blockPosition, 1.0));
 
     gl_Position = camera.projection * camera.view * vec4(worldPos, 1.0);
 }
