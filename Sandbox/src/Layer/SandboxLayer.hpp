@@ -2,6 +2,8 @@
 #include <memory>
 #include <Engine.hpp>
 #include "LightObject.hpp"
+#include "DebugCube.hpp"
+#include "Hitbox.hpp"
 
 class SandboxLayer: public Engine::Layer
 {
@@ -51,6 +53,7 @@ protected:
     Ref<Engine::Shader> m_LightShader;
     Ref<Engine::Shader> m_DepthBufferShader;
     Ref<Engine::Shader> m_DebugShader;
+    Ref<Engine::Shader> m_HitboxShader;
 
     Engine::Framebuffer* m_Framebuffer;
     Engine::Framebuffer* m_DebugFramebuffer;
@@ -66,6 +69,7 @@ protected:
     Engine::Camera m_Camera;
 
     double m_DeltaTime = 0.0f;
+    double m_PassedTime{};
 
     ViewportSize m_ViewportSize;
     Engine::ApplicationSpec m_AppSpec;
@@ -78,4 +82,7 @@ protected:
     bool m_DisableLighting{false};
     bool m_ShowDepthBuffer{false};
     bool m_LockCamera{};
+
+    double velocity{};
+    Hitbox* m_DebugCube;
 };

@@ -77,8 +77,8 @@ void main()
     vec4 outputColor;
 
     outputColor = vec4(light.intensity * ((ambient + specular + vertDataIn.aoColor * diffuse)), 1.0);
-    vec4 fogColor = vec4(vec3(0.7), 1);
-    outputColor = mix(fogColor, outputColor, fogVisibility);
+    // vec4 fogColor = vec4(vec3(0.7), 1);
+    // outputColor = mix(fogColor, outputColor, fogVisibility);
 
     // Apply gamma correction
     float gamma = 1.2;

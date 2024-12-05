@@ -19,22 +19,6 @@ namespace Engine
         m_BlockTextures.Load("BlockTextures", texturePaths);
 
         ChunkFactory::Init(settings);
-
-        glm::ivec3 currentChunkPos = glm::ivec3(0, 0, 0);
-        uint32_t worldSize = settings.GenerationDistance;
-
-        uint32_t maxChunksY = settings.maxTerrainHeight / CHUNK_SIZE;
-        for (int z = 0; z < worldSize; z++)
-        {
-            for (int x = 0; x < worldSize; x++)
-            {
-                for (int y = 0; y < maxChunksY; y++)
-                {
-                    currentChunkPos = glm::ivec3(x, y, z);
-                    ChunkFactory::ScheduleChunkForGeneration(currentChunkPos);
-                }
-            }
-        }
     }
 
     void World::Destroy()
@@ -64,16 +48,15 @@ namespace Engine
     {
         return RendererCommand([shader, cameraPos, this]() {
             m_BlockTextures.Bind();
+            constexpr auto renderDistance = 15;
+            glm::ivec3 chunkPos =
+                    glm::ivec3(cameraPos.x / CHUNK_SIZE, cameraPos.y / CHUNK_SIZE, cameraPos.z / CHUNK_SIZE);
             for (auto& [pos, chunk]: m_Chunks)
             {
-                //float dist = length(light.position - vertDataIn.worldPos);
-                float dist =
-                        glm::distance(cameraPos, glm::vec3{pos.x * CHUNK_SIZE, pos.y * CHUNK_SIZE, pos.z * CHUNK_SIZE});
-                float constant = 1.0f;
-                float linear = 0.02f;
-                float quadratic = 0.02f;
-                float attenuation = 4.0 / (constant + linear * dist + quadratic * (dist * dist));
-                if (attenuation < 0.001) { continue; }
+
+                glm::vec3 centered = chunkPos - pos;
+                float dist2 = centered.x * centered.x +  centered.z * centered.z;
+                if (dist2 > renderDistance * renderDistance) { continue; }
 
                 auto& mesh = chunk.mesh;
                 if (mesh->GetVertexArray() != nullptr)
