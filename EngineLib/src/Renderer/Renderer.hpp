@@ -51,7 +51,8 @@ namespace Engine
         static void SwitchWireframeMode();
         static void SwitchFillMode();
 
-        static void RenderIndexed(VertexArray* vertexArray, uint32_t indexCount = 0);
+        static void RenderIndexed(const VertexArray* vertexArray, uint32_t indexCount = 0);
+        static void SubmitRenderIndexed(VertexArray* vertexArray, uint32_t indexCount = 0);
 
         static void Submit(RendererCommand command);
 

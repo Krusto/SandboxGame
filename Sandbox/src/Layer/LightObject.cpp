@@ -59,7 +59,7 @@ Engine::RendererCommand LightObject::Render(Engine::Shader* shader) const
         model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
         model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
         shader->SetUniform("model", model);
-        glDrawElements(GL_TRIANGLES, m_VertexArray->IndexCount, GL_UNSIGNED_INT, nullptr);
+        Engine::Renderer::RenderIndexed(m_VertexArray, 36);
     });
 }
 

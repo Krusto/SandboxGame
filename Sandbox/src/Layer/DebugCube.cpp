@@ -52,18 +52,11 @@ void DebugCube::Destroy()
 Engine::RendererCommand DebugCube::Render(Engine::Shader* shader) const
 {
     return Engine::RendererCommand([=]() {
-        glDepthFunc(GL_ALWAYS);
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         shader->Bind();
         m_VertexArray->Bind();
         glm::mat4 model = glm::translate(glm::mat4(1.0f), position + glm::vec3(0.5, 0.5, 0.5));
         model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
         shader->SetUniform("model", model);
-        glDrawElements(GL_TRIANGLES, m_VertexArray->IndexCount, GL_UNSIGNED_INT, nullptr);
-        glDisable(GL_CULL_FACE);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        glDepthFunc(GL_LESS);
+        Engine::Renderer::RenderIndexed(m_VertexArray, m_VertexArray->IndexCount);
     });
 }
