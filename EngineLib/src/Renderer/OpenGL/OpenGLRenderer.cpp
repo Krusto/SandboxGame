@@ -24,7 +24,7 @@ namespace Engine
 
     void OpenGLRenderer::BindDefaultFramebuffer() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 
-    void OpenGLRenderer::RenderIndexed(VertexArray* vertexArray, uint32_t indexCount) const
+    void OpenGLRenderer::RenderIndexed(const VertexArray* vertexArray, uint32_t indexCount) const
     {
         vertexArray->Bind();
         glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);

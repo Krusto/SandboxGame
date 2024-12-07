@@ -55,7 +55,7 @@ namespace Engine
             {
 
                 glm::vec3 centered = chunkPos - pos;
-                float dist2 = centered.x * centered.x +  centered.z * centered.z;
+                float dist2 = centered.x * centered.x + centered.z * centered.z;
                 if (dist2 > renderDistance * renderDistance) { continue; }
 
                 auto& mesh = chunk.mesh;
@@ -67,7 +67,7 @@ namespace Engine
                     shader->SetUniform("model", model);
                     shader->SetUniform("offset", glm::vec3{pos.x * CHUNK_SIZE, pos.y * CHUNK_SIZE, pos.z * CHUNK_SIZE});
                     mesh->GetVertexArray()->Bind();
-                    glDrawElements(GL_TRIANGLES, mesh->GetVertexArray()->IndexCount, GL_UNSIGNED_INT, nullptr);
+                    Engine::Renderer::RenderIndexed(mesh->GetVertexArray(), mesh->GetVertexArray()->IndexCount);
                     mesh->GetVertexArray()->Unbind();
                 }
             }

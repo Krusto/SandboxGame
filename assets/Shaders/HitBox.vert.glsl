@@ -31,7 +31,6 @@ vec3 getBlockPosition(uint axis, uint width, uint height)
         else if (vertexID == 2) { blockPosition = vec3(position.z, position.y, position.x); }
         else { blockPosition = vec3(position.z, position.y + height, position.x); }
     }
-
     else if (axis == 4 || axis == 5)
     {
         if (vertexID == 3) { blockPosition = vec3(position.x + width, position.y + height, position.z); }

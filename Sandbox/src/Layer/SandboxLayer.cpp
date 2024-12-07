@@ -3,7 +3,6 @@
 #include <Scene/World/ChunkFactory.hpp>
 #include <algorithm>
 #include <imgui.h>
-#include <glad/glad.h>
 
 SandboxLayer::SandboxLayer(const Engine::ApplicationSpec& spec)
 {
@@ -203,7 +202,7 @@ void SandboxLayer::RenderDepthWorld()
     Engine::Renderer::Submit(m_DebugFramebuffer->ClearColorCommand(glm::vec4{0.0, 0.0, 0.0, 1.0}));
     Engine::Renderer::Submit(m_DebugShader->BindCommand());
     Engine::Renderer::Submit(m_DepthFramebuffer->BindDepthTextureCommand(0));
-    Engine::Renderer::RenderIndexed(m_DepthBufferVA, 6);
+    Engine::Renderer::SubmitRenderIndexed(m_DepthBufferVA, 6);
     Engine::Renderer::BindDefaultFramebuffer();
 }
 
@@ -282,7 +281,7 @@ void SandboxLayer::OnUpdate(double dt)
                 outBlock = currentBlock;
                 outNormal = normal;
                 //LOG("BlockPos: %d %d %d  Block: %d  Axis %d Normal: %d %d %d\n", outPosition.x, outPosition.y,
-                    //outPosition.z, outBlock, axis, outNormal.x, outNormal.y, outNormal.z);
+                //outPosition.z, outBlock, axis, outNormal.x, outNormal.y, outNormal.z);
                 break;
             }
 

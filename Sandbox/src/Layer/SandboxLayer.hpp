@@ -81,7 +81,7 @@ protected:
     std::filesystem::path m_SkyboxDirectory;
 
     int m_WorldShininess{30};
-    bool m_DisableGravity{false};
+    bool m_DisableGravity{true};
     bool m_ShowDepthBuffer{false};
     bool m_LockCamera{};
 

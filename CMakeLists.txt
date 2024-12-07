@@ -29,8 +29,16 @@ file(GLOB_RECURSE IMGUI_HEADER_FILES imgui_impl_opengl3.h imgui_impl_glfw.h   im
 file(GLOB_RECURSE SANDBOX_SOURCE_FILES ./Sandbox/src/*.cpp)
 file(GLOB_RECURSE SANDBOX_HEADER_FILES ./Sandbox/src/*.h)
 
-file(GLOB_RECURSE ENGINE_SOURCE_FILES ./EngineLib/src/*.cpp)
-file(GLOB_RECURSE ENGINE_HEADER_FILES ./EngineLib/src/*.h ./EngineLib/src/*.hpp)
+file(GLOB_RECURSE ENGINE_SOURCE_FILES ./EngineLib/src/Core/*.cpp ./EngineLib/src/Layer/*.cpp ./EngineLib/src/Scene/*.cpp ./EngineLib/src/Util/*.cpp)
+file(GLOB_RECURSE ENGINE_HEADER_FILES ./EngineLib/src/Core/*.hpp ./EngineLib/src/Layer/*.hpp ./EngineLib/src/Scene/*.hpp ./EngineLib/src/Util/*.hpp
+./EngineLib/src/Core/*.h ./EngineLib/src/Layer/*.h ./EngineLib/src/Scene/*.h ./EngineLib/src/Util/*.h
+)
+
+file(GLOB_RECURSE RENDERER_SOURCE_FILES ./EngineLib/src/Renderer/*.cpp )
+file(GLOB_RECURSE RENDERER_HEADER_FILES ./EngineLib/src/Renderer/*.hpp ./EngineLib/src/Renderer/*.h)
+
+set(ENGINE_APPLICATION_SOURCE_FILES ./EngineLib/src/Application/Application.cpp)
+set(ENGINE_APPLICATION_HEADER_FILES ./EngineLib/src/Application/Application.hpp)
 
 add_compile_definitions(GLM_ENABLE_EXPERIMENTAL)
 
@@ -49,7 +57,11 @@ add_library(imgui STATIC ${IMGUI_SOURCE_FILES} ${IMGUI_HEADER_FILES})
 message("${PROJECT_NAME}: Creating glad lib")
 add_library(glad STATIC ${GLAD_SOURCE_FILES} ${GLAD_HEADER_FILES})
 
+add_library(Renderer STATIC ${RENDERER_SOURCE_FILES} ${RENDERER_HEADER_FILES})
+
 add_library(EngineLib STATIC ${ENGINE_SOURCE_FILES} ${ENGINE_HEADER_FILES})
+
+add_library(EngineEntry SHARED ${ENGINE_APPLICATION_SOURCE_FILES} ${ENGINE_APPLICATION_HEADER_FILES})
 
 add_library(CUtils INTERFACE)
 target_include_directories(CUtils INTERFACE ${CUTILS_INCLDUE_DIR})
@@ -95,16 +107,24 @@ target_include_directories(imgui PRIVATE ${IMGUI_INCLUDE_DIR})
 target_include_directories(imgui PRIVATE ${IMGUI_BACKENDS_INCLUDE_DIR})
 target_include_directories(imgui PRIVATE ${GLFW_INCLDUE_DIR})
 
+set(INCLUDE_DIRS ${GLAD_INCLDUE_DIR}
+ ${STB_INCLDUE_DIR}
+ ${IMGUI_INCLUDE_DIR}
+ ${IMGUI_BACKENDS_INCLUDE_DIR}
+ ${GLFW_INCLDUE_DIR}
+ ${GLM_INCLDUE_DIR}
+ ${CUTILS_INCLDUE_DIR}
+ ${PERLIN_INCLUDE_DIR}
+ ${FASTNOISE_INCLUDE_DIR})
+
 target_include_directories(EngineLib PRIVATE "./EngineLib/src")
-target_include_directories(EngineLib PUBLIC ${GLAD_INCLDUE_DIR})
-target_include_directories(EngineLib PUBLIC ${STB_INCLDUE_DIR})
-target_include_directories(EngineLib PUBLIC ${IMGUI_INCLUDE_DIR})
-target_include_directories(EngineLib PUBLIC ${IMGUI_BACKENDS_INCLUDE_DIR})
-target_include_directories(EngineLib PUBLIC ${GLFW_INCLDUE_DIR})
-target_include_directories(EngineLib PUBLIC ${GLM_INCLDUE_DIR})
-target_include_directories(EngineLib PUBLIC ${CUTILS_INCLDUE_DIR})
-target_include_directories(EngineLib PUBLIC ${PERLIN_INCLUDE_DIR})
-target_include_directories(EngineLib PUBLIC ${FASTNOISE_INCLUDE_DIR})
+target_include_directories(EngineLib PUBLIC ${INCLUDE_DIRS})
+
+target_include_directories(Renderer PRIVATE "./EngineLib/src")
+target_include_directories(Renderer PUBLIC ${INCLUDE_DIRS})
+
+target_include_directories(EngineEntry PRIVATE "./EngineLib/src")
+target_include_directories(EngineEntry PUBLIC ${INCLUDE_DIRS})
 
 add_library(EngineInterfaceLibrary INTERFACE)
 
@@ -112,22 +132,18 @@ message("${PROJECT_NAME}: Linking libraries")
 
 target_link_libraries(imgui PRIVATE glfw glad)
 
-target_link_libraries(EngineInterfaceLibrary INTERFACE
-        # glm
-        glfw
-        imgui
-        glad
-        CUtils
-        FastNoise 
-        )
+target_link_libraries(EngineInterfaceLibrary INTERFACE glfw imgui glad CUtils FastNoise )
+
 target_link_libraries(EngineLib PUBLIC EngineInterfaceLibrary)
+target_link_libraries(Renderer PRIVATE EngineLib)
+target_link_libraries(EngineEntry PUBLIC EngineLib Renderer)
 
 add_executable(Sandbox ${SANDBOX_HEADER_FILES} ${SANDBOX_SOURCE_FILES})
 target_include_directories(Sandbox PRIVATE "${CMAKE_SOURCE_DIR}/EngineLib/src")
 target_include_directories(Sandbox PRIVATE "${CMAKE_SOURCE_DIR}/Sandbox/src")
-target_link_libraries(Sandbox EngineLib)
+target_link_libraries(Sandbox EngineEntry)
 
 add_executable(ShaderReflectionTest ./ShaderReflectionTest/main.cpp )
-target_link_libraries(ShaderReflectionTest EngineLib)
+target_link_libraries(ShaderReflectionTest EngineEntry)
 target_include_directories(ShaderReflectionTest PRIVATE ./EngineLib/src/Renderer/Reflection)
 target_include_directories(ShaderReflectionTest PRIVATE ./EngineLib/src/)

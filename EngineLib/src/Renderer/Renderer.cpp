@@ -20,12 +20,17 @@ namespace Engine
         if (s_RendererAPI) s_RendererAPI->SwitchMode(0);
     }
 
-    void Renderer::RenderIndexed(VertexArray* vertexArray, uint32_t indexCount)
+    void Renderer::SubmitRenderIndexed(VertexArray* vertexArray, uint32_t indexCount)
     {
         if (s_RendererAPI)
         {
             Renderer::Submit(RendererCommand([=]() { s_RendererAPI->RenderIndexed(vertexArray, indexCount); }));
         }
+    }
+
+    void Renderer::RenderIndexed(const VertexArray* vertexArray, uint32_t indexCount)
+    {
+        if (s_RendererAPI) { s_RendererAPI->RenderIndexed(vertexArray, indexCount); }
     }
 
     void Renderer::SetViewport(ViewportSize size)
