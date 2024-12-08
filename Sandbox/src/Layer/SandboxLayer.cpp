@@ -130,8 +130,7 @@ void SandboxLayer::Destroy()
     m_DebugShader->Destroy();
     m_HitboxShader->Destroy();
 
-    m_Skybox->Destroy();
-    Engine::Allocator::Deallocate(m_Skybox);
+    m_Skybox.Destroy();
 
     Engine::Allocator::Deallocate(m_Light);
 
@@ -157,11 +156,11 @@ void SandboxLayer::RenderWorld()
     Renderer::Submit(m_Framebuffer->ClearColorCommand(glm::vec4{0.0, 0.0, 0.0, 1.0}));
 
     //Render Skybox
-    Renderer::Submit(m_Skybox->RenderCommand(&m_Camera));
+    Renderer::Submit(m_Skybox.RenderCommand(&m_Camera));
 
     //Render World
     Renderer::Submit(m_Shader->BindCommand());
-    Renderer::Submit(m_Skybox->BindTexture(1));
+    Renderer::Submit(m_Skybox.BindTexture(1));
 
     Renderer::Submit(m_Camera.UploadCommand(m_Shader.Raw()));
 
@@ -230,7 +229,7 @@ void SandboxLayer::OnUpdate(double dt)
         }
     }
     m_Camera.Update(dt, 30.0f, 10.0f);
-    m_Skybox->Update(dt);
+    m_Skybox.Update(dt);
 
     Engine::Renderer::BeginFrame();
 
@@ -389,7 +388,7 @@ void SandboxLayer::OnKeyboardEvent(int action, int key)
         m_Shader->Reload();
         m_DepthBufferShader->Reload();
         m_CubeShader->Reload();
-        m_Skybox->Reload();
+        m_Skybox.Reload();
         m_LightShader->Reload();
         m_DebugShader->Reload();
         m_HitboxShader->Reload();

@@ -1,13 +1,13 @@
 #pragma once
 #include <cstdint>
 #include <Core/Ref.hpp>
+#include <Renderer/RendererCore.hpp>
+#include <Renderer/VertexBuffer.hpp>
+#include <Renderer/IndexBuffer.hpp>
 #include <Renderer/VertexLayout.hpp>
 
 namespace Engine
 {
-
-    class VertexBuffer;
-    class IndexBuffer;
 
     class VertexArray
     {
@@ -37,8 +37,15 @@ namespace Engine
         uint32_t IndexCount{};
 
     protected:
-        VertexBuffer* m_VertexBuffer;
-        IndexBuffer* m_IndexBuffer;
+        VertexBuffer m_VertexBuffer{};
+        IndexBuffer m_IndexBuffer{};
         uint32_t m_ID{};
     };
 }// namespace Engine
+
+
+#ifdef RENDERER_BUILD_DLL
+class __declspec(dllexport) Engine::VertexArray;
+#else
+class __declspec(dllimport) Engine::VertexArray;
+#endif

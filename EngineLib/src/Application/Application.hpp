@@ -5,7 +5,7 @@
 
 #include <Engine.hpp>
 #include <Core/Ref.hpp>
-#include <Renderer/Window.hpp>
+#include <Application/Window.hpp>
 
 namespace Engine
 {

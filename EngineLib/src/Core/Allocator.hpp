@@ -18,7 +18,7 @@
 
 namespace Engine
 {
-//#ifdef _DEBUG
+    //#ifdef _DEBUG
 
     /*struct PointerMetaData {
         PointerMetaData(std::source_location location = std::source_location::current()) : location(location) {}
@@ -181,7 +181,7 @@ namespace Engine
         metaData.ptr = pptr;                                                                                           \
         return Engine::Allocator::_IsLive<type>(metaData);                                                             \
     })*/
-//#else
+    //#else
 
     class Allocator
     {
@@ -431,8 +431,6 @@ namespace Engine
         inline static size_t s_AllocatedMemorySize{};
     };
 
-//#endif
+    //#endif
 
 }// namespace Engine
-
-#include <Core/Allocator.impl.hpp>

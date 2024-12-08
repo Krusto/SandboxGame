@@ -1,29 +1,33 @@
 #pragma once
 #include <cstdint>
+#include <Renderer/RendererCore.hpp>
 
 namespace Engine
 {
     class VertexArray;
+    struct IndexBufferData;
+
     class IndexBuffer
     {
     public:
-        static IndexBuffer* Create(VertexArray* va, const uint32_t* data, uint32_t length);
+        static IndexBuffer Create(VertexArray* va, const uint32_t* data, uint32_t length);
 
     public:
-        virtual ~IndexBuffer() = default;
-
-        virtual void Init(VertexArray* va, const uint32_t* data, uint32_t length) = 0;
-
-        virtual void Destroy() = 0;
-
-        virtual void Bind() const = 0;
-
-        virtual uint32_t GetID() { return m_ID; }
+        void Init(VertexArray* va, const uint32_t* data, uint32_t length);
+        void Destroy();
+        void Bind() const;
+        uint32_t GetID() const;
 
     public:
         uint32_t indexCount{};
 
-    protected:
-        uint32_t m_ID;
+    private:
+        IndexBufferData* m_Data{};
     };
 }// namespace Engine
+
+#ifdef RENDERER_BUILD_DLL
+class __declspec(dllexport) Engine::IndexBuffer;
+#else
+class __declspec(dllimport) Engine::IndexBuffer;
+#endif

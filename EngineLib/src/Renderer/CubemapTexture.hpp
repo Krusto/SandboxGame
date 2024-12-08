@@ -28,26 +28,22 @@ namespace Engine
     {
     public:
         CubemapTexture() = default;
-        ~CubemapTexture() = default;
+        virtual ~CubemapTexture() = default;
 
-    public:
         static CubemapTexture* Create(std::string_view cubemapName,
                                       const std::unordered_map<CubemapTextureFace, std::string>& Path);
 
-        void Load(std::string_view cubemapName, const std::unordered_map<CubemapTextureFace, std::string>& Path);
-
-        void Destroy();
+    public:
+        virtual void Load(std::string_view cubemapName,
+                          const std::unordered_map<CubemapTextureFace, std::string>& Path) = 0;
+        virtual void Destroy() = 0;
 
     public:
-        std::string_view GetName() const;
-        uint32_t ID() const;
-        uint32_t Width() const;
-        uint32_t Height() const;
-        uint32_t Channels() const;
-        void Bind(uint32_t slot = 0) const;
-
-    protected:
-        CubemapTextureSpec m_Spec;
-        uint32_t m_ID;
+        virtual std::string_view GetName() const = 0;
+        virtual uint32_t ID() const = 0;
+        virtual uint32_t Width() const = 0;
+        virtual uint32_t Height() const = 0;
+        virtual uint32_t Channels() const = 0;
+        virtual void Bind(uint32_t slot = 0) const = 0;
     };
 }// namespace Engine

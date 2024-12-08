@@ -26,16 +26,8 @@ namespace Engine
         if (m_ID != 0)
         {
             glDeleteVertexArrays(1, &m_ID);
-            if (m_VertexBuffer)
-            {
-                m_VertexBuffer->Destroy();
-                Engine::Allocator::Deallocate(m_VertexBuffer);
-            }
-            if (m_IndexBuffer)
-            {
-                m_IndexBuffer->Destroy();
-                Engine::Allocator::Deallocate(m_IndexBuffer);
-            }
+            m_VertexBuffer.Destroy();
+            m_IndexBuffer.Destroy();
         }
     }
 
@@ -43,14 +35,14 @@ namespace Engine
     {
         Bind();
         m_VertexBuffer = VertexBuffer::Create(this, layout, data, length);
-        glVertexArrayVertexBuffer(m_ID, 0, m_VertexBuffer->GetID(), 0, layout.stride);
+        glVertexArrayVertexBuffer(m_ID, 0, m_VertexBuffer.GetID(), 0, layout.stride);
     }
 
     void OpenGLVertexArray::AddIndexBuffer(const uint32_t* data, uint32_t length)
     {
         Bind();
         m_IndexBuffer = IndexBuffer::Create(this, data, length);
-        glVertexArrayElementBuffer(m_ID, m_IndexBuffer->GetID());
+        glVertexArrayElementBuffer(m_ID, m_IndexBuffer.GetID());
     }
 
 }// namespace Engine

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <Application/ApplicationSpec.hpp>
 #include <Core/Log.hpp>
 #include <Core/Ref.hpp>
 #include <Renderer/Viewport.hpp>
@@ -19,14 +20,6 @@
 namespace Engine
 {
     class Window;
-
-    struct ApplicationSpec {
-        std::string_view ApplicationName;
-        std::filesystem::path WorkingDirectory;
-        Engine::Version AppVersion;
-        uint32_t width;
-        uint32_t height;
-    };
 
     struct WindowSpec {
         std::string_view title;

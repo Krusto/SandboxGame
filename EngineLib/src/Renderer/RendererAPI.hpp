@@ -3,27 +3,38 @@
 //
 #pragma once
 
-#include "Window.hpp"
 #include "Viewport.hpp"
 #include "Renderer.hpp"
+#include "DepthFunction.hpp"
+#include "RendererCore.hpp"
 
 namespace Engine
 {
 
+    struct ApplicationSpec;
+
     class RendererAPI
     {
     public:
-        virtual ~RendererAPI() = default;
+        RendererAPI() = default;
+        ~RendererAPI() = default;
 
     public:
-        virtual void Init(RendererSpec rendererSpec, ApplicationSpec applicationSpec) = 0;
-        virtual void Shutdown() = 0;
-        virtual void BeginFrame() = 0;
-        virtual void EndFrame() = 0;
-        virtual void ClearColor(glm::vec4 color) = 0;
-        virtual void SwitchMode(uint32_t mode) = 0;
-        virtual void SetViewport(ViewportSize size) = 0;
-        virtual void BindDefaultFramebuffer() const = 0;
-        virtual void RenderIndexed(const VertexArray* vertexArray, uint32_t indexCount) const = 0;
+        void Init(RendererSpec rendererSpec, ApplicationSpec applicationSpec);
+        void Shutdown();
+        void BeginFrame();
+        void EndFrame();
+        void ClearColor(glm::vec4 color);
+        void SwitchMode(uint32_t mode);
+        void SetViewport(ViewportSize size);
+        void BindDefaultFramebuffer() const;
+        void RenderIndexed(const VertexArray* vertexArray, uint32_t indexCount) const;
+        void ChangeDepthFunction(DepthFunction depthFunction);
     };
 }// namespace Engine
+
+#ifdef RENDERER_BUILD_DLL
+class __declspec(dllexport) Engine::RendererAPI;
+#else
+class __declspec(dllimport) Engine::RendererAPI;
+#endif

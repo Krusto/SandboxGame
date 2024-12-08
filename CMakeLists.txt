@@ -34,6 +34,9 @@ file(GLOB_RECURSE ENGINE_HEADER_FILES ./EngineLib/src/Core/*.hpp ./EngineLib/src
 ./EngineLib/src/Core/*.h ./EngineLib/src/Layer/*.h ./EngineLib/src/Scene/*.h ./EngineLib/src/Util/*.h
 )
 
+file(GLOB_RECURSE UTILS_SOURCE_FILES ./EngineLib/src/Util/*.cpp)
+file(GLOB_RECURSE UTILS_HEADER_FILES ./EngineLib/src/Util/*.hpp ./EngineLib/src/Util/*.h)
+
 file(GLOB_RECURSE RENDERER_SOURCE_FILES ./EngineLib/src/Renderer/*.cpp )
 file(GLOB_RECURSE RENDERER_HEADER_FILES ./EngineLib/src/Renderer/*.hpp ./EngineLib/src/Renderer/*.h)
 
@@ -57,9 +60,11 @@ add_library(imgui STATIC ${IMGUI_SOURCE_FILES} ${IMGUI_HEADER_FILES})
 message("${PROJECT_NAME}: Creating glad lib")
 add_library(glad STATIC ${GLAD_SOURCE_FILES} ${GLAD_HEADER_FILES})
 
-add_library(Renderer STATIC ${RENDERER_SOURCE_FILES} ${RENDERER_HEADER_FILES})
+add_library(EngineUtils STATIC ${UTILS_SOURCE_FILES} ${UTILS_HEADER_FILES})
 
-add_library(EngineLib STATIC ${ENGINE_SOURCE_FILES} ${ENGINE_HEADER_FILES})
+add_library(Renderer SHARED ${RENDERER_SOURCE_FILES} ${RENDERER_HEADER_FILES})
+
+add_library(EngineLib SHARED ${ENGINE_SOURCE_FILES} ${ENGINE_HEADER_FILES})
 
 add_library(EngineEntry SHARED ${ENGINE_APPLICATION_SOURCE_FILES} ${ENGINE_APPLICATION_HEADER_FILES})
 
@@ -90,7 +95,42 @@ else ()
     target_compile_definitions(EngineLib PRIVATE GLFW_EXPOSE_NATIVE_X11)
 endif ()
 
+target_compile_definitions(EngineUtils
+    PUBLIC
+    $<$<CONFIG:Debug>:ENGINE_ENABLE_VERBOSE_LOG>
+    $<$<CONFIG:Debug>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
+    $<$<CONFIG:Release>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
+    $<$<CONFIG:Release>:_RELEASE>
+    $<$<CONFIG:RelWithDebInfo>:_DEBUG>
+    $<$<CONFIG:MinSizeRel>:_RELEASE>
+)
+
 target_compile_definitions(EngineLib
+    PUBLIC
+    FASTNOISE_STATIC_LIB 
+    ENGINE_BUILD_DLL
+    RENDERER_BUILD_DLL
+    $<$<CONFIG:Debug>:ENGINE_ENABLE_VERBOSE_LOG>
+    $<$<CONFIG:Debug>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
+    $<$<CONFIG:Release>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
+    $<$<CONFIG:Release>:_RELEASE>
+    $<$<CONFIG:RelWithDebInfo>:_DEBUG>
+    $<$<CONFIG:MinSizeRel>:_RELEASE>
+)
+
+target_compile_definitions(Renderer
+    PUBLIC
+    FASTNOISE_STATIC_LIB 
+    RENDERER_BUILD_DLL
+    $<$<CONFIG:Debug>:ENGINE_ENABLE_VERBOSE_LOG>
+    $<$<CONFIG:Debug>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
+    $<$<CONFIG:Release>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
+    $<$<CONFIG:Release>:_RELEASE>
+    $<$<CONFIG:RelWithDebInfo>:_DEBUG>
+    $<$<CONFIG:MinSizeRel>:_RELEASE>
+)
+
+target_compile_definitions(EngineEntry
     PUBLIC
     FASTNOISE_STATIC_LIB 
     $<$<CONFIG:Debug>:ENGINE_ENABLE_VERBOSE_LOG>
@@ -117,11 +157,15 @@ set(INCLUDE_DIRS ${GLAD_INCLDUE_DIR}
  ${PERLIN_INCLUDE_DIR}
  ${FASTNOISE_INCLUDE_DIR})
 
+target_include_directories(EngineUtils PRIVATE "./EngineLib/src")
+target_include_directories(EngineUtils PRIVATE ${INCLUDE_DIRS})
+
 target_include_directories(EngineLib PRIVATE "./EngineLib/src")
-target_include_directories(EngineLib PUBLIC ${INCLUDE_DIRS})
+target_include_directories(EngineLib PRIVATE ${INCLUDE_DIRS})
 
 target_include_directories(Renderer PRIVATE "./EngineLib/src")
-target_include_directories(Renderer PUBLIC ${INCLUDE_DIRS})
+target_include_directories(Renderer PRIVATE "./EngineLib/src/Core")
+target_include_directories(Renderer PRIVATE ${INCLUDE_DIRS})
 
 target_include_directories(EngineEntry PRIVATE "./EngineLib/src")
 target_include_directories(EngineEntry PUBLIC ${INCLUDE_DIRS})
@@ -132,18 +176,18 @@ message("${PROJECT_NAME}: Linking libraries")
 
 target_link_libraries(imgui PRIVATE glfw glad)
 
-target_link_libraries(EngineInterfaceLibrary INTERFACE glfw imgui glad CUtils FastNoise )
+target_link_libraries(EngineInterfaceLibrary INTERFACE EngineUtils glfw imgui glad CUtils FastNoise )
 
-target_link_libraries(EngineLib PUBLIC EngineInterfaceLibrary)
-target_link_libraries(Renderer PRIVATE EngineLib)
-target_link_libraries(EngineEntry PUBLIC EngineLib Renderer)
+target_link_libraries(Renderer PRIVATE EngineInterfaceLibrary)
+target_link_libraries(EngineLib PRIVATE Renderer EngineInterfaceLibrary)
+target_link_libraries(EngineEntry PRIVATE EngineLib Renderer EngineInterfaceLibrary)
 
 add_executable(Sandbox ${SANDBOX_HEADER_FILES} ${SANDBOX_SOURCE_FILES})
 target_include_directories(Sandbox PRIVATE "${CMAKE_SOURCE_DIR}/EngineLib/src")
 target_include_directories(Sandbox PRIVATE "${CMAKE_SOURCE_DIR}/Sandbox/src")
-target_link_libraries(Sandbox EngineEntry)
+target_link_libraries(Sandbox EngineEntry Renderer EngineLib)
 
 add_executable(ShaderReflectionTest ./ShaderReflectionTest/main.cpp )
-target_link_libraries(ShaderReflectionTest EngineEntry)
+target_link_libraries(ShaderReflectionTest EngineEntry Renderer EngineLib)
 target_include_directories(ShaderReflectionTest PRIVATE ./EngineLib/src/Renderer/Reflection)
 target_include_directories(ShaderReflectionTest PRIVATE ./EngineLib/src/)
