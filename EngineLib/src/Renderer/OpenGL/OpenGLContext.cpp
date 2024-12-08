@@ -2,11 +2,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "OpenGLContext.hpp"
+#include <Renderer/GraphicsContext.hpp>
 
-#include <iostream>
-
-void OpenGLContext::Init()
+void GraphicsContext::Init()
 {
     glfwMakeContextCurrent(p_WindowPtr);
 
@@ -31,7 +29,7 @@ void OpenGLContext::Init()
     glFrontFace(GL_CCW);
 }
 
-void OpenGLContext::SwapBuffers()
+void GraphicsContext::SwapBuffers()
 {
     glfwSwapBuffers(p_WindowPtr);
     glfwPollEvents();

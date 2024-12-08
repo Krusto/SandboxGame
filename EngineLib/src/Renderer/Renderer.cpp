@@ -1,7 +1,8 @@
 #include "Renderer.hpp"
+#include "RendererAPI.hpp"
 
-#include <Renderer/OpenGL/OpenGLRenderer.hpp>
-#include <Renderer/OpenGL/OpenGLContext.hpp>
+#include <Application/ApplicationSpec.hpp>
+#include <Renderer/GraphicsContext.hpp>
 #include <Core/Allocator.hpp>
 
 namespace Engine
@@ -18,6 +19,11 @@ namespace Engine
     void Renderer::SwitchFillMode()
     {
         if (s_RendererAPI) s_RendererAPI->SwitchMode(0);
+    }
+
+    void Renderer::ChangeDepthFunction(DepthFunction depthFunction)
+    {
+        if (s_RendererAPI) s_RendererAPI->ChangeDepthFunction(depthFunction);
     }
 
     void Renderer::SubmitRenderIndexed(VertexArray* vertexArray, uint32_t indexCount)
@@ -65,7 +71,7 @@ namespace Engine
 
     void Renderer::Init(RendererSpec rendererSpec, ApplicationSpec applicationSpec)
     {
-        s_RendererAPI = Engine::Allocator::Allocate<OpenGLRenderer>();
+        s_RendererAPI = Allocator::Allocate<RendererAPI>();
 
         if (s_RendererAPI) s_RendererAPI->Init(rendererSpec, applicationSpec);
     }

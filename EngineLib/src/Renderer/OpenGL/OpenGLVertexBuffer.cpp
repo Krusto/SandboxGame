@@ -1,11 +1,10 @@
+#include <Renderer/OpenGL/OpenGLVertexBuffer.hpp>
+#include <Renderer/OpenGL/OpenGLVertexArray.hpp>
+#include <Renderer/VertexBuffer.hpp>
+
 #include <glad/glad.h>
-
-#include "OpenGLVertexBuffer.hpp"
-
 #include <utility>
 #include <cassert>
-
-#include <Renderer/OpenGL/OpenGLVertexArray.hpp>
 
 namespace glm
 {
@@ -21,10 +20,12 @@ namespace glm
 
 namespace Engine
 {
-    void OpenGLVertexBuffer::Init(VertexArray* va, const VertexLayout& layout, float* data, uint32_t length)
+    void VertexBuffer::Init(VertexArray* va, const VertexLayout& layout, float* data, uint32_t length)
     {
-        glCreateBuffers(1, &m_ID);
-        glNamedBufferStorage(m_ID, static_cast<GLsizei>(length) * static_cast<GLsizei>(layout.stride), data,
+        m_Data = Allocator::Allocate<VertexBufferData>();
+
+        glCreateBuffers(1, &m_Data->m_ID);
+        glNamedBufferStorage(m_Data->m_ID, static_cast<GLsizei>(length) * static_cast<GLsizei>(layout.stride), data,
                              GL_DYNAMIC_STORAGE_BIT);
 
         uint32_t index = 0;
@@ -90,21 +91,26 @@ namespace Engine
         }
     }
 
-    void OpenGLVertexBuffer::Bind() const
+    void VertexBuffer::Bind() const
     {
-        assert(m_ID != 0);
-        glBindBuffer(GL_ARRAY_BUFFER, m_ID);
+        assert(m_Data->m_ID != 0);
+        glBindBuffer(GL_ARRAY_BUFFER, m_Data->m_ID);
     }
 
-    size_t OpenGLVertexBuffer::GetSize() const { return sizeof(OpenGLVertexBuffer); }
+    size_t VertexBuffer::GetSize() const { return sizeof(VertexBuffer); }
 
-    void OpenGLVertexBuffer::Destroy()
+    void VertexBuffer::Destroy()
     {
-        if (m_ID)
+        if (m_Data == nullptr) { return; }
+        if (m_Data->m_ID)
         {
-            glDeleteBuffers(1, &m_ID);
-            m_ID = 0;
+            glDeleteBuffers(1, &m_Data->m_ID);
+            m_Data->m_ID = 0;
         }
+        Allocator::Deallocate(m_Data);
+        m_Data = nullptr;
     }
+
+    uint32_t VertexBuffer::GetID() const { return m_Data->m_ID; }
 
 }// namespace Engine

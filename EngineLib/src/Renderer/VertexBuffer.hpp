@@ -6,27 +6,21 @@
 namespace Engine
 {
     class VertexArray;
+    struct VertexBufferData;
 
     class VertexBuffer
     {
     public:
-        static VertexBuffer* Create(VertexArray* va, const VertexLayout& layout, float* data, uint32_t length);
+        static VertexBuffer Create(VertexArray* va, const VertexLayout& layout, float* data, uint32_t length);
 
     public:
-        virtual ~VertexBuffer(){};
+        void Init(VertexArray* va, const VertexLayout& layout, float* data, uint32_t length);
+        void Bind() const;
+        size_t GetSize() const;
+        void Destroy();
+        uint32_t GetID() const;
 
-        virtual void Init(VertexArray* va, const VertexLayout& layout, float* data, uint32_t length) = 0;
-
-        virtual void Bind() const = 0;
-
-        virtual size_t GetSize() const = 0;
-
-        virtual void Destroy() = 0;
-
-    public:
-        uint32_t GetID() const { return m_ID; }
-
-    protected:
-        uint32_t m_ID;
+    private:
+        VertexBufferData* m_Data;
     };
 }// namespace Engine

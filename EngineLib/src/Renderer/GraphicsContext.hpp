@@ -7,18 +7,19 @@
 class GraphicsContext
 {
 public:
-    GraphicsContext() {}
+    GraphicsContext() = default;
+
     GraphicsContext(GLFWwindow* handle) : p_WindowPtr(handle) {}
+
+    ~GraphicsContext() = default;
 
 public:
     static GraphicsContext* Create(GLFWwindow* window);
     static void Destroy();
 
 public:
-    virtual ~GraphicsContext() = default;
-
-    virtual void Init() = 0;
-    virtual void SwapBuffers() = 0;
+    void Init();
+    void SwapBuffers();
 
 public:
     static GraphicsContext* s_Context;

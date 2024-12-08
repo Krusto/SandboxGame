@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <Renderer/RendererCore.hpp>
 
 namespace Engine
 {

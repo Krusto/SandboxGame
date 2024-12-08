@@ -61,7 +61,7 @@ protected:
     Engine::Framebuffer* m_DebugFramebuffer;
     Engine::Framebuffer* m_DepthFramebuffer;
     Engine::VertexArray* m_DepthBufferVA;
-    Engine::Skybox* m_Skybox{};
+    Engine::Skybox m_Skybox{};
 
     LightObject* m_Light;
 

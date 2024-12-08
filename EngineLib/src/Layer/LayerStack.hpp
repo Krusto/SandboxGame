@@ -1,5 +1,6 @@
 #pragma once
 #include "Layer.hpp"
+#include <Core/Core.hpp>
 #include <Core/Ref.hpp>
 #include <unordered_map>
 #include <utility>
@@ -8,7 +9,7 @@
 namespace Engine
 {
 
-    class LayerStack
+    class SANDBOX_ENGINE_API LayerStack
     {
     public:
         LayerStack() = default;

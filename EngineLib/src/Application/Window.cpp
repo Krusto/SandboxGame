@@ -1,7 +1,7 @@
 #include "Window.hpp"
 
-#include "GraphicsContext.hpp"
-#include "Renderer.hpp"
+#include <Renderer/GraphicsContext.hpp>
+#include <Renderer/Renderer.hpp>
 
 #include <Core/Log.hpp>
 

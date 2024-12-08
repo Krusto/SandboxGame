@@ -9,7 +9,7 @@
 
 #include <glm/vec4.hpp>
 
-#include "Window.hpp"
+#include "RendererCore.hpp"
 #include "Viewport.hpp"
 #include "Shader.hpp"
 #include "Camera.hpp"
@@ -18,6 +18,7 @@
 #include "Skybox.hpp"
 #include "Framebuffer.hpp"
 #include "VertexArray.hpp"
+#include "DepthFunction.hpp"
 
 #include <Renderer/GraphicsContext.hpp>
 #include <Renderer/RendererCommand.hpp>
@@ -32,6 +33,8 @@ namespace Engine
 
     class Entity;
     class RendererAPI;
+    class Window;
+    struct ApplicationSpec;
 
     class Renderer
     {
@@ -50,6 +53,7 @@ namespace Engine
 
         static void SwitchWireframeMode();
         static void SwitchFillMode();
+        static void ChangeDepthFunction(DepthFunction depthFunction);
 
         static void RenderIndexed(const VertexArray* vertexArray, uint32_t indexCount = 0);
         static void SubmitRenderIndexed(VertexArray* vertexArray, uint32_t indexCount = 0);
@@ -64,5 +68,11 @@ namespace Engine
         inline static RendererSpec s_RendererSpec{};
     };
 }// namespace Engine
+
+#ifdef RENDERER_BUILD_DLL
+class __declspec(dllexport) Engine::Renderer;
+#else
+class __declspec(dllimport) Engine::Renderer;
+#endif
 
 #include <Renderer/Renderer.impl>

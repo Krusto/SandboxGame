@@ -4,35 +4,6 @@
 #include <memory>
 #include <stdio.h>
 
-namespace Engine
-{
-    class Logger
-    {
-    public:
-        Logger() { Init(); }
-
-        ~Logger() { Destroy(); };
-
-    public:
-        void Init();
-        void Destroy();
-
-    public:
-        static void Create();
-
-        static Logger* GetInstance();
-#ifdef LWLOG
-        std::shared_ptr<lwlog::logger<lwlog::default_log_policy, lwlog::default_storage_policy,
-                                      lwlog::single_threaded_policy, lwlog::sinks::stdout_sink>>
-                console;
-#endif
-    private:
-        static std::shared_ptr<Logger> s_Logger;
-    };
-
-}// namespace Engine
-
-
 #ifdef LWLOG
 #define LOG(...)                                                                                                       \
     Engine::Logger::GetInstance()->console->info(__VA_ARGS__);                                                         \

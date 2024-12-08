@@ -6,6 +6,7 @@
 #include <sstream>
 #include <limits>
 #include <fstream>
+#include <filesystem>
 
 #ifdef __cplusplus
 extern "C" {

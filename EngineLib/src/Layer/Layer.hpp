@@ -3,12 +3,13 @@
 #include <memory>
 #include <string_view>
 #include <Core/Ref.hpp>
+#include <Core/Core.hpp>
 
 namespace Engine
 {
     class Window;
 
-    class Layer
+    class SANDBOX_ENGINE_API Layer
     {
     public:
         virtual ~Layer() = default;
