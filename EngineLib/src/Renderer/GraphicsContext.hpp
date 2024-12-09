@@ -3,8 +3,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
+#include <Renderer/Predefines.hpp>
 
-class GraphicsContext
+class EXPORT_RENDERER GraphicsContext
 {
 public:
     GraphicsContext() = default;
@@ -14,15 +15,13 @@ public:
     ~GraphicsContext() = default;
 
 public:
-    static GraphicsContext* Create(GLFWwindow* window);
-    static void Destroy();
+    static GraphicsContext* Get();
 
 public:
+    void Create(GLFWwindow* window);
+    void Destroy();
     void Init();
     void SwapBuffers();
-
-public:
-    static GraphicsContext* s_Context;
 
 protected:
     GLFWwindow* p_WindowPtr{};

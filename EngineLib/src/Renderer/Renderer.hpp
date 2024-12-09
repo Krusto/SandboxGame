@@ -9,7 +9,6 @@
 
 #include <glm/vec4.hpp>
 
-#include "RendererCore.hpp"
 #include "Viewport.hpp"
 #include "Shader.hpp"
 #include "Camera.hpp"
@@ -22,6 +21,7 @@
 
 #include <Renderer/GraphicsContext.hpp>
 #include <Renderer/RendererCommand.hpp>
+#include <Renderer/Predefines.hpp>
 
 namespace Engine
 {
@@ -36,7 +36,7 @@ namespace Engine
     class Window;
     struct ApplicationSpec;
 
-    class Renderer
+    class EXPORT_RENDERER Renderer
     {
     public:
         static void Init(RendererSpec rendererSpec, ApplicationSpec applicationSpec);
@@ -48,7 +48,6 @@ namespace Engine
         static void SetViewport(ViewportSize size);
         static void BindDefaultFramebuffer();
 
-        static GraphicsContext* CreateGraphicsContext(GLFWwindow* handle);
         static RendererAPI* GetAPIInstance();
 
         static void SwitchWireframeMode();
@@ -68,11 +67,5 @@ namespace Engine
         inline static RendererSpec s_RendererSpec{};
     };
 }// namespace Engine
-
-#ifdef RENDERER_BUILD_DLL
-class __declspec(dllexport) Engine::Renderer;
-#else
-class __declspec(dllimport) Engine::Renderer;
-#endif
 
 #include <Renderer/Renderer.impl>

@@ -16,7 +16,6 @@ void GraphicsContext::Init()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
     // Enables the Depth Buffer
     glEnable(GL_DEPTH_TEST);
 
@@ -27,6 +26,9 @@ void GraphicsContext::Init()
     // glCullFace(GL_BACK);
     // Uses counter clock-wise standard
     glFrontFace(GL_CCW);
+
+    const char* version = (const char*) glGetString(GL_VERSION);
+    LOG("OPENGL VERSION %s!\n", version);
 }
 
 void GraphicsContext::SwapBuffers()

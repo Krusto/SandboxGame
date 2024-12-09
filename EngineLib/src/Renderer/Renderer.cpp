@@ -92,5 +92,4 @@ namespace Engine
 
     void Renderer::EndFrame(){};
 
-    GraphicsContext* Renderer::CreateGraphicsContext(GLFWwindow* handle) { return GraphicsContext::Create(handle); }
 }// namespace Engine

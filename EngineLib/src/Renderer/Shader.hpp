@@ -11,6 +11,7 @@
 #include <Renderer/RendererCommand.hpp>
 #include <Renderer/ShaderUniform.hpp>
 #include <Renderer/ShaderDataType.hpp>
+#include <Renderer/Predefines.hpp>
 
 namespace Engine
 {
@@ -23,7 +24,7 @@ namespace Engine
         Other
     };
 
-    class Shader: public RefCounted
+    class EXPORT_RENDERER Shader: public RefCounted
     {
     public:
         static Shader* Load(const std::string& path);

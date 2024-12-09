@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <Renderer/Predefines.hpp>
 
 namespace Engine
 {
@@ -11,7 +12,7 @@ namespace Engine
         Depth
     };
 
-    class Image
+    class EXPORT_RENDERER Image
     {
     public:
         static Image* Create(uint8_t* data, size_t width, size_t height, ImageType type);

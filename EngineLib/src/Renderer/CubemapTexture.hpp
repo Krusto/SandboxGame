@@ -2,6 +2,7 @@
 
 #include <string>
 #include <Core/Ref.hpp>
+#include <Renderer/Predefines.hpp>
 
 namespace Engine
 {
@@ -24,7 +25,7 @@ namespace Engine
         int32_t Channels;
     };
 
-    class CubemapTexture
+    class EXPORT_RENDERER CubemapTexture
     {
     public:
         CubemapTexture() = default;

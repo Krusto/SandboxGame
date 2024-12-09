@@ -1,15 +1,15 @@
 #pragma once
 #include <cstdint>
 #include <Core/Ref.hpp>
-#include <Renderer/RendererCore.hpp>
 #include <Renderer/VertexBuffer.hpp>
 #include <Renderer/IndexBuffer.hpp>
 #include <Renderer/VertexLayout.hpp>
+#include <Renderer/Predefines.hpp>
 
 namespace Engine
 {
 
-    class VertexArray
+    class EXPORT_RENDERER  VertexArray
     {
     public:
         static VertexArray* Create(uint32_t indexCount);
@@ -42,10 +42,3 @@ namespace Engine
         uint32_t m_ID{};
     };
 }// namespace Engine
-
-
-#ifdef RENDERER_BUILD_DLL
-class __declspec(dllexport) Engine::VertexArray;
-#else
-class __declspec(dllimport) Engine::VertexArray;
-#endif

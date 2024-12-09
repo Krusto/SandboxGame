@@ -3,7 +3,7 @@
 #include <string>
 #include <Core/Core.hpp>
 #include <Core/Ref.hpp>
-#include <Renderer/RendererCore.hpp>
+#include <Renderer/Predefines.hpp>
 
 namespace Engine
 {
@@ -15,7 +15,7 @@ namespace Engine
         int32_t Channels;
     };
 
-    class TextureArray
+    class EXPORT_RENDERER TextureArray
     {
     public:
         TextureArray() = default;
@@ -37,9 +37,3 @@ namespace Engine
         virtual uint32_t Channels() const = 0;
     };
 }// namespace Engine
-
-#ifdef RENDERER_BUILD_DLL
-class __declspec(dllexport) Engine::TextureArray;
-#else
-class __declspec(dllimport) Engine::TextureArray;
-#endif

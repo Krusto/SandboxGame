@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <cstdint>
+#include "Predefines.hpp"
 
 namespace Engine
 {
@@ -13,7 +14,7 @@ namespace Engine
         Binary
     };
 
-    class File
+    class EXPORT_UTILS File
     {
     public:
         File() = default;

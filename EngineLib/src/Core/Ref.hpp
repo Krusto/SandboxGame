@@ -2,10 +2,10 @@
 
 #include <mutex>
 #include <atomic>
-
+#include <Core/Predefines.hpp>
 #include <Core/Allocator.hpp>
 
-class RefCounted
+class EXPORT_REF RefCounted
 {
 public:
     void IncRefCount() const;

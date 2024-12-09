@@ -5,12 +5,12 @@
 
 #include <Engine.hpp>
 #include <Core/Ref.hpp>
+#include <Core/Predefines.hpp>
 #include <Application/Window.hpp>
 
 namespace Engine
 {
-
-    class Application
+    class EXPORT_ENGINE_ENTRY Application
     {
     public:
         Application() = default;
@@ -29,17 +29,16 @@ namespace Engine
 
         auto& Spec() { return m_ApplicationSpec; }
 
-        static Application& Get() { return *Application::s_Application; }
+        static Application& Get();
 
         Window* WindowHandle() { return m_Window; }
 
         void Destroy();
 
     protected:
-        static Application* s_Application;
 
-        Window* m_Window;
-        ApplicationSpec m_ApplicationSpec;
+        Window* m_Window{};
+        ApplicationSpec m_ApplicationSpec{};
     };
 
 }// namespace Engine

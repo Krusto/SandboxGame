@@ -2,13 +2,14 @@
 #include <cstdint>
 #include <Core/Ref.hpp>
 #include <Renderer/Vertex.hpp>
+#include <Renderer/Predefines.hpp>
 
 namespace Engine
 {
-    class VertexArray;
+    class  VertexArray;
     struct VertexBufferData;
 
-    class VertexBuffer
+    class  EXPORT_RENDERER VertexBuffer
     {
     public:
         static VertexBuffer Create(VertexArray* va, const VertexLayout& layout, float* data, uint32_t length);
