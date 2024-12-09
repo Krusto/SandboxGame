@@ -6,7 +6,7 @@
 #include <Renderer/RendererAPI.hpp>
 #include <chrono>
 
-Engine::Application* Engine::Application::s_Application;
+Engine::Application* s_Application{};
 
 inline static double GetTime()
 {
@@ -14,6 +14,8 @@ inline static double GetTime()
     return std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(before_time.time_since_epoch())
             .count();
 }
+
+Engine::Application& Engine::Application::Get() { return *s_Application; }
 
 void Engine::Application::Run()
 {
@@ -46,7 +48,6 @@ void Engine::Application::Init(const Engine::ApplicationSpec& spec)
 {
     m_ApplicationSpec = spec;
     m_ApplicationSpec.WorkingDirectory = std::filesystem::absolute(spec.WorkingDirectory);
-    Logger::Create();
 
     m_Window = Engine::Allocator::Allocate<Window>();
     m_Window->Create(WindowSpec{m_ApplicationSpec.ApplicationName, m_ApplicationSpec.width, m_ApplicationSpec.height});

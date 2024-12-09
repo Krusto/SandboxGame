@@ -1,11 +1,13 @@
 #pragma once
 #include <Renderer/Viewport.hpp>
 #include <Renderer/RendererCommand.hpp>
+#include <Renderer/Predefines.hpp>
 
 #include <glm/glm.hpp>
+
 namespace Engine
 {
-    class Framebuffer
+    class EXPORT_RENDERER Framebuffer
     {
     public:
         virtual ~Framebuffer() = default;

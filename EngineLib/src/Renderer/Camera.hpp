@@ -9,6 +9,7 @@
 #include <Renderer/Viewport.hpp>
 #include <Renderer/RendererCommand.hpp>
 #include <Renderer/Shader.hpp>
+#include <Renderer/Predefines.hpp>
 
 namespace Engine
 {
@@ -34,7 +35,7 @@ namespace Engine
 
     class Shader;
 
-    class Camera: public RefCounted
+    class EXPORT_RENDERER Camera: public RefCounted
     {
     public:
         Camera() = default;

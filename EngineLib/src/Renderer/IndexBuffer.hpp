@@ -1,13 +1,13 @@
 #pragma once
 #include <cstdint>
-#include <Renderer/RendererCore.hpp>
+#include <Renderer/Predefines.hpp>
 
 namespace Engine
 {
     class VertexArray;
     struct IndexBufferData;
 
-    class IndexBuffer
+    class EXPORT_RENDERER IndexBuffer
     {
     public:
         static IndexBuffer Create(VertexArray* va, const uint32_t* data, uint32_t length);
@@ -25,9 +25,3 @@ namespace Engine
         IndexBufferData* m_Data{};
     };
 }// namespace Engine
-
-#ifdef RENDERER_BUILD_DLL
-class __declspec(dllexport) Engine::IndexBuffer;
-#else
-class __declspec(dllimport) Engine::IndexBuffer;
-#endif

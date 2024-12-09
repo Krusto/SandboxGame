@@ -1,6 +1,7 @@
 #pragma once
 #include <Renderer/ShaderUniform.hpp>
 #include <Renderer/ShaderDataType.hpp>
+#include <Renderer/Predefines.hpp>
 
 #include <string_view>
 #include <string>
@@ -8,7 +9,8 @@
 
 namespace Engine
 {
-    class GLSLReflection
+
+    class EXPORT_RENDERER GLSLReflection
     {
     public:
         void Init(std::string_view source);

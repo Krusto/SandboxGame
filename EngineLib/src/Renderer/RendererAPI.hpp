@@ -6,14 +6,14 @@
 #include "Viewport.hpp"
 #include "Renderer.hpp"
 #include "DepthFunction.hpp"
-#include "RendererCore.hpp"
+#include <Renderer/Predefines.hpp>
 
 namespace Engine
 {
 
     struct ApplicationSpec;
 
-    class RendererAPI
+    class EXPORT_RENDERER RendererAPI
     {
     public:
         RendererAPI() = default;
@@ -32,9 +32,3 @@ namespace Engine
         void ChangeDepthFunction(DepthFunction depthFunction);
     };
 }// namespace Engine
-
-#ifdef RENDERER_BUILD_DLL
-class __declspec(dllexport) Engine::RendererAPI;
-#else
-class __declspec(dllimport) Engine::RendererAPI;
-#endif

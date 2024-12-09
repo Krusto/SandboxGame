@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-#include <Renderer/RendererCore.hpp>
+#include <Renderer/Predefines.hpp>
 
 namespace Engine
 {
@@ -15,7 +15,7 @@ namespace Engine
         ClientStorage
     };
 
-    class StorageBuffer
+    class EXPORT_RENDERER StorageBuffer
     {
     public:
         static StorageBuffer* Create(uint8_t* data, size_t size, StorageBufferType type);

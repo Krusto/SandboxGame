@@ -4,12 +4,13 @@
 #include <string_view>
 #include <Core/Ref.hpp>
 #include <Core/Core.hpp>
+#include <Core/Predefines.hpp>
 
 namespace Engine
 {
     class Window;
 
-    class SANDBOX_ENGINE_API Layer
+    class EXPORT_ENGINE Layer
     {
     public:
         virtual ~Layer() = default;

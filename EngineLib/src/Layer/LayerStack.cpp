@@ -3,16 +3,18 @@
 
 namespace Engine
 {
+    inline static std::vector<Layer*> s_Layers;
+
     void LayerStack::InitLayers(Window* window)
     {
-        for (auto layer: m_Layers) { layer->Init(window); }
+        for (auto layer: s_Layers) { layer->Init(window); }
     }
 
     void LayerStack::PushLayer(Layer* layer)
     {
         if (!LayerStack::ContainsLayer(layer->GetName()))
         {
-            LayerStack::m_Layers.push_back(layer);
+            s_Layers.push_back(layer);
             layer->OnAttach();
         }
     }
@@ -21,46 +23,46 @@ namespace Engine
     {
         if (LayerStack::ContainsLayer(name))
         {
-            LayerStack::m_Layers[FindLayerIndex(name)]->OnDetach();
+            s_Layers[FindLayerIndex(name)]->OnDetach();
 
-            LayerStack::m_Layers.erase(LayerStack::m_Layers.begin() + FindLayerIndex(name));
+            s_Layers.erase(s_Layers.begin() + FindLayerIndex(name));
         }
     }
 
     void LayerStack::PopLayers()
     {
-        for (uint32_t index = 0; index < m_Layers.size(); ++index) { m_Layers[index]->OnDetach(); }
+        for (uint32_t index = 0; index < s_Layers.size(); ++index) { s_Layers[index]->OnDetach(); }
     }
 
     void LayerStack::DestroyLayers()
     {
-        for (auto& layer: m_Layers) { layer->Destroy(); }
-        for (auto& layer: m_Layers) { Engine::Allocator::Deallocate(layer); }
+        for (auto& layer: s_Layers) { layer->Destroy(); }
+        for (auto& layer: s_Layers) { Engine::Allocator::Deallocate(layer); }
 
-        m_Layers.clear();
+        s_Layers.clear();
     }
 
-    Layer* LayerStack::GetLayer(std::string name) { return LayerStack::m_Layers[FindLayerIndex(name)]; }
+    Layer* LayerStack::GetLayer(std::string name) { return s_Layers[FindLayerIndex(name)]; }
 
-    auto LayerStack::end() { return LayerStack::m_Layers.end(); }
+    auto LayerStack::end() { return s_Layers.end(); }
 
-    auto LayerStack::begin() { return LayerStack::m_Layers.begin(); }
+    auto LayerStack::begin() { return s_Layers.begin(); }
 
-    std::vector<Layer*>& LayerStack::data() { return LayerStack::m_Layers; }
+    std::vector<Layer*>& LayerStack::data() { return s_Layers; }
 
     uint32_t LayerStack::FindLayerIndex(std::string_view name)
     {
 
-        for (uint32_t i = 0; i < m_Layers.size(); i++)
+        for (uint32_t i = 0; i < s_Layers.size(); i++)
         {
-            if (m_Layers[i]->GetName() == name) return i;
+            if (s_Layers[i]->GetName() == name) return i;
         }
-        return LayerStack::m_Layers.size();
+        return s_Layers.size();
     }
 
     bool LayerStack::ContainsLayer(std::string_view name)
     {
-        if (FindLayerIndex(name) != LayerStack::m_Layers.size()) { return true; }
+        if (FindLayerIndex(name) != s_Layers.size()) { return true; }
         return false;
     }
 

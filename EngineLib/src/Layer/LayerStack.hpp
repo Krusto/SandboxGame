@@ -1,5 +1,6 @@
 #pragma once
 #include "Layer.hpp"
+#include <Core/Predefines.hpp>
 #include <Core/Core.hpp>
 #include <Core/Ref.hpp>
 #include <unordered_map>
@@ -9,7 +10,7 @@
 namespace Engine
 {
 
-    class SANDBOX_ENGINE_API LayerStack
+    class EXPORT_ENGINE LayerStack
     {
     public:
         LayerStack() = default;
@@ -36,8 +37,6 @@ namespace Engine
         static std::vector<Layer*>& data();
 
     private:
-        inline static std::vector<Layer*> m_Layers;
-
         static uint32_t FindLayerIndex(std::string_view name);
 
         static bool ContainsLayer(std::string_view name);

@@ -5,6 +5,47 @@
 
 #include <Core/Log.hpp>
 
+ #include <Windows.h>
+HMODULE libGL;
+typedef void*(APIENTRYP PFNWGLGETPROCADDRESSPROC_PRIVATE)(const char*);
+static PFNWGLGETPROCADDRESSPROC_PRIVATE gladGetProcAddressPtr;
+
+static int open_gl(void)
+{
+#ifndef IS_UWP
+    libGL = LoadLibraryW(L"opengl32.dll");
+    if (libGL != NULL)
+    {
+        void (*tmp)(void);
+        tmp = (void (*)(void)) GetProcAddress(libGL, "wglGetProcAddress");
+        gladGetProcAddressPtr = (PFNWGLGETPROCADDRESSPROC_PRIVATE) tmp;
+        return gladGetProcAddressPtr != NULL;
+    }
+#endif
+
+    return 0;
+}
+
+static void* get_proc(const char* namez)
+{
+    void* result = NULL;
+    if (libGL == NULL) return NULL;
+
+#if !defined(__APPLE__) && !defined(__HAIKU__)
+    if (gladGetProcAddressPtr != NULL) { result = gladGetProcAddressPtr(namez); }
+#endif
+    if (result == NULL)
+    {
+#if defined(_WIN32) || defined(__CYGWIN__)
+        result = (void*) GetProcAddress((HMODULE) libGL, namez);
+#else
+        result = dlsym(libGL, namez);
+#endif
+    }
+
+    return result;
+}
+
 namespace Engine
 {
     void Window::Create(WindowSpec spec)
@@ -43,11 +84,15 @@ namespace Engine
 
         glfwMakeContextCurrent(s_WindowPtr);
 
-        GraphicsContext::s_Context = GraphicsContext::Create(s_WindowPtr);
-        GraphicsContext::s_Context->Init();
+        GraphicsContext::Get()->Create(s_WindowPtr);
+        GraphicsContext::Get()->Init();
 
         if constexpr (OPENGL_VERSION_MAJOR == 4 && OPENGL_VERSION_MINOR >= 3)
         {
+            //open_gl();
+            //glad_glEnable = (PFNGLENABLEPROC) get_proc("glEnable");
+            //glEnable = (PFNGLGETSTRINGPROC) load("glEnable");
+
             glEnable(GL_DEBUG_OUTPUT);
             glDebugMessageCallback(Engine::Window::_MessageCallback, 0);
         }
@@ -62,12 +107,12 @@ namespace Engine
     void Window::Destroy()
     {
         glfwDestroyWindow(s_WindowPtr);
-        GraphicsContext::Destroy();
+        GraphicsContext::Get()->Destroy();
     }
 
     void Window::Update()
     {
-        GraphicsContext::s_Context->SwapBuffers();
+        GraphicsContext::Get()->SwapBuffers();
         m_WindowSpec.width = s_ViewportSize.width;
         m_WindowSpec.height = s_ViewportSize.height;
     }

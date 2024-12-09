@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <vector>
 #include <string_view>
+#include <Renderer/Predefines.hpp>
 
 namespace Engine
 {
@@ -32,7 +33,7 @@ namespace Engine
         Std430
     };
 
-    class ShaderDataType
+    class EXPORT_RENDERER ShaderDataType
     {
     public:
         ShaderDataType() = delete;

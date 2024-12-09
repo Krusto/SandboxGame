@@ -2,12 +2,13 @@
 #include <Renderer/CubemapTexture.hpp>
 #include <Renderer/RendererCommand.hpp>
 #include <Renderer/Camera.hpp>
+#include <Renderer/Predefines.hpp>
 
 namespace Engine
 {
     struct SkyboxData;
 
-    class Skybox
+    class EXPORT_RENDERER Skybox
     {
     public:
         static Skybox Create(std::string_view cubemapName, const std::string& shaderPath,

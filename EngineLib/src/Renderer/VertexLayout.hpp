@@ -18,7 +18,7 @@ namespace Engine
         uint32_t offset{};
     };
 
-    class VertexLayout
+    class EXPORT_RENDERER VertexLayout
     {
     public:
         VertexLayout() = default;

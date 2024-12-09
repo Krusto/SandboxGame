@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <Application/Predefines.hpp>
 #include <Application/ApplicationSpec.hpp>
 #include <Core/Log.hpp>
 #include <Core/Ref.hpp>
@@ -27,7 +28,7 @@ namespace Engine
         uint32_t height;
     };
 
-    class Window: public RefCounted
+    class EXPORT_ENGINE_ENTRY Window: public RefCounted
     {
     public:
         Window() = default;
