@@ -58,8 +58,6 @@ namespace Engine
         WindowSpec* GetSpec();
         const WindowSpec* GetSpec() const;
 
-    public:
-        static inline ViewportSize s_ViewportSize{};
 
     private:
         static void _CloseCallback(GLFWwindow* window);
@@ -72,9 +70,6 @@ namespace Engine
                                                 GLchar const* message, void const* user_param);
 
         static void _ErrorCallback(int code, const char* err_str);
-
-    private:
-        static inline GLFWwindow* s_WindowPtr = nullptr;
 
     private:
         WindowSpec m_WindowSpec{};

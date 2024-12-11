@@ -5,46 +5,8 @@
 
 #include <Core/Log.hpp>
 
- #include <Windows.h>
-HMODULE libGL;
-typedef void*(APIENTRYP PFNWGLGETPROCADDRESSPROC_PRIVATE)(const char*);
-static PFNWGLGETPROCADDRESSPROC_PRIVATE gladGetProcAddressPtr;
-
-static int open_gl(void)
-{
-#ifndef IS_UWP
-    libGL = LoadLibraryW(L"opengl32.dll");
-    if (libGL != NULL)
-    {
-        void (*tmp)(void);
-        tmp = (void (*)(void)) GetProcAddress(libGL, "wglGetProcAddress");
-        gladGetProcAddressPtr = (PFNWGLGETPROCADDRESSPROC_PRIVATE) tmp;
-        return gladGetProcAddressPtr != NULL;
-    }
-#endif
-
-    return 0;
-}
-
-static void* get_proc(const char* namez)
-{
-    void* result = NULL;
-    if (libGL == NULL) return NULL;
-
-#if !defined(__APPLE__) && !defined(__HAIKU__)
-    if (gladGetProcAddressPtr != NULL) { result = gladGetProcAddressPtr(namez); }
-#endif
-    if (result == NULL)
-    {
-#if defined(_WIN32) || defined(__CYGWIN__)
-        result = (void*) GetProcAddress((HMODULE) libGL, namez);
-#else
-        result = dlsym(libGL, namez);
-#endif
-    }
-
-    return result;
-}
+EXPORT_ENGINE_ENTRY ViewportSize s_ViewportSize{};
+EXPORT_ENGINE_ENTRY GLFWwindow* s_WindowPtr{};
 
 namespace Engine
 {
@@ -75,6 +37,9 @@ namespace Engine
 
         s_WindowPtr = glfwCreateWindow(this->m_WindowSpec.width, this->m_WindowSpec.height,
                                        this->m_WindowSpec.title.data(), nullptr, nullptr);
+        s_ViewportSize.width = m_WindowSpec.width;
+        s_ViewportSize.height = m_WindowSpec.height;
+
         if (!IsValid())
         {
             LOG_ERROR("Failed to create GLFW window!");
@@ -89,18 +54,14 @@ namespace Engine
 
         if constexpr (OPENGL_VERSION_MAJOR == 4 && OPENGL_VERSION_MINOR >= 3)
         {
-            //open_gl();
-            //glad_glEnable = (PFNGLENABLEPROC) get_proc("glEnable");
-            //glEnable = (PFNGLGETSTRINGPROC) load("glEnable");
-
             glEnable(GL_DEBUG_OUTPUT);
             glDebugMessageCallback(Engine::Window::_MessageCallback, 0);
         }
-        glfwSetWindowCloseCallback(this->s_WindowPtr, _CloseCallback);
-        glfwSetWindowSizeCallback(this->s_WindowPtr, _WindowSizeCallback);
-        glfwSetKeyCallback(this->s_WindowPtr, _WindowKeyCallback);
-        glfwSetCursorPosCallback(this->s_WindowPtr, _WindowMouseMoveCallback);
-        glfwSetScrollCallback(this->s_WindowPtr, _WindowMouseScrollCallback);
+        glfwSetWindowCloseCallback(s_WindowPtr, _CloseCallback);
+        glfwSetWindowSizeCallback(s_WindowPtr, _WindowSizeCallback);
+        glfwSetKeyCallback(s_WindowPtr, _WindowKeyCallback);
+        glfwSetCursorPosCallback(s_WindowPtr, _WindowMouseMoveCallback);
+        glfwSetScrollCallback(s_WindowPtr, _WindowMouseScrollCallback);
         glfwSwapInterval(1);
     }
 

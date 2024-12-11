@@ -50,8 +50,8 @@ namespace Engine
 
     void OpenGLFramebuffer::Bind() const
     {
-        glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-        glViewport(0, 0, (GLsizei) m_width, (GLsizei) m_height);
+        glad_glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+        glad_glViewport(0, 0, (GLsizei) m_width, (GLsizei) m_height);
     }
 
     void OpenGLFramebuffer::BindColorTexture(uint32_t slot) const

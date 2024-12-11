@@ -2,28 +2,152 @@ cmake_minimum_required(VERSION 3.20)
 
 project(SandboxGame)
 
+set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/Vendor/glfw-3.4/src")
 set(BUILD_ENGINE_SHARED ON CACHE BOOL "Build engine shared library" FORCE)
+set(BUILD_SHARED_LIBS ON CACHE BOOL "Build engine shared library" FORCE)
 set(FASTNOISE2_NOISETOOL OFF CACHE BOOL "Build noise tool" FORCE)
 set(FASTNOISE2_TESTS OFF CACHE BOOL "Build noise tests" FORCE)
+set(GLFW_LIBRARY_TYPE "SHARED" CACHE STRING "Library type override for GLFW (SHARED, STATIC, OBJECT, or empty to follow BUILD_SHARED_LIBS)")
+set(YAML_BUILD_SHARED_LIBS ON CACHE BOOL "Build yaml-cpp shared library" FORCE)
 
-if(BUILD_ENGINE_SHARED EQUAL "ON")
-message("${PROJECT_NAME}: Build engine shared library")
-set(BUILD_SHARED_LIBS ON CACHE BOOL "Build engine shared library" FORCE)
-set(BUILD_LIB_FLAG "SHARED")
+if(BUILD_SHARED_LIBS)
+    message("${PROJECT_NAME}: Build engine shared library")
+    set(BUILD_LIB_FLAG "SHARED")
 else()
-message("${PROJECT_NAME}: Build engine static library")
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build engine shared library" FORCE)
-set(BUILD_LIB_FLAG "STATIC")
+    message("${PROJECT_NAME}: Build engine static library")
+    set(BUILD_LIB_FLAG "STATIC")
 endif()
+
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_$<CONFIG> ${CMAKE_SOURCE_DIR}/build/$<CONFIG>/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_$<CONFIG> ${CMAKE_SOURCE_DIR}/build/$<CONFIG>/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_$<CONFIG> ${CMAKE_SOURCE_DIR}/build/$<CONFIG>/bin)
 
 set(CMAKE_CXX_STANDARD 23)
 message("Compiler Version: ${CMAKE_CXX_COMPILER_VERSION}")
 
 message("${PROJECT_NAME}: Adding yaml-cpp...")
 add_subdirectory("${CMAKE_SOURCE_DIR}/Vendor/yaml-cpp")
+find_package(Threads REQUIRED)
 
 message("${PROJECT_NAME}: Adding glfw...")
-add_subdirectory("${CMAKE_SOURCE_DIR}/Vendor/glfw-3.4")
+include(CMakeDependentOption)
+cmake_dependent_option(GLFW_BUILD_WIN32 "Build support for Win32" ON "WIN32" OFF)
+cmake_dependent_option(GLFW_BUILD_COCOA "Build support for Cocoa" ON "APPLE" OFF)
+cmake_dependent_option(GLFW_BUILD_X11 "Build support for X11" ON "UNIX;NOT APPLE" OFF)
+cmake_dependent_option(GLFW_BUILD_WAYLAND "Build support for Wayland" ON "UNIX;NOT APPLE" OFF)
+cmake_dependent_option(USE_MSVC_RUNTIME_LIBRARY_DLL "Use MSVC runtime library DLL" ON
+                       "MSVC" OFF)
+if (GLFW_BUILD_WIN32)
+    message(STATUS "Including Win32 support")
+endif()
+if (GLFW_BUILD_COCOA)
+    message(STATUS "Including Cocoa support")
+endif()
+if (GLFW_BUILD_WAYLAND)
+    message(STATUS "Including Wayland support")
+endif()
+if (GLFW_BUILD_X11)
+    message(STATUS "Including X11 support")
+endif()
+if (MSVC AND NOT USE_MSVC_RUNTIME_LIBRARY_DLL)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+set(GLFW_SOURCE_DIR "${CMAKE_SOURCE_DIR}/Vendor/glfw-3.4/src")
+
+add_library(glfw SHARED
+                 "${GLFW_SOURCE_DIR}/../include/GLFW/glfw3.h"
+                 "${GLFW_SOURCE_DIR}/../include/GLFW/glfw3native.h"
+                 "${GLFW_SOURCE_DIR}/internal.h "
+                 "${GLFW_SOURCE_DIR}/platform.h "
+                 "${GLFW_SOURCE_DIR}/mappings.h"
+                 "${GLFW_SOURCE_DIR}/context.c "
+                 "${GLFW_SOURCE_DIR}/init.c "
+                 "${GLFW_SOURCE_DIR}/input.c"
+                 "${GLFW_SOURCE_DIR}/monitor.c"
+                 "${GLFW_SOURCE_DIR}/platform.c"
+                 "${GLFW_SOURCE_DIR}/vulkan.c"
+                 "${GLFW_SOURCE_DIR}/window.c"
+                 "${GLFW_SOURCE_DIR}/egl_context.c "
+                 "${GLFW_SOURCE_DIR}/osmesa_context.c"
+                 "${GLFW_SOURCE_DIR}/null_platform.h"
+                 "${GLFW_SOURCE_DIR}/null_joystick.h"
+                 "${GLFW_SOURCE_DIR}/null_init.c"
+                 "${GLFW_SOURCE_DIR}/null_monitor.c"
+                 "${GLFW_SOURCE_DIR}/null_window.c"
+                 "${GLFW_SOURCE_DIR}/null_joystick.c")
+if (WIN32)
+    target_sources(glfw PRIVATE "${GLFW_SOURCE_DIR}/win32_time.h"
+                                "${GLFW_SOURCE_DIR}/win32_thread.h"
+                                "${GLFW_SOURCE_DIR}/win32_module.c"
+                                "${GLFW_SOURCE_DIR}/win32_time.c"
+                                "${GLFW_SOURCE_DIR}/win32_thread.c")
+else()
+    target_sources(glfw PRIVATE "${GLFW_SOURCE_DIR}/posix_time.h" 
+                                "${GLFW_SOURCE_DIR}/posix_thread.h"
+                                "${GLFW_SOURCE_DIR}/posix_module.c"
+                                "${GLFW_SOURCE_DIR}/posix_time.c" 
+                                "${GLFW_SOURCE_DIR}/posix_thread.c")
+endif()
+if (GLFW_BUILD_WIN32)
+target_compile_definitions(glfw PRIVATE _GLFW_WIN32)
+target_sources(glfw PRIVATE "${GLFW_SOURCE_DIR}/win32_platform.h" 
+                            "${GLFW_SOURCE_DIR}/win32_joystick.h" 
+                            "${GLFW_SOURCE_DIR}/win32_init.c"
+                            "${GLFW_SOURCE_DIR}/win32_joystick.c" 
+                            "${GLFW_SOURCE_DIR}/win32_monitor.c" 
+                            "${GLFW_SOURCE_DIR}/win32_window.c"
+                            "${GLFW_SOURCE_DIR}/wgl_context.c")
+endif()
+
+if (GLFW_BUILD_X11)
+target_compile_definitions(glfw PRIVATE _GLFW_X11)
+target_sources(glfw PRIVATE "${GLFW_SOURCE_DIR}/x11_platform.h" 
+                            "${GLFW_SOURCE_DIR}/xkb_unicode.h"
+                            "${GLFW_SOURCE_DIR}/x11_init.c"
+                            "${GLFW_SOURCE_DIR}/x11_monitor.c"
+                            "${GLFW_SOURCE_DIR}/x11_window.c" 
+                            "${GLFW_SOURCE_DIR}/xkb_unicode.c"
+                            "${GLFW_SOURCE_DIR}/glx_context.c")
+endif()
+
+if (GLFW_BUILD_WAYLAND)
+target_compile_definitions(glfw PRIVATE _GLFW_WAYLAND)
+target_sources(glfw PRIVATE "${GLFW_SOURCE_DIR}/wl_platform.h" 
+                            "${GLFW_SOURCE_DIR}/xkb_unicode.h"
+                            "${GLFW_SOURCE_DIR}/wl_init.c"
+                            "${GLFW_SOURCE_DIR}/wl_monitor.c"
+                            "${GLFW_SOURCE_DIR}/wl_window.c"
+                            "${GLFW_SOURCE_DIR}/xkb_unicode.c")
+endif()
+
+if (GLFW_BUILD_X11 OR GLFW_BUILD_WAYLAND)
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    target_sources(glfw PRIVATE "${GLFW_SOURCE_DIR}/linux_joystick.h" 
+                                "${GLFW_SOURCE_DIR}/linux_joystick.c")
+endif()
+target_sources(glfw PRIVATE "${GLFW_SOURCE_DIR}/posix_poll.h" 
+                            "${GLFW_SOURCE_DIR}/posix_poll.c")
+endif()
+
+if (UNIX AND GLFW_BUILD_SHARED_LIBRARY)
+    set(GLFW_LIB_NAME glfw)
+else()
+    set(GLFW_LIB_NAME glfw3)
+endif()
+set(GLFW_LIB_NAME_SUFFIX "")
+
+set_target_properties(glfw PROPERTIES
+                      OUTPUT_NAME glfw3
+                      C_STANDARD 99
+                      C_EXTENSIONS OFF
+                      DEFINE_SYMBOL _GLFW_BUILD_DLL
+                     )
+target_include_directories(glfw PUBLIC
+                      "$<BUILD_INTERFACE:${GLFW_SOURCE_DIR}/../include>")
+target_include_directories(glfw PRIVATE
+                      "${GLFW_SOURCE_DIR}/")
+target_link_libraries(glfw PRIVATE Threads::Threads)
 
 message("${PROJECT_NAME}: Adding FastNoise2...")
 add_subdirectory("${CMAKE_SOURCE_DIR}/Vendor/FastNoise")
@@ -68,7 +192,7 @@ set(PERLIN_INCLUDE_DIR         "./Vendor/PerlinNoise")
 set(FASTNOISE_INCLUDE_DIR         "./Vendor/FastNoise/include")
 
 message("${PROJECT_NAME}: Creating imgui lib")
-add_library(imgui ${BUILD_LIB_FLAG} ${IMGUI_SOURCE_FILES} ${IMGUI_HEADER_FILES})
+add_library(imgui SHARED ${IMGUI_SOURCE_FILES} ${IMGUI_HEADER_FILES})
 message("${PROJECT_NAME}: Creating glad lib")
 add_library(glad SHARED ${GLAD_SOURCE_FILES} ${GLAD_HEADER_FILES})
 
@@ -85,9 +209,6 @@ add_library(SandboxWorld STATIC ${SANDBOX_WORLD_SOURCE_FILES} ${SANDBOX_WORLD_HE
 add_library(CUtils INTERFACE)
 target_include_directories(CUtils INTERFACE ${CUTILS_INCLDUE_DIR})
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_compile_options(EngineLib PRIVATE -static-libstdc++)
@@ -98,10 +219,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 endif()
 
 if(MSVC)
-    # target_compile_options(EngineLib PRIVATE /MP)
-    if(BUILD_ENGINE_SHARED EQUAL "ON")
-        set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-    endif()
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
 if (WIN32)
     target_compile_definitions(EngineLib PRIVATE GLFW_EXPOSE_NATIVE_WIN32)
@@ -223,28 +341,9 @@ target_link_libraries(ShaderReflectionTest EngineEntry Renderer EngineLib)
 target_include_directories(ShaderReflectionTest PRIVATE ./EngineLib/src/Renderer/Reflection)
 target_include_directories(ShaderReflectionTest PRIVATE ./EngineLib/src/)
 
-if(BUILD_ENGINE_SHARED EQUAL "ON")
-    target_compile_definitions(EngineUtils PUBLIC ENGINE_UTILS_BUILD_DLL)
-    target_compile_definitions(EngineLib PUBLIC ENGINE_BUILD_DLL FASTNOISE_SHARED_LIB)
-    target_compile_definitions(Renderer PUBLIC ENGINE_RENDERER_BUILD_DLL FASTNOISE_SHARED_LIB)
-    target_compile_definitions(EngineEntry PUBLIC ENGINE_ENTRY_BUILD_DLL FASTNOISE_SHARED_LIB)
-endif()
-
-function (copy_dlls target)
-    if (WIN32)
-        add_custom_command (
-            TARGET "${target}" POST_BUILD
-            COMMAND "${CMAKE_COMMAND}" -E copy -t "$<TARGET_FILE_DIR:${target}>"
-                    "$<TARGET_RUNTIME_DLLS:${target}>" USES_TERMINAL COMMAND_EXPAND_LISTS
-        )
-        if(DEBUG)
-            add_custom_command (
-                TARGET "${target}" POST_BUILD
-                COMMAND "${CMAKE_COMMAND}" -E copy -t "$<TARGET_FILE_DIR:${target}>"
-                        "$<TARGET_PDB_FILE:${target}>" USES_TERMINAL COMMAND_EXPAND_LISTS
-            )
-        endif ()
-    endif ()
-endfunction ()
-
-copy_dlls(Sandbox)
+# if(BUILD_ENGINE_SHARED EQUAL "ON")
+#     target_compile_definitions(EngineUtils PUBLIC ENGINE_UTILS_BUILD_DLL)
+#     target_compile_definitions(EngineLib PUBLIC ENGINE_BUILD_DLL FASTNOISE_SHARED_LIB)
+#     target_compile_definitions(Renderer PUBLIC ENGINE_RENDERER_BUILD_DLL FASTNOISE_SHARED_LIB)
+#     target_compile_definitions(EngineEntry PUBLIC ENGINE_ENTRY_BUILD_DLL FASTNOISE_SHARED_LIB)
+# endif()
