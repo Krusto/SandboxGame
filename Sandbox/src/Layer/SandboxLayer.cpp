@@ -133,18 +133,27 @@ void SandboxLayer::Destroy()
     m_Skybox.Destroy();
 
     Engine::Allocator::Deallocate(m_Light);
+    m_Light = nullptr;
 
     m_Framebuffer->Destroy();
     Engine::Allocator::Deallocate(m_Framebuffer);
+    m_Framebuffer = nullptr;
+
     m_DepthFramebuffer->Destroy();
     Engine::Allocator::Deallocate(m_DepthFramebuffer);
+    m_DepthFramebuffer = nullptr;
+
     m_DebugFramebuffer->Destroy();
     Engine::Allocator::Deallocate(m_DebugFramebuffer);
+    m_DebugFramebuffer = nullptr;
+
     m_DepthBufferVA->Destroy();
     Engine::Allocator::Deallocate(m_DepthBufferVA);
+    m_DepthBufferVA = nullptr;
 
     m_DebugCube->Destroy();
     Engine::Allocator::Deallocate(m_DebugCube);
+    m_DebugCube = nullptr;
 }
 
 void SandboxLayer::RenderWorld()
