@@ -3,7 +3,6 @@ set (CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 project(SandboxGame)
 
-set(BUILD_ENGINE_SHARED ON CACHE BOOL "Build engine shared library" FORCE)
 set(BUILD_SHARED_LIBS ON CACHE BOOL "Build engine shared library" FORCE)
 set(FASTNOISE2_NOISETOOL OFF CACHE BOOL "Build noise tool" FORCE)
 set(FASTNOISE2_TESTS OFF CACHE BOOL "Build noise tests" FORCE)
@@ -76,17 +75,17 @@ set(PERLIN_INCLUDE_DIR         "./Vendor/PerlinNoise")
 set(FASTNOISE_INCLUDE_DIR         "./Vendor/FastNoise/include")
 
 message(STATUS "${PROJECT_NAME}: Creating imgui lib")
-add_library(imgui SHARED ${IMGUI_SOURCE_FILES} ${IMGUI_HEADER_FILES})
+add_library(imgui ${BUILD_LIB_FLAG} ${IMGUI_SOURCE_FILES} ${IMGUI_HEADER_FILES})
 message(STATUS "${PROJECT_NAME}: Creating glad lib")
-add_library(glad SHARED ${GLAD_SOURCE_FILES} ${GLAD_HEADER_FILES})
+add_library(glad ${BUILD_LIB_FLAG} ${GLAD_SOURCE_FILES} ${GLAD_HEADER_FILES})
 
-add_library(EngineUtils SHARED ${UTILS_SOURCE_FILES} ${UTILS_HEADER_FILES})
+add_library(EngineUtils ${BUILD_LIB_FLAG} ${UTILS_SOURCE_FILES} ${UTILS_HEADER_FILES})
 
-add_library(Renderer SHARED ${RENDERER_SOURCE_FILES} ${RENDERER_HEADER_FILES})
+add_library(Renderer ${BUILD_LIB_FLAG} ${RENDERER_SOURCE_FILES} ${RENDERER_HEADER_FILES})
 
-add_library(EngineLib SHARED ${ENGINE_SOURCE_FILES} ${ENGINE_HEADER_FILES})
+add_library(EngineLib ${BUILD_LIB_FLAG} ${ENGINE_SOURCE_FILES} ${ENGINE_HEADER_FILES})
 
-add_library(EngineEntry SHARED ${ENGINE_APPLICATION_SOURCE_FILES} ${ENGINE_APPLICATION_HEADER_FILES})
+add_library(EngineEntry ${BUILD_LIB_FLAG} ${ENGINE_APPLICATION_SOURCE_FILES} ${ENGINE_APPLICATION_HEADER_FILES})
 
 add_library(SandboxWorld STATIC ${SANDBOX_WORLD_SOURCE_FILES} ${SANDBOX_WORLD_HEADER_FILES})
 
@@ -102,7 +101,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 
 endif()
 
-if(MSVC)
+if(MSVC AND ${BUILD_LIB_FLAG} STREQUAL "SHARED")
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
 if (WIN32)
@@ -116,6 +115,8 @@ endif ()
 
 target_compile_definitions(EngineUtils
     PUBLIC
+    $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:LINK_SHARED>
+    $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:EngineUtils_EXPORTS>
     $<$<CONFIG:Debug>:ENGINE_ENABLE_VERBOSE_LOG>
     $<$<CONFIG:Debug>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
     $<$<CONFIG:Release>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
@@ -126,6 +127,8 @@ target_compile_definitions(EngineUtils
 
 target_compile_definitions(EngineLib
     PUBLIC
+    $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:LINK_SHARED>
+    $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:EngineLib_EXPORTS>
     $<$<CONFIG:Debug>:ENGINE_ENABLE_VERBOSE_LOG>
     $<$<CONFIG:Debug>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
     $<$<CONFIG:Release>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
@@ -136,12 +139,15 @@ target_compile_definitions(EngineLib
 
 target_compile_definitions(glad
     PRIVATE
-    GLAD_GLAPI_EXPORT_BUILD
-    GLAD_GLAPI_EXPORT 
+    $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:LINK_SHARED>
+    $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:GLAD_GLAPI_EXPORT_BUILD>
+    $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:GLAD_GLAPI_EXPORT>
 )
 target_compile_definitions(Renderer
     PUBLIC
-    GLAD_GLAPI_EXPORT
+    $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:LINK_SHARED>
+    $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:Renderer_EXPORTS>
+    $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:GLAD_GLAPI_EXPORT>
     $<$<CONFIG:Debug>:ENGINE_ENABLE_VERBOSE_LOG>
     $<$<CONFIG:Debug>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
     $<$<CONFIG:Release>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
@@ -152,6 +158,8 @@ target_compile_definitions(Renderer
 
 target_compile_definitions(EngineEntry
     PUBLIC
+    $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:LINK_SHARED>
+    $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:EngineEntry_EXPORTS>
     $<$<CONFIG:Debug>:ENGINE_ENABLE_VERBOSE_LOG>
     $<$<CONFIG:Debug>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
     $<$<CONFIG:Release>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
@@ -162,6 +170,7 @@ target_compile_definitions(EngineEntry
 
 target_compile_definitions(SandboxWorld
     PUBLIC
+    $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:LINK_SHARED>
     $<$<CONFIG:Debug>:ENGINE_ENABLE_VERBOSE_LOG>
     $<$<CONFIG:Debug>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
     $<$<CONFIG:Release>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
@@ -216,6 +225,11 @@ target_link_libraries(EngineEntry PRIVATE EngineLib Renderer EngineInterfaceLibr
 target_link_libraries(SandboxWorld PRIVATE EngineEntry EngineLib Renderer EngineInterfaceLibrary)
 
 add_executable(Sandbox ${SANDBOX_HEADER_FILES} ${SANDBOX_SOURCE_FILES})
+target_compile_definitions(Sandbox
+    PUBLIC
+    $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:LINK_SHARED>
+)
+
 target_include_directories(Sandbox PRIVATE "${CMAKE_SOURCE_DIR}/EngineLib/src")
 target_include_directories(Sandbox PRIVATE "${CMAKE_SOURCE_DIR}/Sandbox/src")
 target_link_libraries(Sandbox SandboxWorld EngineEntry Renderer EngineLib EngineInterfaceLibrary)

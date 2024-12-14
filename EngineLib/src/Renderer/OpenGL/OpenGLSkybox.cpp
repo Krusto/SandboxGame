@@ -69,6 +69,7 @@ namespace Engine
             m_Data->m_VertexArray = nullptr;
         }
         Allocator::Deallocate(m_Data);
+        m_Data = nullptr;
     }
 
     void Skybox::Reload() { m_Data->m_Shader->Reload(); }
