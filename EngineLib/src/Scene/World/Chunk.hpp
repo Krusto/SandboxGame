@@ -1,5 +1,5 @@
 #pragma once
-#include <Renderer/StorageBuffer.hpp>
+#include <Renderer/Renderer.hpp>
 
 namespace Engine
 {

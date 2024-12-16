@@ -6,10 +6,10 @@
 
 namespace Engine
 {
-    class  VertexArray;
+    class VertexArray;
     struct VertexBufferData;
 
-    class  EXPORT_RENDERER VertexBuffer
+    class EXPORT_RENDERER VertexBuffer
     {
     public:
         static VertexBuffer Create(VertexArray* va, const VertexLayout& layout, float* data, uint32_t length);

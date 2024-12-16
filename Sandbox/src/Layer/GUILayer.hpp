@@ -42,7 +42,17 @@ public:
 
     void End() override {}
 
+    std::string_view GetName() override { return m_Name; }
+
+    std::string_view GetName() const override { return m_Name; }
+
+    bool ShouldExit() override { return m_ShouldExit; }
+
+    void SetShouldExit(bool value) override { m_ShouldExit = value; }
+
 protected:
+    std::string m_Name;
+    bool m_ShouldExit = false;
     double m_DeltaTime = 0.0f;
 
     ViewportSize m_ViewportSize;

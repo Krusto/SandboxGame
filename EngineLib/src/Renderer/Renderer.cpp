@@ -26,7 +26,7 @@ namespace Engine
         if (s_RendererAPI) s_RendererAPI->ChangeDepthFunction(depthFunction);
     }
 
-    void Renderer::SubmitRenderIndexed(VertexArray* vertexArray, uint32_t indexCount)
+    void Renderer::SubmitRenderIndexed(VertexArray vertexArray, uint32_t indexCount)
     {
         if (s_RendererAPI)
         {
@@ -34,7 +34,7 @@ namespace Engine
         }
     }
 
-    void Renderer::RenderIndexed(const VertexArray* vertexArray, uint32_t indexCount)
+    void Renderer::RenderIndexed(VertexArray vertexArray, uint32_t indexCount)
     {
         if (s_RendererAPI) { s_RendererAPI->RenderIndexed(vertexArray, indexCount); }
     }

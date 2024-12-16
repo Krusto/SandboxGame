@@ -14,28 +14,25 @@ namespace Engine
         MapCoherent,
         ClientStorage
     };
+    struct StorageBufferData;
 
     class EXPORT_RENDERER StorageBuffer
     {
     public:
-        static StorageBuffer* Create(uint8_t* data, size_t size, StorageBufferType type);
+        StorageBuffer() = default;
+        ~StorageBuffer() = default;
 
     public:
-        virtual ~StorageBuffer() = default;
+        static StorageBuffer Create(uint8_t* data, size_t size, StorageBufferType type);
 
     public:
-        virtual void Init(uint8_t* data, size_t size, StorageBufferType type) = 0;
+        void Init(uint8_t* data, size_t size, StorageBufferType type);
+        void Bind(size_t location) const;
+        void Unbind() const;
+        void Destroy();
+        uint32_t id() const;
 
-        virtual void Bind(size_t location) const = 0;
-
-        virtual void Unbind() const = 0;
-
-        virtual void Destroy() = 0;
-
-    public:
-        uint32_t id() const { return m_ID; }
-
-    protected:
-        uint32_t m_ID{};
+    private:
+        StorageBufferData* m_Data{};
     };
 }// namespace Engine

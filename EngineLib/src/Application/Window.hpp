@@ -8,7 +8,7 @@
 #include <Application/ApplicationSpec.hpp>
 #include <Core/Log.hpp>
 #include <Core/Ref.hpp>
-#include <Renderer/Viewport.hpp>
+#include <Renderer/Renderer.hpp>
 #include <Layer/LayerStack.hpp>
 #include <Util/Version.hpp>
 

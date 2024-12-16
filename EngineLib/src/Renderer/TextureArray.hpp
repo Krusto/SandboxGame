@@ -2,7 +2,6 @@
 
 #include <string>
 #include <Core/Core.hpp>
-#include <Core/Ref.hpp>
 #include <Renderer/Predefines.hpp>
 
 namespace Engine
@@ -14,26 +13,30 @@ namespace Engine
         int32_t Height;
         int32_t Channels;
     };
+    struct TextureArrayData;
 
     class EXPORT_RENDERER TextureArray
     {
     public:
         TextureArray() = default;
-        virtual ~TextureArray() = default;
-
-        static TextureArray* Create();
+        ~TextureArray() = default;
 
     public:
-        virtual void Load(std::string_view arrayName, std::initializer_list<std::string> Path) = 0;
-        virtual void Load(std::string_view arrayName, const std::unordered_map<uint32_t, std::string>& Path) = 0;
-        virtual void Bind(uint32_t slot = 0) const = 0;
-        virtual void Destroy() = 0;
+        static TextureArray Create();
 
-    public:
-        virtual std::string_view GetName() const = 0;
-        virtual uint32_t ID() const = 0;
-        virtual uint32_t Width() const = 0;
-        virtual uint32_t Height() const = 0;
-        virtual uint32_t Channels() const = 0;
+        void Load(std::string_view arrayName, std::initializer_list<std::string> Path);
+        void Load(std::string_view arrayName, const std::unordered_map<uint32_t, std::string>& Path);
+        void Bind(uint32_t slot = 0) const;
+        void Destroy();
+        std::string_view GetName() const;
+        uint32_t ID() const;
+        uint32_t Width() const;
+        uint32_t Height() const;
+        uint32_t Channels() const;
+
+        bool IsValid() const { return m_Data != nullptr; }
+
+    private:
+        TextureArrayData* m_Data{};
     };
 }// namespace Engine

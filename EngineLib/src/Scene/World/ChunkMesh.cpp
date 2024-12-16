@@ -26,11 +26,11 @@ namespace Engine
         if (mesh->m_Mesh.vertices.size() != 0)
         {
             mesh->m_VertexArray = Engine::VertexArray::Create(mesh->m_Mesh.indices.size());
-            mesh->m_VertexArray->Bind();
-            // mesh->m_VertexArray->AddVertexBuffer(VoxelVertex::GetLayout(), (float*) mesh->m_Mesh.vertices.data(),
+            mesh->m_VertexArray.Bind();
+            // mesh->m_VertexArray.AddVertexBuffer(VoxelVertex::GetLayout(), (float*) mesh->m_Mesh.vertices.data(),
             //                                      mesh->m_Mesh.vertices.size());
 
-            mesh->m_VertexArray->AddIndexBuffer(mesh->m_Mesh.indices.data(), mesh->m_Mesh.indices.size());
+            mesh->m_VertexArray.AddIndexBuffer(mesh->m_Mesh.indices.data(), mesh->m_Mesh.indices.size());
 
             mesh->m_BlocksBuffer = Engine::StorageBuffer::Create(mesh->m_Mesh.blocks.data(), mesh->m_Mesh.blocks.size(),
                                                                  StorageBufferType::MapCoherent);
@@ -219,16 +219,11 @@ namespace Engine
 
     void ChunkMesh::Destroy()
     {
-        if (m_VertexArray != nullptr)
+        if (m_VertexArray.IsValid())
         {
-            m_VertexArray->Destroy();
-            m_BlocksBuffer->Destroy();
-            Engine::Allocator::Deallocate(m_VertexArray);
-            Engine::Allocator::Deallocate(m_QuadsBuffer);
-            Engine::Allocator::Deallocate(m_BlocksBuffer);
-            m_VertexArray = nullptr;
-            m_QuadsBuffer = nullptr;
-            m_BlocksBuffer = nullptr;
+            m_VertexArray.Destroy();
+            m_BlocksBuffer.Destroy();
+            m_QuadsBuffer.Destroy();
         }
     }
 }// namespace Engine

@@ -31,7 +31,7 @@ namespace Engine
 
     private:
         TerrainGenerationSettings m_Settings;
-        Engine::TextureArray* m_BlockTextures;
+        Engine::TextureArray m_BlockTextures;
 
         ChunkFactory m_ChunkFactory;
 

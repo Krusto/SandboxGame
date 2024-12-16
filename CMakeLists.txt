@@ -92,13 +92,11 @@ add_library(SandboxWorld STATIC ${SANDBOX_WORLD_SOURCE_FILES} ${SANDBOX_WORLD_HE
 add_library(CUtils INTERFACE)
 target_include_directories(CUtils INTERFACE ${CUTILS_INCLDUE_DIR})
 
-
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_compile_options(EngineLib PRIVATE -static-libstdc++)
     target_compile_options(EngineLib PRIVATE -Wall)
     target_compile_options(EngineLib PRIVATE -pedantic)
     target_compile_options(CUtils INTERFACE -Wno-fPermissive)
-
 endif()
 
 if(MSVC AND ${BUILD_LIB_FLAG} STREQUAL "SHARED")

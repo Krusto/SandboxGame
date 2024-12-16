@@ -1,6 +1,5 @@
 #pragma once
-#include <Renderer/ShaderUniform.hpp>
-#include <Renderer/ShaderDataType.hpp>
+#include <Renderer/Renderer.hpp>
 #include <Renderer/Predefines.hpp>
 
 #include <string_view>

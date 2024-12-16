@@ -7,12 +7,12 @@
 #include <string_view>
 
 #include <Core/Core.hpp>
-#include "ShaderDataType.hpp"
+#include "Renderer/Predefines.hpp"
+#include "ShaderUniform.hpp"
 
 namespace Engine
 {
     struct VertexAttribute {
-    public:
         std::string_view name{};
         ShaderUniformType type;
         uint32_t offset{};
