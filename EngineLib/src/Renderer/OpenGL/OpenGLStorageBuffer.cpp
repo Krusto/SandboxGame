@@ -1,13 +1,15 @@
 #include <glad/glad.h>
 #include <cassert>
+#include <Core/Allocator.hpp>
+#include <Renderer/StorageBuffer.hpp>
 #include "OpenGLStorageBuffer.hpp"
 
 namespace Engine
 {
 
-
-    void OpenGLStorageBuffer::Init(uint8_t* data, size_t size, StorageBufferType type)
+    void StorageBuffer::Init(uint8_t* data, size_t size, StorageBufferType type)
     {
+        if (m_Data == nullptr) { m_Data = Engine::Allocator::Allocate<StorageBufferData>(); }
         GLenum usage{};
         switch (type)
         {
@@ -33,24 +35,31 @@ namespace Engine
                 break;
         }
 
-        glGenBuffers(1, &m_ID);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_ID);
+        glGenBuffers(1, &m_Data->id);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_Data->id);
         glBufferData(GL_SHADER_STORAGE_BUFFER, size, data, GL_STATIC_DRAW);
 
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     }
 
-    void OpenGLStorageBuffer::Bind(size_t location) const
+    void StorageBuffer::Bind(size_t location) const
     {
-        assert(m_ID != 0);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, location, m_ID);
+        assert(m_Data->id != 0);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, location, m_Data->id);
     }
 
-    void OpenGLStorageBuffer::Unbind() const { glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0); }
+    void StorageBuffer::Unbind() const { glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0); }
 
-    void OpenGLStorageBuffer::Destroy()
+    void StorageBuffer::Destroy()
     {
-        if (m_ID != 0) { glDeleteBuffers(1, &m_ID); }
+        if (m_Data)
+        {
+            glDeleteBuffers(1, &m_Data->id);
+            Allocator::Deallocate(m_Data);
+            m_Data = nullptr;
+        }
     }
+
+    uint32_t StorageBuffer::id() const { return m_Data->id; }
 
 }// namespace Engine

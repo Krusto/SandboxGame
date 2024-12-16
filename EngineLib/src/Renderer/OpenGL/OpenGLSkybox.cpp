@@ -42,9 +42,9 @@ namespace Engine
 
         VertexLayout layout({{"Position", ShaderUniformType::Vec3}});
 
-        m_Data->m_VertexArray->Bind();
-        m_Data->m_VertexArray->AddVertexBuffer(layout, (float*) skyboxVertices, 8);
-        m_Data->m_VertexArray->AddIndexBuffer(skyboxIndices, 36);
+        m_Data->m_VertexArray.Bind();
+        m_Data->m_VertexArray.AddVertexBuffer(layout, (float*) skyboxVertices, 8);
+        m_Data->m_VertexArray.AddIndexBuffer(skyboxIndices, 36);
     }
 
     void Skybox::Destroy()
@@ -62,11 +62,9 @@ namespace Engine
             Allocator::Deallocate(m_Data->m_Shader);
             m_Data->m_Shader = nullptr;
         }
-        if (m_Data->m_VertexArray)
+        if (m_Data->m_VertexArray.IsValid())
         {
-            m_Data->m_VertexArray->Destroy();
-            Allocator::Deallocate(m_Data->m_VertexArray);
-            m_Data->m_VertexArray = nullptr;
+            m_Data->m_VertexArray.Destroy();
         }
         Allocator::Deallocate(m_Data);
         m_Data = nullptr;
@@ -94,8 +92,8 @@ namespace Engine
             shader->SetUniform("camera.view", view);
 
             cubemap->Bind(0);
-            va->Bind();
-            Renderer::RenderIndexed(va, va->IndexCount);
+            va.Bind();
+            Renderer::RenderIndexed(va);
             Renderer::ChangeDepthFunction(DepthFunction::Less);
         });
     }

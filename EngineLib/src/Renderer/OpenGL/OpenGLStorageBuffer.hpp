@@ -4,20 +4,8 @@
 
 namespace Engine
 {
-
-    class OpenGLStorageBuffer: public StorageBuffer
-    {
-    public:
-        OpenGLStorageBuffer() = default;
-        ~OpenGLStorageBuffer() = default;
-
-    public:
-        void Init(uint8_t* data, size_t size, StorageBufferType type) override;
-
-        void Bind(size_t location) const override;
-
-        void Unbind() const override;
-
-        void Destroy() override;
+    struct StorageBufferData {
+        uint32_t id;
+        StorageBufferType type;
     };
 }// namespace Engine

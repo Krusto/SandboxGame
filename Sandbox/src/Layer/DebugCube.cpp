@@ -34,29 +34,24 @@ void DebugCube::Init()
             {{"Position", Engine::ShaderUniformType::Vec3}, {"TexCoord", Engine::ShaderUniformType::Vec2}});
 
     m_VertexArray = Engine::VertexArray::Create(36);
-    m_VertexArray->Bind();
-    m_VertexArray->AddVertexBuffer(layout, (float*) vertices, sizeof(vertices) / sizeof(float));
-    m_VertexArray->AddIndexBuffer(indices, 36);
+    m_VertexArray.Bind();
+    m_VertexArray.AddVertexBuffer(layout, (float*) vertices, sizeof(vertices) / sizeof(float));
+    m_VertexArray.AddIndexBuffer(indices, 36);
 }
 
 void DebugCube::Destroy()
 {
-    if (m_VertexArray)
-    {
-        m_VertexArray->Destroy();
-        Engine::Allocator::Deallocate(m_VertexArray);
-        m_VertexArray = nullptr;
-    }
+    m_VertexArray.Destroy();
 }
 
 Engine::RendererCommand DebugCube::Render(Engine::Shader* shader) const
 {
     return Engine::RendererCommand([=]() {
         shader->Bind();
-        m_VertexArray->Bind();
+        m_VertexArray.Bind();
         glm::mat4 model = glm::translate(glm::mat4(1.0f), position + glm::vec3(0.5, 0.5, 0.5));
         model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
         shader->SetUniform("model", model);
-        Engine::Renderer::RenderIndexed(m_VertexArray, m_VertexArray->IndexCount);
+        Engine::Renderer::RenderIndexed(m_VertexArray);
     });
 }

@@ -1,8 +1,6 @@
 #pragma once
 #include <vector>
 #include <array>
-#include <Renderer/VertexArray.hpp>
-#include <Renderer/StorageBuffer.hpp>
 #include <Renderer/Renderer.hpp>
 
 #include "BlockRegistry.hpp"
@@ -32,11 +30,11 @@ namespace Engine
         void Destroy();
         void Generate(const BlockData* blockData);
 
-        const Engine::VertexArray* GetVertexArray() const { return m_VertexArray; }
+        const Engine::VertexArray GetVertexArray() const { return m_VertexArray; }
 
-        const Engine::StorageBuffer* GetBlocksBuffer() const { return m_BlocksBuffer; }
+        const Engine::StorageBuffer* GetBlocksBuffer() const { return &m_BlocksBuffer; }
 
-        const Engine::StorageBuffer* GetQuadsBuffer() const { return m_QuadsBuffer; }
+        const Engine::StorageBuffer* GetQuadsBuffer() const { return &m_QuadsBuffer; }
 
         static void UploadData(ChunkMesh* mesh);
 
@@ -60,8 +58,8 @@ namespace Engine
     private:
         ChunkMeshRaw m_Mesh{};
 
-        VertexArray* m_VertexArray{};
-        StorageBuffer* m_QuadsBuffer{};
-        StorageBuffer* m_BlocksBuffer{};
+        VertexArray m_VertexArray{};
+        StorageBuffer m_QuadsBuffer{};
+        StorageBuffer m_BlocksBuffer{};
     };
 }// namespace Engine

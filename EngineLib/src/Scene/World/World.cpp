@@ -1,6 +1,5 @@
 #include "World.hpp"
 #include <Renderer/Renderer.hpp>
-#include <Renderer/RendererCommand.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/hash.hpp>
 #include <glm/gtx/string_cast.hpp>
@@ -17,7 +16,7 @@ namespace Engine
         for (auto& path: texturePaths) { path.second.insert(0, texturesDirectory.string() + "/"); }
 
         m_BlockTextures = TextureArray::Create();
-        m_BlockTextures->Load("BlockTextures", texturePaths);
+        m_BlockTextures.Load("BlockTextures", texturePaths);
 
         ChunkFactory::Init(settings);
     }
@@ -26,12 +25,7 @@ namespace Engine
     {
         for (auto& [pos, chunk]: m_Chunks) { m_ChunkFactory.DestroyChunk(chunk); }
         BlockRegistry::Destroy();
-        if (m_BlockTextures)
-        {
-            m_BlockTextures->Destroy();
-            Allocator::Deallocate(m_BlockTextures);
-            m_BlockTextures = nullptr;
-        }
+        m_BlockTextures.Destroy();
     }
 
     void World::OnUpdate(double dt)
@@ -54,7 +48,7 @@ namespace Engine
     RendererCommand World::RenderWorldCommand(Shader* shader, glm::vec3 cameraPos) const
     {
         return RendererCommand([shader, cameraPos, this]() {
-            m_BlockTextures->Bind();
+            m_BlockTextures.Bind();
             constexpr auto renderDistance = 15;
             glm::ivec3 chunkPos =
                     glm::ivec3(cameraPos.x / CHUNK_SIZE, cameraPos.y / CHUNK_SIZE, cameraPos.z / CHUNK_SIZE);
@@ -66,16 +60,16 @@ namespace Engine
                 if (dist2 > renderDistance * renderDistance) { continue; }
 
                 auto& mesh = chunk.mesh;
-                if (mesh->GetVertexArray() != nullptr)
+                if (mesh->GetVertexArray().IsValid())
                 {
                     mesh->GetBlocksBuffer()->Bind(3);
                     mesh->GetQuadsBuffer()->Bind(4);
                     glm::mat4 model(1.0);
                     shader->SetUniform("model", model);
                     shader->SetUniform("offset", glm::vec3{pos.x * CHUNK_SIZE, pos.y * CHUNK_SIZE, pos.z * CHUNK_SIZE});
-                    mesh->GetVertexArray()->Bind();
-                    Engine::Renderer::RenderIndexed(mesh->GetVertexArray(), mesh->GetVertexArray()->IndexCount);
-                    mesh->GetVertexArray()->Unbind();
+                    mesh->GetVertexArray().Bind();
+                    Engine::Renderer::RenderIndexed(mesh->GetVertexArray());
+                    mesh->GetVertexArray().Unbind();
                 }
             }
         });

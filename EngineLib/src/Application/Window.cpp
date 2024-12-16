@@ -1,6 +1,5 @@
 #include "Window.hpp"
 
-#include <Renderer/GraphicsContext.hpp>
 #include <Renderer/Renderer.hpp>
 
 #include <Core/Log.hpp>

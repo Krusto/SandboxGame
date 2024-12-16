@@ -1,6 +1,0 @@
-#include "Renderer.hpp"
-
-namespace Engine
-{
-
-}// namespace Engine

@@ -1,5 +1,7 @@
 #include <Renderer/RendererAPI.hpp>
 #include <Application/ApplicationSpec.hpp>
+#include <glad/glad.h>
+
 namespace Engine
 {
     void RendererAPI::ClearColor(glm::vec4 color)
@@ -24,10 +26,11 @@ namespace Engine
 
     void RendererAPI::BindDefaultFramebuffer() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 
-    void RendererAPI::RenderIndexed(const VertexArray* vertexArray, uint32_t indexCount) const
+    void RendererAPI::RenderIndexed(VertexArray vertexArray, uint32_t indexCount) const
     {
-        vertexArray->Bind();
-        glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
+        vertexArray.Bind();
+        glDrawElements(GL_TRIANGLES, (indexCount == 0) ? vertexArray.IndexCount() : indexCount, GL_UNSIGNED_INT,
+                       nullptr);
     };
 
     void RendererAPI::ChangeDepthFunction(DepthFunction depthFunction)

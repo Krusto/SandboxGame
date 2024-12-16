@@ -33,26 +33,21 @@ void LightObject::Init()
     Engine::VertexLayout layout({{"Position", Engine::ShaderUniformType::Vec3}});
 
     m_VertexArray = Engine::VertexArray::Create(36);
-    m_VertexArray->Bind();
-    m_VertexArray->AddVertexBuffer(layout, (float*) vertices, sizeof(vertices) / sizeof(float));
-    m_VertexArray->AddIndexBuffer(indices, 36);
+    m_VertexArray.Bind();
+    m_VertexArray.AddVertexBuffer(layout, (float*) vertices, sizeof(vertices) / sizeof(float));
+    m_VertexArray.AddIndexBuffer(indices, 36);
 }
 
 void LightObject::Destroy()
 {
-    if (m_VertexArray)
-    {
-        m_VertexArray->Destroy();
-        Engine::Allocator::Deallocate(m_VertexArray);
-        m_VertexArray = nullptr;
-    }
+    m_VertexArray.Destroy();
 }
 
 Engine::RendererCommand LightObject::Render(Engine::Shader* shader) const
 {
     return Engine::RendererCommand([=]() {
         shader->Bind();
-        m_VertexArray->Bind();
+        m_VertexArray.Bind();
         glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
         model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
         model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));

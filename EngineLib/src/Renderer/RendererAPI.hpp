@@ -2,11 +2,12 @@
 // Created by Stoyanov, Krusto (K.S.) on 6/7/2022.
 //
 #pragma once
-
-#include "Viewport.hpp"
-#include "Renderer.hpp"
-#include "DepthFunction.hpp"
+#include <glm/glm.hpp>
 #include <Renderer/Predefines.hpp>
+#include "Viewport.hpp"
+#include "RendererSpec.hpp"
+#include "DepthFunction.hpp"
+#include "VertexArray.hpp"
 
 namespace Engine
 {
@@ -28,7 +29,7 @@ namespace Engine
         void SwitchMode(uint32_t mode);
         void SetViewport(ViewportSize size);
         void BindDefaultFramebuffer() const;
-        void RenderIndexed(const VertexArray* vertexArray, uint32_t indexCount) const;
+        void RenderIndexed(VertexArray vertexArray, uint32_t indexCount) const;
         void ChangeDepthFunction(DepthFunction depthFunction);
     };
 }// namespace Engine

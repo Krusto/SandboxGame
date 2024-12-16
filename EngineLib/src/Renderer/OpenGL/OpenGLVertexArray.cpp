@@ -1,5 +1,6 @@
 #include <glad/glad.h>
 #include <cassert>
+#include "Renderer/VertexArray.hpp"
 #include "OpenGLVertexArray.hpp"
 #include <Renderer/VertexBuffer.hpp>
 #include <Renderer/IndexBuffer.hpp>
@@ -7,42 +8,51 @@
 namespace Engine
 {
 
-    void OpenGLVertexArray::Init(uint32_t indexCount)
+    void VertexArray::Init(uint32_t indexCount)
     {
-        glCreateVertexArrays(1, &m_ID);
-        this->IndexCount = indexCount;
+        if (m_Data == nullptr) { m_Data = Engine::Allocator::Allocate<VertexArrayData>(); }
+        glCreateVertexArrays(1, &m_Data->id);
+        m_Data->indexCount = indexCount;
     }
 
-    void OpenGLVertexArray::Bind() const
+    void VertexArray::Bind() const
     {
-        assert(m_ID != 0);
-        glBindVertexArray(m_ID);
+        assert(m_Data->id != 0);
+        glBindVertexArray(m_Data->id);
     }
 
-    void OpenGLVertexArray::Unbind() const { glBindVertexArray(0); }
+    void VertexArray::Unbind() const { glBindVertexArray(0); }
 
-    void OpenGLVertexArray::Destroy()
+    void VertexArray::Destroy()
     {
-        if (m_ID != 0)
+        if (m_Data)
         {
-            glDeleteVertexArrays(1, &m_ID);
-            m_VertexBuffer.Destroy();
-            m_IndexBuffer.Destroy();
+            if (m_Data->id != 0)
+            {
+                glDeleteVertexArrays(1, &m_Data->id);
+                m_Data->vertexBuffer.Destroy();
+                m_Data->indexBuffer.Destroy();
+            }
+            Allocator::Deallocate(m_Data);
+            m_Data = nullptr;
         }
     }
 
-    void OpenGLVertexArray::AddVertexBuffer(const VertexLayout& layout, float* data, uint32_t length)
+    void VertexArray::AddVertexBuffer(const VertexLayout& layout, float* data, uint32_t length)
     {
         Bind();
-        m_VertexBuffer = VertexBuffer::Create(this, layout, data, length);
-        glVertexArrayVertexBuffer(m_ID, 0, m_VertexBuffer.GetID(), 0, layout.stride);
+        m_Data->vertexBuffer = VertexBuffer::Create(this, layout, data, length);
+        glVertexArrayVertexBuffer(m_Data->id, 0, m_Data->vertexBuffer.GetID(), 0, layout.stride);
     }
 
-    void OpenGLVertexArray::AddIndexBuffer(const uint32_t* data, uint32_t length)
+    void VertexArray::AddIndexBuffer(const uint32_t* data, uint32_t length)
     {
         Bind();
-        m_IndexBuffer = IndexBuffer::Create(this, data, length);
-        glVertexArrayElementBuffer(m_ID, m_IndexBuffer.GetID());
+        m_Data->indexBuffer = IndexBuffer::Create(this, data, length);
+        glVertexArrayElementBuffer(m_Data->id, m_Data->indexBuffer.GetID());
     }
 
+    uint32_t VertexArray::IndexCount() const { return m_Data->indexCount; }
+
+    uint32_t VertexArray::id() const { return m_Data->id; }
 }// namespace Engine

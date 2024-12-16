@@ -10,17 +10,15 @@ void Hitbox::Init()
                           12, 13, 14, 12, 14, 15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23};
 
     m_VertexArray = Engine::VertexArray::Create(36);
-    m_VertexArray->Bind();
-    m_VertexArray->AddIndexBuffer(indices, 36);
+    m_VertexArray.Bind();
+    m_VertexArray.AddIndexBuffer(indices, 36);
 }
 
 void Hitbox::Destroy()
 {
-    if (m_VertexArray)
+    if (m_VertexArray.IsValid())
     {
-        m_VertexArray->Destroy();
-        Engine::Allocator::Deallocate(m_VertexArray);
-        m_VertexArray = nullptr;
+        m_VertexArray.Destroy();
     }
 }
 
@@ -30,7 +28,7 @@ Engine::RendererCommand Hitbox::Render(Engine::Shader* shader, float dt, uint32_
         shader->Bind();
         shader->SetUniform("axis", axis);
         shader->SetUniform("delta", dt);
-        m_VertexArray->Bind();
+        m_VertexArray.Bind();
         glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
         shader->SetUniform("model", model);
         Engine::Renderer::RenderIndexed(m_VertexArray, 36);

@@ -9,27 +9,31 @@
 
 #include <glm/vec4.hpp>
 
-#include "Viewport.hpp"
-#include "Shader.hpp"
 #include "Camera.hpp"
-#include "TextureArray.hpp"
 #include "CubemapTexture.hpp"
-#include "Skybox.hpp"
-#include "Framebuffer.hpp"
-#include "VertexArray.hpp"
 #include "DepthFunction.hpp"
-
-#include <Renderer/GraphicsContext.hpp>
-#include <Renderer/RendererCommand.hpp>
-#include <Renderer/Predefines.hpp>
+#include "Framebuffer.hpp"
+#include "GraphicsContext.hpp"
+#include "Image.hpp"
+#include "IndexBuffer.hpp"
+#include "RendererAPI.hpp"
+#include "RendererCommand.hpp"
+#include "Shader.hpp"
+#include "ShaderDataType.hpp"
+#include "ShaderUniform.hpp"
+#include "Skybox.hpp"
+#include "StorageBuffer.hpp"
+#include "TextureArray.hpp"
+#include "Vertex.hpp"
+#include "VertexBuffer.hpp"
+#include "VertexArray.hpp"
+#include "VertexLayout.hpp"
+#include "Viewport.hpp"
+#include "RendererSpec.hpp"
+#include "Predefines.hpp"
 
 namespace Engine
 {
-
-    struct RendererSpec {
-        ViewportSize SurfaceSize;
-        std::vector<const char*> extensions;
-    };
 
     class Entity;
     class RendererAPI;
@@ -54,8 +58,8 @@ namespace Engine
         static void SwitchFillMode();
         static void ChangeDepthFunction(DepthFunction depthFunction);
 
-        static void RenderIndexed(const VertexArray* vertexArray, uint32_t indexCount = 0);
-        static void SubmitRenderIndexed(VertexArray* vertexArray, uint32_t indexCount = 0);
+        static void RenderIndexed(VertexArray vertexArray, uint32_t indexCount = 0);
+        static void SubmitRenderIndexed(VertexArray vertexArray, uint32_t indexCount = 0);
 
         static void Submit(RendererCommand command);
 
@@ -67,5 +71,3 @@ namespace Engine
         inline static RendererSpec s_RendererSpec{};
     };
 }// namespace Engine
-
-#include <Renderer/Renderer.impl>

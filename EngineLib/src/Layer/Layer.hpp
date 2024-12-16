@@ -48,17 +48,12 @@ namespace Engine
 
         virtual void End() = 0;
 
-    public:
-        std::string_view GetName();
+        virtual std::string_view GetName() = 0;
 
-        std::string_view GetName() const;
+        virtual std::string_view GetName() const = 0;
 
-        bool ShouldExit();
+        virtual bool ShouldExit() = 0;
 
-        void SetShouldExit(bool value);
-
-    protected:
-        bool m_ShouldExit{};
-        std::string_view m_Name{};
+        virtual void SetShouldExit(bool value) = 0;
     };
 }// namespace Engine

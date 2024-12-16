@@ -29,8 +29,8 @@ void SandboxLayer::Init(Engine::Window* window)
     m_DepthFramebuffer = Engine::Framebuffer::Create(3000, 3000, true);
     m_DebugFramebuffer = Engine::Framebuffer::Create(3000, 3000);
 
-    m_Shader = Ref<Engine::Shader>(Engine::Shader::Load(worldShaderPath));
-    m_DepthBufferShader = Ref<Engine::Shader>(Engine::Shader::Load(depthShaderPath));
+    m_Shader = Engine::Shader::Load(worldShaderPath);
+    m_DepthBufferShader = Engine::Shader::Load(depthShaderPath);
 
     std::string skyboxName = "skybox_day";
     std::unordered_map<Engine::CubemapTextureFace, std::string> faces = {
@@ -60,8 +60,8 @@ void SandboxLayer::Init(Engine::Window* window)
 
     std::string cubeShaderPath = m_ShadersDirectory.string() + "/Cube";
 
-    m_CubeShader = Ref<Engine::Shader>(Engine::Shader::Load(cubeShaderPath));
-    m_LightShader = Ref<Engine::Shader>(Engine::Shader::Load(lightShaderPath));
+    m_CubeShader = Engine::Shader::Load(cubeShaderPath);
+    m_LightShader = Engine::Shader::Load(lightShaderPath);
 
     m_Light = Engine::Allocator::Allocate<LightObject>();
     m_Light->Init();
@@ -83,12 +83,12 @@ void SandboxLayer::Init(Engine::Window* window)
             Engine::VertexLayout({Engine::VertexAttribute{"Position", Engine::ShaderUniformType::Vec3},
                                   Engine::VertexAttribute{"TextureCoord", Engine::ShaderUniformType::Vec2}});
 
-    m_DepthBufferVA->AddVertexBuffer(layout, vertices, length);
+    m_DepthBufferVA.AddVertexBuffer(layout, vertices, length);
 
     uint32_t indices[] = {0, 1, 2, 0, 2, 3};
-    m_DepthBufferVA->AddIndexBuffer(indices, 6);
+    m_DepthBufferVA.AddIndexBuffer(indices, 6);
 
-    m_DebugShader = Ref<Engine::Shader>(Engine::Shader::Load(m_ShadersDirectory.string() + "/Debug"));
+    m_DebugShader = Engine::Shader::Load(m_ShadersDirectory.string() + "/Debug");
 
 
     glm::ivec3 currentChunkPos = glm::ivec3(0, 0, 0);
@@ -111,7 +111,7 @@ void SandboxLayer::Init(Engine::Window* window)
         }
     }
 
-    m_HitboxShader = Ref<Engine::Shader>(Engine::Shader::Load(hitboxShaderPath));
+    m_HitboxShader = Engine::Shader::Load(hitboxShaderPath);
     m_DebugCube = Engine::Allocator::Allocate<Hitbox>();
     m_DebugCube->Init();
 }
@@ -124,11 +124,27 @@ void SandboxLayer::Destroy()
 {
     m_World->Destroy();
     m_Shader->Destroy();
+    Engine::Allocator::Deallocate(m_Shader);
+    m_Shader = nullptr;
     m_DepthBufferShader->Destroy();
+    Engine::Allocator::Deallocate(m_DepthBufferShader);
+    m_DepthBufferShader = nullptr;
+
     m_CubeShader->Destroy();
+    Engine::Allocator::Deallocate(m_CubeShader);
+    m_CubeShader = nullptr;
+
     m_LightShader->Destroy();
+    Engine::Allocator::Deallocate(m_LightShader);
+    m_LightShader = nullptr;
+
     m_DebugShader->Destroy();
+    Engine::Allocator::Deallocate(m_DebugShader);
+    m_DebugShader = nullptr;
+
     m_HitboxShader->Destroy();
+    Engine::Allocator::Deallocate(m_HitboxShader);
+    m_HitboxShader = nullptr;
 
     m_Skybox.Destroy();
 
@@ -147,9 +163,7 @@ void SandboxLayer::Destroy()
     Engine::Allocator::Deallocate(m_DebugFramebuffer);
     m_DebugFramebuffer = nullptr;
 
-    m_DepthBufferVA->Destroy();
-    Engine::Allocator::Deallocate(m_DepthBufferVA);
-    m_DepthBufferVA = nullptr;
+    m_DepthBufferVA.Destroy();
 
     m_DebugCube->Destroy();
     Engine::Allocator::Deallocate(m_DebugCube);
@@ -171,17 +185,17 @@ void SandboxLayer::RenderWorld()
     Renderer::Submit(m_Shader->BindCommand());
     Renderer::Submit(m_Skybox.BindTexture(1));
 
-    Renderer::Submit(m_Camera.UploadCommand(m_Shader.Raw()));
+    Renderer::Submit(m_Camera.UploadCommand(m_Shader));
 
-    Renderer::Submit(m_Light->UploadLight(m_Shader.Raw()));
+    Renderer::Submit(m_Light->UploadLight(m_Shader));
     Renderer::Submit(RendererCommand([=]() { m_Shader->SetUniform("light.shininess", (float) m_WorldShininess); }));
 
-    Renderer::Submit(m_World->RenderWorldCommand(m_Shader.Raw(), m_Camera.GetPosition()));
+    Renderer::Submit(m_World->RenderWorldCommand(m_Shader, m_Camera.GetPosition()));
 
     //Render light debug object
     Renderer::Submit(m_LightShader->BindCommand());
-    Renderer::Submit(m_Camera.UploadCommand(m_LightShader.Raw()));
-    Renderer::Submit(m_Light->Render(m_LightShader.Raw()));
+    Renderer::Submit(m_Camera.UploadCommand(m_LightShader));
+    Renderer::Submit(m_Light->Render(m_LightShader));
 }
 
 void SandboxLayer::RenderDepthWorld()
@@ -202,7 +216,7 @@ void SandboxLayer::RenderDepthWorld()
         m_DepthBufferShader->SetUniform("lightSpaceMatrix", lightMatrix);
     }));
 
-    Engine::Renderer::Submit(m_World->RenderWorldCommand(m_DepthBufferShader.Raw(), m_Light->position));
+    Engine::Renderer::Submit(m_World->RenderWorldCommand(m_DepthBufferShader, m_Light->position));
 
     Engine::Renderer::Submit(Engine::RendererCommand([=]() { m_DebugFramebuffer->Bind(); }));
     Engine::Renderer::SetViewport({m_DebugFramebuffer->width(), m_DebugFramebuffer->height()});
@@ -325,8 +339,8 @@ void SandboxLayer::OnUpdate(double dt)
 
         //Render debug cube object
         Engine::Renderer::Submit(m_HitboxShader->BindCommand());
-        Engine::Renderer::Submit(m_Camera.UploadCommand(m_HitboxShader.Raw()));
-        Engine::Renderer::Submit(m_DebugCube->Render(m_HitboxShader.Raw(), m_PassedTime, axis));
+        Engine::Renderer::Submit(m_Camera.UploadCommand(m_HitboxShader));
+        Engine::Renderer::Submit(m_DebugCube->Render(m_HitboxShader, m_PassedTime, axis));
     }
 
     Engine::Renderer::BindDefaultFramebuffer();

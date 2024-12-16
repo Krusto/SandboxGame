@@ -45,22 +45,32 @@ public:
 
     void End() override {}
 
+    std::string_view GetName() override { return m_Name; }
+
+    std::string_view GetName() const override { return m_Name; }
+
+    bool ShouldExit() override { return m_ShouldExit; }
+
+    void SetShouldExit(bool value) override { m_ShouldExit = value; }
+
     void RenderWorld();
     void RenderDepthWorld();
 
-protected:
+private:
+    std::string m_Name;
+    bool m_ShouldExit = false;
     Engine::Window* m_Window;
-    Ref<Engine::Shader> m_Shader;
-    Ref<Engine::Shader> m_CubeShader;
-    Ref<Engine::Shader> m_LightShader;
-    Ref<Engine::Shader> m_DepthBufferShader;
-    Ref<Engine::Shader> m_DebugShader;
-    Ref<Engine::Shader> m_HitboxShader;
+    Engine::Shader* m_Shader;
+    Engine::Shader* m_CubeShader;
+    Engine::Shader* m_LightShader;
+    Engine::Shader* m_DepthBufferShader;
+    Engine::Shader* m_DebugShader;
+    Engine::Shader* m_HitboxShader;
 
     Engine::Framebuffer* m_Framebuffer;
     Engine::Framebuffer* m_DebugFramebuffer;
     Engine::Framebuffer* m_DepthFramebuffer;
-    Engine::VertexArray* m_DepthBufferVA;
+    Engine::VertexArray m_DepthBufferVA;
     Engine::Skybox m_Skybox{};
 
     LightObject* m_Light;

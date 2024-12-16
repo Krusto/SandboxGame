@@ -6,12 +6,9 @@
 
 #include <glm/glm.hpp>
 
-#include <Core/Ref.hpp>
-
+#include <Renderer/Predefines.hpp>
 #include <Renderer/RendererCommand.hpp>
 #include <Renderer/ShaderUniform.hpp>
-#include <Renderer/ShaderDataType.hpp>
-#include <Renderer/Predefines.hpp>
 
 namespace Engine
 {
@@ -23,39 +20,41 @@ namespace Engine
         Compute,
         Other
     };
+    struct ShaderData;
 
-    class EXPORT_RENDERER Shader: public RefCounted
+    class EXPORT_RENDERER Shader
     {
     public:
-        static Shader* Load(const std::string& path);
+        Shader() = default;
+        ~Shader() = default;
+        static Shader Create(const std::string& path);
 
     public:
-        virtual ~Shader() = default;
-
-        virtual void Destroy() = 0;
-        virtual const std::string& GetName() const = 0;
-        virtual const std::string& GetPath() const = 0;
-        virtual void Reload(bool forceCompile = true) = 0;
-        virtual void Bind() = 0;
-        virtual void Bind() const = 0;
-        virtual uint32_t ID() const = 0;
-        virtual void SetUniform(const std::string& fullname, float value) const = 0;
-        virtual void SetUniform(const std::string& fullname, int value) const = 0;
-        virtual void SetUniform(const std::string& fullname, const glm::ivec2& value) const = 0;
-        virtual void SetUniform(const std::string& fullname, const glm::ivec3& value) const = 0;
-        virtual void SetUniform(const std::string& fullname, const glm::ivec4& value) const = 0;
-        virtual void SetUniform(const std::string& fullname, uint32_t value) const = 0;
-        virtual void SetUniform(const std::string& fullname, const glm::vec2& value) const = 0;
-        virtual void SetUniform(const std::string& fullname, const glm::vec3& value) const = 0;
-        virtual void SetUniform(const std::string& fullname, const glm::vec4& value) const = 0;
-        virtual void SetUniform(const std::string& fullname, const glm::mat3& value) const = 0;
-        virtual void SetUniform(const std::string& fullname, const glm::mat4& value) const = 0;
+        void Load(const std::string& path);
+        void Destroy();
+        const std::string& GetName() const;
+        const std::string& GetPath() const;
+        void Reload(bool forceCompile = true);
+        void Bind();
+        void Bind() const;
+        uint32_t ID() const;
+        void SetUniform(const std::string& fullname, float value) const;
+        void SetUniform(const std::string& fullname, int value) const;
+        void SetUniform(const std::string& fullname, const glm::ivec2& value) const;
+        void SetUniform(const std::string& fullname, const glm::ivec3& value) const;
+        void SetUniform(const std::string& fullname, const glm::ivec4& value) const;
+        void SetUniform(const std::string& fullname, uint32_t value) const;
+        void SetUniform(const std::string& fullname, const glm::vec2& value) const;
+        void SetUniform(const std::string& fullname, const glm::vec3& value) const;
+        void SetUniform(const std::string& fullname, const glm::vec4& value) const;
+        void SetUniform(const std::string& fullname, const glm::mat3& value) const;
+        void SetUniform(const std::string& fullname, const glm::mat4& value) const;
 
     public:
         RendererCommand BindCommand() const;
 
-    public:
-        uint32_t offset = 0;
+    private:
+        ShaderData* m_Data{};
     };
 
 }// namespace Engine

@@ -1,44 +1,32 @@
 #pragma once
 #include <cstdint>
-#include <Core/Ref.hpp>
-#include <Renderer/VertexBuffer.hpp>
-#include <Renderer/IndexBuffer.hpp>
-#include <Renderer/VertexLayout.hpp>
 #include <Renderer/Predefines.hpp>
+#include <Renderer/VertexLayout.hpp>
 
 namespace Engine
 {
+    struct VertexArrayData;
 
-    class EXPORT_RENDERER  VertexArray
+    class EXPORT_RENDERER VertexArray
     {
     public:
-        static VertexArray* Create(uint32_t indexCount);
+        static VertexArray Create(uint32_t indexCount);
 
-    public:
-        virtual ~VertexArray() = default;
+        VertexArray() = default;
+        ~VertexArray() = default;
 
-        virtual void Init(uint32_t indexCount) = 0;
+        void Init(uint32_t indexCount);
+        void Bind() const;
+        void Unbind() const;
+        void Destroy();
+        void AddVertexBuffer(const VertexLayout& layout, float* data, uint32_t length);
+        void AddIndexBuffer(const uint32_t* data, uint32_t length);
+        uint32_t IndexCount() const;
+        uint32_t id() const;
 
-        virtual void Bind() const = 0;
+        bool IsValid() const { return m_Data != nullptr; }
 
-        virtual void Unbind() const = 0;
-
-        virtual void Destroy() = 0;
-
-        virtual void AddVertexBuffer(const VertexLayout& layout, float* data, uint32_t length) = 0;
-
-        virtual void AddIndexBuffer(const uint32_t* data, uint32_t length) = 0;
-
-    public:
-        uint32_t id() const { return m_ID; }
-
-
-    public:
-        uint32_t IndexCount{};
-
-    protected:
-        VertexBuffer m_VertexBuffer{};
-        IndexBuffer m_IndexBuffer{};
-        uint32_t m_ID{};
+    private:
+        VertexArrayData* m_Data{};
     };
 }// namespace Engine

@@ -7,7 +7,7 @@ namespace Engine
 {
     struct SkyboxData {
         CubemapTexture* m_Cubemap{};
-        VertexArray* m_VertexArray{};
+        VertexArray m_VertexArray{};
         Shader* m_Shader{};
         std::string m_CubemapName{};
         const float m_RotationSpeed{0.001f};

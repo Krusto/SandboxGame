@@ -19,5 +19,5 @@ public:
 
 private:
 private:
-    Engine::VertexArray* m_VertexArray;
+    Engine::VertexArray m_VertexArray;
 };
