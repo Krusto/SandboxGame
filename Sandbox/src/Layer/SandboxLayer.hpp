@@ -60,16 +60,16 @@ private:
     std::string m_Name;
     bool m_ShouldExit = false;
     Engine::Window* m_Window;
-    Engine::Shader* m_Shader;
-    Engine::Shader* m_CubeShader;
-    Engine::Shader* m_LightShader;
-    Engine::Shader* m_DepthBufferShader;
-    Engine::Shader* m_DebugShader;
-    Engine::Shader* m_HitboxShader;
+    Engine::Shader m_Shader;
+    Engine::Shader m_CubeShader;
+    Engine::Shader m_LightShader;
+    Engine::Shader m_DepthBufferShader;
+    Engine::Shader m_DebugShader;
+    Engine::Shader m_HitboxShader;
 
-    Engine::Framebuffer* m_Framebuffer;
-    Engine::Framebuffer* m_DebugFramebuffer;
-    Engine::Framebuffer* m_DepthFramebuffer;
+    Engine::Framebuffer m_Framebuffer;
+    Engine::Framebuffer m_DebugFramebuffer;
+    Engine::Framebuffer m_DepthFramebuffer;
     Engine::VertexArray m_DepthBufferVA;
     Engine::Skybox m_Skybox{};
 

@@ -7,13 +7,14 @@
 
 namespace Engine
 {
+    struct FramebufferData;
+
     class EXPORT_RENDERER Framebuffer
     {
     public:
-        virtual ~Framebuffer() = default;
-
-    public:
-        static Framebuffer* Create(uint32_t width, uint32_t height, bool isDepthMap = false);
+        Framebuffer() = default;
+        ~Framebuffer() = default;
+        static Framebuffer Create(uint32_t width, uint32_t height, bool isDepthMap = false);
 
     public:
         RendererCommand BindCommand() const;
@@ -23,32 +24,23 @@ namespace Engine
         RendererCommand ClearDepthCommand() const;
 
     public:
-        virtual uint32_t GetID() = 0;
+        void Init(uint32_t width, uint32_t height, bool isDepthMap = false);
+        uint32_t GetID();
+        uint32_t GetColorAttachmentID();
+        uint32_t GetDepthAttachmentID();
+        void Resize(uint32_t width, uint32_t height);
+        void Destroy();
+        void Bind() const;
+        void BindColorTexture(uint32_t slot) const;
+        void BindDepthTexture(uint32_t slot) const;
+        void ClearColor(glm::vec4 color) const;
+        void ClearDepth() const;
+        void Unbind();
+        uint32_t width();
+        uint32_t height();
+        ViewportSize GetViewportSize();
 
-        virtual uint32_t GetColorAttachmentID() = 0;
-
-        virtual uint32_t GetDepthAttachmentID() = 0;
-
-        virtual void Resize(uint32_t width, uint32_t height) = 0;
-
-        virtual void Destroy() = 0;
-
-        virtual void Bind() const = 0;
-
-        virtual void BindColorTexture(uint32_t slot) const = 0;
-
-        virtual void BindDepthTexture(uint32_t slot) const = 0;
-
-        virtual void ClearColor(glm::vec4 color) const = 0;
-
-        virtual void ClearDepth() const = 0;
-
-        virtual void Unbind() = 0;
-
-        virtual uint32_t width() = 0;
-
-        virtual uint32_t height() = 0;
-
-        virtual ViewportSize GetViewportSize() = 0;
+    private:
+        FramebufferData* m_Data{};
     };
 }// namespace Engine
