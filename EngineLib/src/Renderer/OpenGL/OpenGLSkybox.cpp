@@ -15,7 +15,7 @@ namespace Engine
         m_Data = Allocator::Allocate<SkyboxData>();
 
         m_Data->m_Cubemap = CubemapTexture::Create(cubemapName, Path);
-        m_Data->m_Shader = Shader::Load(shaderPath);
+        m_Data->m_Shader = Shader::Create(shaderPath);
         m_Data->m_VertexArray = VertexArray::Create(6 * 6);
 
         float skyboxVertices[] = {                    //   Coordinates
@@ -56,21 +56,13 @@ namespace Engine
             Allocator::Deallocate(m_Data->m_Cubemap);
             m_Data->m_Cubemap = nullptr;
         }
-        if (m_Data->m_Shader)
-        {
-            m_Data->m_Shader->Destroy();
-            Allocator::Deallocate(m_Data->m_Shader);
-            m_Data->m_Shader = nullptr;
-        }
-        if (m_Data->m_VertexArray.IsValid())
-        {
-            m_Data->m_VertexArray.Destroy();
-        }
+        m_Data->m_Shader.Destroy();
+        if (m_Data->m_VertexArray.IsValid()) { m_Data->m_VertexArray.Destroy(); }
         Allocator::Deallocate(m_Data);
         m_Data = nullptr;
     }
 
-    void Skybox::Reload() { m_Data->m_Shader->Reload(); }
+    void Skybox::Reload() { m_Data->m_Shader.Reload(); }
 
     void Skybox::Update(float dt) { m_Data->m_Rotation += m_Data->m_RotationSpeed * dt; }
 
@@ -84,12 +76,12 @@ namespace Engine
         return RendererCommand([shader = m_Data->m_Shader, cubemap = m_Data->m_Cubemap, va = m_Data->m_VertexArray,
                                 camera, rotation = m_Data->m_Rotation]() {
             Renderer::ChangeDepthFunction(DepthFunction::LEqual);
-            shader->Bind();
-            shader->SetUniform("skybox", 0);
-            shader->SetUniform("camera.projection", camera->GetProjection());
+            shader.Bind();
+            shader.SetUniform("skybox", 0);
+            shader.SetUniform("camera.projection", camera->GetProjection());
             auto view = glm::mat4(glm::mat3(camera->GetView()));
             view = glm::rotate(view, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-            shader->SetUniform("camera.view", view);
+            shader.SetUniform("camera.view", view);
 
             cubemap->Bind(0);
             va.Bind();

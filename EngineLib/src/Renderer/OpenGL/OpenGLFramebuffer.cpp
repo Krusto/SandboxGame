@@ -1,34 +1,40 @@
 #include <glad/glad.h>
 #include <Core/Allocator.hpp>
 #include "OpenGLFramebuffer.hpp"
+#include <Renderer/Image.hpp>
+#include <Renderer/Framebuffer.hpp>
 
 namespace Engine
 {
 
-    void OpenGLFramebuffer::Init(uint32_t width, uint32_t height, bool isDepthMap)
+    void Framebuffer::Init(uint32_t width, uint32_t height, bool isDepthMap)
     {
-        this->m_width = width;
-        this->m_height = height;
+        if (m_Data == nullptr) { m_Data = Engine::Allocator::Allocate<FramebufferData>(); }
+        m_Data->width = width;
+        m_Data->height = height;
 
-        glGenFramebuffers(1, &m_fbo);
-        glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+        glGenFramebuffers(1, &m_Data->fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_Data->fbo);
 
         if (!isDepthMap)
         {
-            m_color_attachment = Image::Create(nullptr, width, height, ImageType::RGB);
+            m_Data->color_attachment = Image::Create(nullptr, width, height, ImageType::RGB);
 
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_color_attachment->GetID(), 0);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+                                   m_Data->color_attachment.GetID(), 0);
 
-            m_depth_attachment = Image::Create(nullptr, width, height, ImageType::Depth);
+            m_Data->depth_attachment = Image::Create(nullptr, width, height, ImageType::Depth);
 
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth_attachment->GetID(), 0);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_Data->depth_attachment.GetID(),
+                                   0);
         }
         else
         {
 
-            m_depth_attachment = Image::Create(nullptr, width, height, ImageType::Depth);
+            m_Data->depth_attachment = Image::Create(nullptr, width, height, ImageType::Depth);
 
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depth_attachment->GetID(), 0);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_Data->depth_attachment.GetID(),
+                                   0);
 
             glDrawBuffer(GL_NONE);
             glReadBuffer(GL_NONE);
@@ -36,66 +42,61 @@ namespace Engine
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    uint32_t OpenGLFramebuffer::GetID() { return m_fbo; }
+    uint32_t Framebuffer::GetID() { return m_Data->fbo; }
 
-    uint32_t OpenGLFramebuffer::GetColorAttachmentID() { return m_color_attachment->GetID(); }
+    uint32_t Framebuffer::GetColorAttachmentID() { return m_Data->color_attachment.GetID(); }
 
-    uint32_t OpenGLFramebuffer::GetDepthAttachmentID() { return m_depth_attachment->GetID(); }
+    uint32_t Framebuffer::GetDepthAttachmentID() { return m_Data->depth_attachment.GetID(); }
 
-    void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height)
+    void Framebuffer::Resize(uint32_t width, uint32_t height)
     {
         Destroy();
         Init(width, height);
     }
 
-    void OpenGLFramebuffer::Bind() const
+    void Framebuffer::Bind() const
     {
-        glad_glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-        glad_glViewport(0, 0, (GLsizei) m_width, (GLsizei) m_height);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_Data->fbo);
+        glViewport(0, 0, (GLsizei) m_Data->width, (GLsizei) m_Data->height);
     }
 
-    void OpenGLFramebuffer::BindColorTexture(uint32_t slot) const
-    {
-        glActiveTexture(GL_TEXTURE0 + slot);
-        glBindTexture(GL_TEXTURE_2D, m_color_attachment->GetID());
-    }
-
-    void OpenGLFramebuffer::BindDepthTexture(uint32_t slot) const
+    void Framebuffer::BindColorTexture(uint32_t slot) const
     {
         glActiveTexture(GL_TEXTURE0 + slot);
-        glBindTexture(GL_TEXTURE_2D, m_depth_attachment->GetID());
+        glBindTexture(GL_TEXTURE_2D, m_Data->color_attachment.GetID());
     }
 
-    void OpenGLFramebuffer::ClearColor(glm::vec4 color) const
+    void Framebuffer::BindDepthTexture(uint32_t slot) const
+    {
+        glActiveTexture(GL_TEXTURE0 + slot);
+        glBindTexture(GL_TEXTURE_2D, m_Data->depth_attachment.GetID());
+    }
+
+    void Framebuffer::ClearColor(glm::vec4 color) const
     {
         glClear(GL_COLOR_BUFFER_BIT);
         glClearColor(color.r, color.g, color.b, color.a);
     }
 
-    void OpenGLFramebuffer::ClearDepth() const { glClear(GL_DEPTH_BUFFER_BIT); }
+    void Framebuffer::ClearDepth() const { glClear(GL_DEPTH_BUFFER_BIT); }
 
-    void OpenGLFramebuffer::Unbind() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
+    void Framebuffer::Unbind() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 
-    void OpenGLFramebuffer::Destroy()
+    void Framebuffer::Destroy()
     {
-        if (m_color_attachment)
-        {
-            m_color_attachment->Destroy();
-            Allocator::Deallocate(m_color_attachment);
-            m_color_attachment = nullptr;
-        }
-        if (m_depth_attachment)
-        {
-            m_depth_attachment->Destroy();
-            Allocator::Deallocate(m_depth_attachment);
-            m_depth_attachment = nullptr;
-        }
-        glDeleteFramebuffers(1, &m_fbo);
+        if (m_Data == nullptr) { return; }
+
+        m_Data->color_attachment.Destroy();
+        m_Data->depth_attachment.Destroy();
+        glDeleteFramebuffers(1, &m_Data->fbo);
+
+        Allocator::Deallocate(m_Data);
+        m_Data = nullptr;
     }
 
-    uint32_t OpenGLFramebuffer::width() { return m_width; }
+    uint32_t Framebuffer::width() { return m_Data->width; }
 
-    uint32_t OpenGLFramebuffer::height() { return m_height; }
+    uint32_t Framebuffer::height() { return m_Data->height; }
 
-    ViewportSize OpenGLFramebuffer::GetViewportSize() { return {m_width, m_height}; }
+    ViewportSize Framebuffer::GetViewportSize() { return {m_Data->width, m_Data->height}; }
 }// namespace Engine

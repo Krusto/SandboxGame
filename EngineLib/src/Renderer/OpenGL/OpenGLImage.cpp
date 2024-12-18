@@ -1,4 +1,6 @@
 #include "OpenGLImage.hpp"
+#include <Core/Allocator.hpp>
+#include <Renderer/Image.hpp>
 #include <glad/glad.h>
 
 namespace Engine
@@ -21,11 +23,12 @@ namespace Engine
         }
     }
 
-    void OpenGLImage::Init(uint8_t* data, size_t width, size_t height, ImageType type)
+    void Image::Init(uint8_t* data, size_t width, size_t height, ImageType type)
     {
-        glGenTextures(1, &m_ID);
+        if (m_Data == nullptr) { m_Data = Engine::Allocator::Allocate<ImageData>(); }
+        glGenTextures(1, &m_Data->id);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, m_ID);
+        glBindTexture(GL_TEXTURE_2D, m_Data->id);
 
         glTexImage2D(GL_TEXTURE_2D, 0, ImageTypeToGL(type), (GLsizei) width, (GLsizei) height, 0, ImageTypeToGL(type),
                      GL_FLOAT, data);
@@ -36,13 +39,19 @@ namespace Engine
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
 
-    void OpenGLImage::Bind(size_t location) const
+    void Image::Bind(size_t location) const
     {
         glActiveTexture(GL_TEXTURE0 + location);
-        glBindTexture(GL_TEXTURE_2D, m_ID);
+        glBindTexture(GL_TEXTURE_2D, m_Data->id);
     }
 
-    void OpenGLImage::Destroy() { glDeleteTextures(1, &m_ID); }
+    void Image::Destroy()
+    {
+        if (m_Data == nullptr) { return; }
+        glDeleteTextures(1, &m_Data->id);
+        Allocator::Deallocate(m_Data);
+        m_Data = nullptr;
+    }
 
-    uint32_t OpenGLImage::GetID() const { return m_ID; }
+    uint32_t Image::GetID() const { return m_Data->id; }
 }// namespace Engine

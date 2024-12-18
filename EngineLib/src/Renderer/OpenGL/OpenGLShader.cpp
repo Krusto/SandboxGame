@@ -8,55 +8,43 @@
 #include <fstream>
 #include <filesystem>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-// #define NO_STD_LOG
-// #include <CFilesystem.h>
-
-#ifdef __cplusplus
-}
-#endif
-
 #include <glm/gtc/type_ptr.hpp>
 
 namespace Engine
 {
+    void Compile(ShaderData* shaderData, const std::string& vertexData, const std::string& fragmentData);
 
-    OpenGLShader::OpenGLShader(const std::string& filepath, bool forceRecompile)
+    void CheckShader(ShaderData* shaderData, GLuint id, GLuint type, GLint* ret, const char* onfail);
+
+    std::string ReadShaderFromFile(ShaderData* shaderData, const std::string& filepath, ShaderType shaderType);
+
+    std::unordered_map<GLenum, std::string> PreProcess(ShaderData* shaderData, const std::string& source);
+
+    int32_t GetUniformLocation(ShaderData* shaderData, const std::string& name);
+
+    void Shader::Reload(bool forceCompile)
     {
-        m_AssetPath = std::filesystem::absolute(filepath).parent_path().string();
-        m_Name = std::filesystem::path(filepath).filename().string();
+        m_Data->shaderSource =
+                PreProcess(m_Data, std::filesystem::path(m_Data->assetPath).append(m_Data->name).string());
+
+        Compile(m_Data, m_Data->shaderSource[GL_VERTEX_SHADER], m_Data->shaderSource[GL_FRAGMENT_SHADER]);
+    }
+
+    void Shader::Load(const std::string& path)
+    {
+        if (m_Data == nullptr) { m_Data = Engine::Allocator::Allocate<ShaderData>(); }
+        m_Data->assetPath = std::filesystem::absolute(path).parent_path().string();
+        m_Data->name = std::filesystem::path(path).filename().string();
         Reload(true);
     }
 
-    OpenGLShader* OpenGLShader::CreateFromString(const std::string& source)
-    {
-        OpenGLShader* shader = Engine::Allocator::Allocate<OpenGLShader>();
-        shader->Load(source, true);
-        return shader;
-    }
+    void SubmitShader(Shader* shader, const std::string& vertexData, const std::string& fragmentData) {}
 
-    void OpenGLShader::Reload(bool forceCompile)
-    {
-        m_ShaderSource = PreProcess(std::filesystem::path(m_AssetPath).append(m_Name).string());
-
-        Compile(m_ShaderSource[GL_VERTEX_SHADER], m_ShaderSource[GL_FRAGMENT_SHADER]);
-    }
-
-    void OpenGLShader::Load(const std::string& source, bool forceCompile)
-    {
-        m_ShaderSource = PreProcess(source);
-        Compile(m_ShaderSource[GL_VERTEX_SHADER], m_ShaderSource[GL_FRAGMENT_SHADER]);
-    }
-
-    void SubmitShader(OpenGLShader* shader, const std::string& vertexData, const std::string& fragmentData) {}
-
-    void OpenGLShader::Compile(const std::string& vertexData, const std::string& fragmentData)
+    void Compile(ShaderData* shaderData, const std::string& vertexData, const std::string& fragmentData)
     {
 
         Renderer::SubmitAndFlush(std::function<void(void)>([&]() {
-            if (this->m_RendererID != 0) glDeleteProgram(this->m_RendererID);
+            if (shaderData->rendererID != 0) glDeleteProgram(shaderData->rendererID);
 
             const char* vShaderCode = vertexData.c_str();
             const char* fShaderCode = fragmentData.c_str();
@@ -65,25 +53,25 @@ namespace Engine
             vertex = glCreateShader(GL_VERTEX_SHADER);
             glShaderSource(vertex, 1, &vShaderCode, nullptr);
             glCompileShader(vertex);
-            CheckShader(vertex, GL_COMPILE_STATUS, &result, "Unable to compile the vertex shader!");
+            CheckShader(shaderData, vertex, GL_COMPILE_STATUS, &result, "Unable to compile the vertex shader!");
 
             fragment = glCreateShader(GL_FRAGMENT_SHADER);
             glShaderSource(fragment, 1, &fShaderCode, nullptr);
             glCompileShader(fragment);
-            CheckShader(fragment, GL_COMPILE_STATUS, &result, "Unable to compile the fragment shader!");
+            CheckShader(shaderData, fragment, GL_COMPILE_STATUS, &result, "Unable to compile the fragment shader!");
 
-            this->m_RendererID = glCreateProgram();
-            glAttachShader(this->m_RendererID, vertex);
-            glAttachShader(this->m_RendererID, fragment);
-            glLinkProgram(this->m_RendererID);
-            CheckShader(this->m_RendererID, GL_LINK_STATUS, &result, "Unable to link the program!");
+            shaderData->rendererID = glCreateProgram();
+            glAttachShader(shaderData->rendererID, vertex);
+            glAttachShader(shaderData->rendererID, fragment);
+            glLinkProgram(shaderData->rendererID);
+            CheckShader(shaderData, shaderData->rendererID, GL_LINK_STATUS, &result, "Unable to link the program!");
 
             glDeleteShader(vertex);
             glDeleteShader(fragment);
         }));
     }
 
-    void OpenGLShader::CheckShader(GLuint id, GLuint type, GLint* ret, const char* onfail)
+    void CheckShader(ShaderData* shaderData, GLuint id, GLuint type, GLint* ret, const char* onfail)
     {
         switch (type)
         {
@@ -109,21 +97,21 @@ namespace Engine
         }
     }
 
-    std::unordered_map<GLenum, std::string> OpenGLShader::PreProcess(const std::string& source)
+    std::unordered_map<GLenum, std::string> PreProcess(ShaderData* shaderData, const std::string& source)
     {
         std::unordered_map<GLenum, std::string> shaderSources;
 
-        shaderSources[GL_VERTEX_SHADER] = ReadShaderFromFile(source, ShaderType::Vertex);
-        shaderSources[GL_FRAGMENT_SHADER] = ReadShaderFromFile(source, ShaderType::Fragment);
+        shaderSources[GL_VERTEX_SHADER] = ReadShaderFromFile(shaderData, source, ShaderType::Vertex);
+        shaderSources[GL_FRAGMENT_SHADER] = ReadShaderFromFile(shaderData, source, ShaderType::Fragment);
 
         return shaderSources;
     }
 
-    void OpenGLShader::Bind() { glUseProgram(m_RendererID); }
+    void Shader::Bind() { glUseProgram(m_Data->rendererID); }
 
-    void OpenGLShader::Bind() const { glUseProgram(m_RendererID); }
+    void Shader::Bind() const { glUseProgram(m_Data->rendererID); }
 
-    uint32_t OpenGLShader::ID() const { return m_RendererID; }
+    uint32_t Shader::ID() const { return m_Data->rendererID; }
 
     static bool file_read_string(const int8_t* path, size_t* len, std::string* buffer)
     {
@@ -141,7 +129,7 @@ namespace Engine
         return false;
     }
 
-    std::string OpenGLShader::ReadShaderFromFile(const std::string& filepath, ShaderType shaderType) const
+    std::string ReadShaderFromFile(ShaderData* shaderData, const std::string& filepath, ShaderType shaderType)
     {
         std::string result{};
         std::ifstream in;
@@ -172,66 +160,78 @@ namespace Engine
         return result;
     }
 
-    void OpenGLShader::Destroy() { glDeleteProgram(m_RendererID); }
-
-    int32_t OpenGLShader::GetUniformLocation(const std::string& name) const
+    void Shader::Destroy()
     {
-        int32_t result = glGetUniformLocation(m_RendererID, name.c_str());
+        if (m_Data)
+        {
+            glDeleteProgram(m_Data->rendererID);
+            Allocator::Deallocate(m_Data);
+            m_Data = nullptr;
+        }
+    }
+
+    int32_t GetUniformLocation(ShaderData* shaderData, const std::string& name)
+    {
+        int32_t result = glGetUniformLocation(shaderData->rendererID, name.c_str());
         return result;
     }
 
-    void OpenGLShader::SetUniform(const std::string& fullname, float value) const
+    void Shader::SetUniform(const std::string& fullname, float value) const
     {
-        glUniform1f(GetUniformLocation(fullname), value);
+        glUniform1f(GetUniformLocation(m_Data, fullname), value);
     }
 
-    void OpenGLShader::SetUniform(const std::string& fullname, int value) const
+    void Shader::SetUniform(const std::string& fullname, int value) const
     {
-        glUniform1i(GetUniformLocation(fullname), value);
+        glUniform1i(GetUniformLocation(m_Data, fullname), value);
     }
 
-    void OpenGLShader::SetUniform(const std::string& fullname, const glm::ivec2& value) const
+    void Shader::SetUniform(const std::string& fullname, const glm::ivec2& value) const
     {
-        glUniform2i(GetUniformLocation(fullname), value.x, value.y);
+        glUniform2i(GetUniformLocation(m_Data, fullname), value.x, value.y);
     }
 
-    void OpenGLShader::SetUniform(const std::string& fullname, const glm::ivec3& value) const
+    void Shader::SetUniform(const std::string& fullname, const glm::ivec3& value) const
     {
-        glUniform3i(GetUniformLocation(fullname), value.x, value.y, value.z);
+        glUniform3i(GetUniformLocation(m_Data, fullname), value.x, value.y, value.z);
     }
 
-    void OpenGLShader::SetUniform(const std::string& fullname, const glm::ivec4& value) const
+    void Shader::SetUniform(const std::string& fullname, const glm::ivec4& value) const
     {
-        glUniform4i(GetUniformLocation(fullname), value.x, value.y, value.z, value.w);
+        glUniform4i(GetUniformLocation(m_Data, fullname), value.x, value.y, value.z, value.w);
     }
 
-    void OpenGLShader::SetUniform(const std::string& fullname, uint32_t value) const
+    void Shader::SetUniform(const std::string& fullname, uint32_t value) const
     {
-        glUniform1ui(GetUniformLocation(fullname), value);
+        glUniform1ui(GetUniformLocation(m_Data, fullname), value);
     }
 
-    void OpenGLShader::SetUniform(const std::string& fullname, const glm::vec2& value) const
+    void Shader::SetUniform(const std::string& fullname, const glm::vec2& value) const
     {
-        glUniform2f(GetUniformLocation(fullname), value.x, value.y);
+        glUniform2f(GetUniformLocation(m_Data, fullname), value.x, value.y);
     }
 
-    void OpenGLShader::SetUniform(const std::string& fullname, const glm::vec3& value) const
+    void Shader::SetUniform(const std::string& fullname, const glm::vec3& value) const
     {
-        glUniform3f(GetUniformLocation(fullname), value.x, value.y, value.z);
+        glUniform3f(GetUniformLocation(m_Data, fullname), value.x, value.y, value.z);
     }
 
-    void OpenGLShader::SetUniform(const std::string& fullname, const glm::vec4& value) const
+    void Shader::SetUniform(const std::string& fullname, const glm::vec4& value) const
     {
-        glUniform4f(GetUniformLocation(fullname), value.x, value.y, value.z, value.w);
+        glUniform4f(GetUniformLocation(m_Data, fullname), value.x, value.y, value.z, value.w);
     }
 
-    void OpenGLShader::SetUniform(const std::string& fullname, const glm::mat3& value) const
+    void Shader::SetUniform(const std::string& fullname, const glm::mat3& value) const
     {
-        glUniformMatrix3fv(GetUniformLocation(fullname), 1, GL_FALSE, glm::value_ptr(value));
+        glUniformMatrix3fv(GetUniformLocation(m_Data, fullname), 1, GL_FALSE, glm::value_ptr(value));
     }
 
-    void OpenGLShader::SetUniform(const std::string& fullname, const glm::mat4& value) const
+    void Shader::SetUniform(const std::string& fullname, const glm::mat4& value) const
     {
-        glUniformMatrix4fv(GetUniformLocation(fullname), 1, GL_FALSE, glm::value_ptr(value));
+        glUniformMatrix4fv(GetUniformLocation(m_Data, fullname), 1, GL_FALSE, glm::value_ptr(value));
     }
+
+    const std::string& Shader::GetName() const { return m_Data->name; }
+
+    const std::string& Shader::GetPath() const { return m_Data->assetPath; };
 }// namespace Engine

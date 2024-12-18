@@ -29,8 +29,8 @@ void SandboxLayer::Init(Engine::Window* window)
     m_DepthFramebuffer = Engine::Framebuffer::Create(3000, 3000, true);
     m_DebugFramebuffer = Engine::Framebuffer::Create(3000, 3000);
 
-    m_Shader = Engine::Shader::Load(worldShaderPath);
-    m_DepthBufferShader = Engine::Shader::Load(depthShaderPath);
+    m_Shader = Engine::Shader::Create(worldShaderPath);
+    m_DepthBufferShader = Engine::Shader::Create(depthShaderPath);
 
     std::string skyboxName = "skybox_day";
     std::unordered_map<Engine::CubemapTextureFace, std::string> faces = {
@@ -60,8 +60,8 @@ void SandboxLayer::Init(Engine::Window* window)
 
     std::string cubeShaderPath = m_ShadersDirectory.string() + "/Cube";
 
-    m_CubeShader = Engine::Shader::Load(cubeShaderPath);
-    m_LightShader = Engine::Shader::Load(lightShaderPath);
+    m_CubeShader = Engine::Shader::Create(cubeShaderPath);
+    m_LightShader = Engine::Shader::Create(lightShaderPath);
 
     m_Light = Engine::Allocator::Allocate<LightObject>();
     m_Light->Init();
@@ -88,7 +88,7 @@ void SandboxLayer::Init(Engine::Window* window)
     uint32_t indices[] = {0, 1, 2, 0, 2, 3};
     m_DepthBufferVA.AddIndexBuffer(indices, 6);
 
-    m_DebugShader = Engine::Shader::Load(m_ShadersDirectory.string() + "/Debug");
+    m_DebugShader = Engine::Shader::Create(m_ShadersDirectory.string() + "/Debug");
 
 
     glm::ivec3 currentChunkPos = glm::ivec3(0, 0, 0);
@@ -111,7 +111,7 @@ void SandboxLayer::Init(Engine::Window* window)
         }
     }
 
-    m_HitboxShader = Engine::Shader::Load(hitboxShaderPath);
+    m_HitboxShader = Engine::Shader::Create(hitboxShaderPath);
     m_DebugCube = Engine::Allocator::Allocate<Hitbox>();
     m_DebugCube->Init();
 }
@@ -123,45 +123,21 @@ void SandboxLayer::OnDetach() {}
 void SandboxLayer::Destroy()
 {
     m_World->Destroy();
-    m_Shader->Destroy();
-    Engine::Allocator::Deallocate(m_Shader);
-    m_Shader = nullptr;
-    m_DepthBufferShader->Destroy();
-    Engine::Allocator::Deallocate(m_DepthBufferShader);
-    m_DepthBufferShader = nullptr;
-
-    m_CubeShader->Destroy();
-    Engine::Allocator::Deallocate(m_CubeShader);
-    m_CubeShader = nullptr;
-
-    m_LightShader->Destroy();
-    Engine::Allocator::Deallocate(m_LightShader);
-    m_LightShader = nullptr;
-
-    m_DebugShader->Destroy();
-    Engine::Allocator::Deallocate(m_DebugShader);
-    m_DebugShader = nullptr;
-
-    m_HitboxShader->Destroy();
-    Engine::Allocator::Deallocate(m_HitboxShader);
-    m_HitboxShader = nullptr;
+    m_Shader.Destroy();
+    m_DepthBufferShader.Destroy();
+    m_CubeShader.Destroy();
+    m_LightShader.Destroy();
+    m_DebugShader.Destroy();
+    m_HitboxShader.Destroy();
 
     m_Skybox.Destroy();
 
     Engine::Allocator::Deallocate(m_Light);
     m_Light = nullptr;
 
-    m_Framebuffer->Destroy();
-    Engine::Allocator::Deallocate(m_Framebuffer);
-    m_Framebuffer = nullptr;
-
-    m_DepthFramebuffer->Destroy();
-    Engine::Allocator::Deallocate(m_DepthFramebuffer);
-    m_DepthFramebuffer = nullptr;
-
-    m_DebugFramebuffer->Destroy();
-    Engine::Allocator::Deallocate(m_DebugFramebuffer);
-    m_DebugFramebuffer = nullptr;
+    m_Framebuffer.Destroy();
+    m_DepthFramebuffer.Destroy();
+    m_DebugFramebuffer.Destroy();
 
     m_DepthBufferVA.Destroy();
 
@@ -174,35 +150,35 @@ void SandboxLayer::RenderWorld()
 {
     using namespace Engine;
     Renderer::SetViewport(m_ViewportSize);
-    Renderer::Submit(m_Framebuffer->BindCommand());
-    Renderer::Submit(m_Framebuffer->ClearDepthCommand());
-    Renderer::Submit(m_Framebuffer->ClearColorCommand(glm::vec4{0.0, 0.0, 0.0, 1.0}));
+    Renderer::Submit(m_Framebuffer.BindCommand());
+    Renderer::Submit(m_Framebuffer.ClearDepthCommand());
+    Renderer::Submit(m_Framebuffer.ClearColorCommand(glm::vec4{0.0, 0.0, 0.0, 1.0}));
 
     //Render Skybox
     Renderer::Submit(m_Skybox.RenderCommand(&m_Camera));
 
     //Render World
-    Renderer::Submit(m_Shader->BindCommand());
+    Renderer::Submit(m_Shader.BindCommand());
     Renderer::Submit(m_Skybox.BindTexture(1));
 
-    Renderer::Submit(m_Camera.UploadCommand(m_Shader));
+    Renderer::Submit(m_Camera.UploadCommand(&m_Shader));
 
-    Renderer::Submit(m_Light->UploadLight(m_Shader));
-    Renderer::Submit(RendererCommand([=]() { m_Shader->SetUniform("light.shininess", (float) m_WorldShininess); }));
+    Renderer::Submit(m_Light->UploadLight(&m_Shader));
+    Renderer::Submit(RendererCommand([=]() { m_Shader.SetUniform("light.shininess", (float) m_WorldShininess); }));
 
-    Renderer::Submit(m_World->RenderWorldCommand(m_Shader, m_Camera.GetPosition()));
+    Renderer::Submit(m_World->RenderWorldCommand(&m_Shader, m_Camera.GetPosition()));
 
     //Render light debug object
-    Renderer::Submit(m_LightShader->BindCommand());
-    Renderer::Submit(m_Camera.UploadCommand(m_LightShader));
-    Renderer::Submit(m_Light->Render(m_LightShader));
+    Renderer::Submit(m_LightShader.BindCommand());
+    Renderer::Submit(m_Camera.UploadCommand(&m_LightShader));
+    Renderer::Submit(m_Light->Render(&m_LightShader));
 }
 
 void SandboxLayer::RenderDepthWorld()
 {
     Engine::Renderer::SetViewport(m_ViewportSize);
-    Engine::Renderer::Submit(m_DepthFramebuffer->BindCommand());
-    Engine::Renderer::Submit(m_DepthFramebuffer->ClearDepthCommand());
+    Engine::Renderer::Submit(m_DepthFramebuffer.BindCommand());
+    Engine::Renderer::Submit(m_DepthFramebuffer.ClearDepthCommand());
     //Render World
     float near_plane = 1.0f, far_plane = 1000.0f;
 
@@ -212,18 +188,18 @@ void SandboxLayer::RenderDepthWorld()
 
     glm::mat4 lightMatrix = lightProjection * lightView;
     Engine::Renderer::Submit(Engine::RendererCommand([=]() {
-        m_DepthBufferShader->Bind();
-        m_DepthBufferShader->SetUniform("lightSpaceMatrix", lightMatrix);
+        m_DepthBufferShader.Bind();
+        m_DepthBufferShader.SetUniform("lightSpaceMatrix", lightMatrix);
     }));
 
-    Engine::Renderer::Submit(m_World->RenderWorldCommand(m_DepthBufferShader, m_Light->position));
+    Engine::Renderer::Submit(m_World->RenderWorldCommand(&m_DepthBufferShader, m_Light->position));
 
-    Engine::Renderer::Submit(Engine::RendererCommand([=]() { m_DebugFramebuffer->Bind(); }));
-    Engine::Renderer::SetViewport({m_DebugFramebuffer->width(), m_DebugFramebuffer->height()});
-    Engine::Renderer::Submit(m_DebugFramebuffer->ClearDepthCommand());
-    Engine::Renderer::Submit(m_DebugFramebuffer->ClearColorCommand(glm::vec4{0.0, 0.0, 0.0, 1.0}));
-    Engine::Renderer::Submit(m_DebugShader->BindCommand());
-    Engine::Renderer::Submit(m_DepthFramebuffer->BindDepthTextureCommand(0));
+    Engine::Renderer::Submit(Engine::RendererCommand([=]() { m_DebugFramebuffer.Bind(); }));
+    Engine::Renderer::SetViewport({m_DebugFramebuffer.width(), m_DebugFramebuffer.height()});
+    Engine::Renderer::Submit(m_DebugFramebuffer.ClearDepthCommand());
+    Engine::Renderer::Submit(m_DebugFramebuffer.ClearColorCommand(glm::vec4{0.0, 0.0, 0.0, 1.0}));
+    Engine::Renderer::Submit(m_DebugShader.BindCommand());
+    Engine::Renderer::Submit(m_DepthFramebuffer.BindDepthTextureCommand(0));
     Engine::Renderer::SubmitRenderIndexed(m_DepthBufferVA, 6);
     Engine::Renderer::BindDefaultFramebuffer();
 }
@@ -338,9 +314,9 @@ void SandboxLayer::OnUpdate(double dt)
         if (outPosition != (glm::ivec3) m_DebugCube->position) { m_DebugCube->position = outPosition; }
 
         //Render debug cube object
-        Engine::Renderer::Submit(m_HitboxShader->BindCommand());
-        Engine::Renderer::Submit(m_Camera.UploadCommand(m_HitboxShader));
-        Engine::Renderer::Submit(m_DebugCube->Render(m_HitboxShader, m_PassedTime, axis));
+        Engine::Renderer::Submit(m_HitboxShader.BindCommand());
+        Engine::Renderer::Submit(m_Camera.UploadCommand(&m_HitboxShader));
+        Engine::Renderer::Submit(m_DebugCube->Render(&m_HitboxShader, m_PassedTime, axis));
     }
 
     Engine::Renderer::BindDefaultFramebuffer();
@@ -355,7 +331,7 @@ void SandboxLayer::OnUpdate(double dt)
     }
 }
 
-void SandboxLayer::OnWindowResizeEvent(int width, int height) { m_Framebuffer->Resize(width, height); }
+void SandboxLayer::OnWindowResizeEvent(int width, int height) { m_Framebuffer.Resize(width, height); }
 
 void SandboxLayer::OnImGuiBegin() {}
 
@@ -378,13 +354,13 @@ void SandboxLayer::OnImGuiDraw()
     ImGui::Begin("Framebuffer");
     if (m_ShowDepthBuffer)
     {
-        ImGui::Image((void*) m_DebugFramebuffer->GetColorAttachmentID(),
-                     {(float) m_DebugFramebuffer->width(), (float) m_DebugFramebuffer->height()}, {0, 1}, {1, 0});
+        ImGui::Image((void*) m_DebugFramebuffer.GetColorAttachmentID(),
+                     {(float) m_DebugFramebuffer.width(), (float) m_DebugFramebuffer.height()}, {0, 1}, {1, 0});
     }
     else
     {
-        ImGui::Image((void*) m_Framebuffer->GetColorAttachmentID(),
-                     {(float) m_Framebuffer->width(), (float) m_Framebuffer->height()}, {0, 1}, {1, 0});
+        ImGui::Image((void*) m_Framebuffer.GetColorAttachmentID(),
+                     {(float) m_Framebuffer.width(), (float) m_Framebuffer.height()}, {0, 1}, {1, 0});
     }
     ImGui::End();
 }
@@ -408,13 +384,13 @@ void SandboxLayer::OnKeyboardEvent(int action, int key)
     else if (key == GLFW_KEY_V && action == GLFW_PRESS) { Engine::Renderer::SwitchWireframeMode(); }
     else if (key == GLFW_KEY_R && action == GLFW_PRESS)
     {
-        m_Shader->Reload();
-        m_DepthBufferShader->Reload();
-        m_CubeShader->Reload();
+        m_Shader.Reload();
+        m_DepthBufferShader.Reload();
+        m_CubeShader.Reload();
         m_Skybox.Reload();
-        m_LightShader->Reload();
-        m_DebugShader->Reload();
-        m_HitboxShader->Reload();
+        m_LightShader.Reload();
+        m_DebugShader.Reload();
+        m_HitboxShader.Reload();
     }
     else if (key == GLFW_KEY_L && action == GLFW_PRESS) { m_Light->position = m_Camera.GetPosition(); }
     else if (key == GLFW_KEY_O && action == GLFW_PRESS) { m_DebugCube->position = m_Camera.GetPosition(); }
