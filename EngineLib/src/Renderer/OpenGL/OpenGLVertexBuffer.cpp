@@ -1,6 +1,5 @@
-#include <Renderer/OpenGL/OpenGLVertexBuffer.hpp>
-#include <Renderer/OpenGL/OpenGLVertexArray.hpp>
-#include <Renderer/VertexBuffer.hpp>
+#include <Renderer/Shared/VertexArray.hpp>
+#include <Renderer/Shared/VertexBuffer.hpp>
 
 #include <glad/glad.h>
 #include <utility>
@@ -20,6 +19,10 @@ namespace glm
 
 namespace Engine
 {
+    struct VertexBufferData {
+        uint32_t m_ID;
+    };
+
     void VertexBuffer::Init(VertexArray* va, const VertexLayout& layout, float* data, uint32_t length)
     {
         m_Data = Allocator::Allocate<VertexBufferData>();

@@ -1,11 +1,14 @@
 #include <glad/glad.h>
 #include <cassert>
 #include <Core/Allocator.hpp>
-#include <Renderer/StorageBuffer.hpp>
-#include "OpenGLStorageBuffer.hpp"
+#include <Renderer/Shared/StorageBuffer.hpp>
 
 namespace Engine
 {
+    struct StorageBufferData {
+        uint32_t id;
+        StorageBufferType type;
+    };
 
     void StorageBuffer::Init(uint8_t* data, size_t size, StorageBufferType type)
     {

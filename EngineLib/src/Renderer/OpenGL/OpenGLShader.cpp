@@ -1,5 +1,7 @@
-#include "OpenGLShader.hpp"
+#include <glad/glad.h>
 #include <Renderer/Renderer.hpp>
+#include <Renderer/Shared/Shader.hpp>
+#include <Renderer/ShaderUniform.hpp>
 #include <Util/File.hpp>
 #include <Core/Allocator.hpp>
 #include <string>
@@ -12,6 +14,17 @@
 
 namespace Engine
 {
+    struct ShaderData {
+        uint32_t rendererID = 0;
+        bool loaded = false;
+        bool compiled = false;
+
+        std::string name, assetPath;
+
+        std::unordered_map<GLenum, std::string> shaderSource;
+        std::vector<ShaderUniformBlockLayout> uniformBlocks;
+    };
+
     void Compile(ShaderData* shaderData, const std::string& vertexData, const std::string& fragmentData);
 
     void CheckShader(ShaderData* shaderData, GLuint id, GLuint type, GLint* ret, const char* onfail);

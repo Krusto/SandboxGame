@@ -1,14 +1,25 @@
 #include <Core/Allocator.hpp>
-#include <Renderer/Skybox.hpp>
-#include <Renderer/OpenGL/OpenGLSkybox.hpp>
+#include <Renderer/Shared/Skybox.hpp>
 #include <Renderer/Renderer.hpp>
 #include <Renderer/VertexLayout.hpp>
 #include <Renderer/ShaderUniform.hpp>
+#include <Renderer/Shared/CubemapTexture.hpp>
+#include <Renderer/Shared/Shader.hpp>
+#include <Renderer/Shared/VertexArray.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 
 namespace Engine
 {
+    struct SkyboxData {
+        CubemapTexture m_Cubemap{};
+        VertexArray m_VertexArray{};
+        Shader m_Shader{};
+        std::string m_CubemapName{};
+        const float m_RotationSpeed{0.001f};
+        glm::vec3 m_Rotation{};
+    };
+
     void Skybox::Load(std::string_view cubemapName, const std::string& shaderPath,
                       const std::unordered_map<CubemapTextureFace, std::string>& Path)
     {
@@ -50,12 +61,7 @@ namespace Engine
     void Skybox::Destroy()
     {
         if (m_Data == nullptr) { return; }
-        if (m_Data->m_Cubemap)
-        {
-            m_Data->m_Cubemap->Destroy();
-            Allocator::Deallocate(m_Data->m_Cubemap);
-            m_Data->m_Cubemap = nullptr;
-        }
+        m_Data->m_Cubemap.Destroy();
         m_Data->m_Shader.Destroy();
         if (m_Data->m_VertexArray.IsValid()) { m_Data->m_VertexArray.Destroy(); }
         Allocator::Deallocate(m_Data);
@@ -68,7 +74,13 @@ namespace Engine
 
     RendererCommand Skybox::BindTexture(uint32_t slot) const
     {
-        return RendererCommand([cubemap = m_Data->m_Cubemap, slot]() { cubemap->Bind(slot); });
+        return RendererCommand([cubemap = m_Data->m_Cubemap, slot]() { cubemap.Bind(slot); });
+    }
+
+    void Skybox::Draw(Camera* camera) const
+    {
+        auto cmd = RenderCommand(camera);
+        cmd.Execute();
     }
 
     RendererCommand Skybox::RenderCommand(Camera* camera) const
@@ -83,7 +95,7 @@ namespace Engine
             view = glm::rotate(view, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
             shader.SetUniform("camera.view", view);
 
-            cubemap->Bind(0);
+            cubemap.Bind(0);
             va.Bind();
             Renderer::RenderIndexed(va);
             Renderer::ChangeDepthFunction(DepthFunction::Less);

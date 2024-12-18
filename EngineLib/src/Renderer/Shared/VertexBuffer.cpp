@@ -1,5 +1,4 @@
 ﻿#include "VertexBuffer.hpp"
-#include <Renderer/RendererAPI.hpp>
 
 namespace Engine
 {
