@@ -8,7 +8,6 @@
 #include <Core/Ref.hpp>
 #include <Renderer/Viewport.hpp>
 #include <Renderer/RendererCommand.hpp>
-#include <Renderer/Shader.hpp>
 #include <Renderer/Predefines.hpp>
 
 namespace Engine

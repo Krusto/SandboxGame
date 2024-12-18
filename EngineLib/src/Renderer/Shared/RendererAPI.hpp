@@ -4,10 +4,10 @@
 #pragma once
 #include <glm/glm.hpp>
 #include <Renderer/Predefines.hpp>
-#include "Viewport.hpp"
-#include "RendererSpec.hpp"
-#include "DepthFunction.hpp"
-#include "VertexArray.hpp"
+#include <Renderer/Viewport.hpp>
+#include <Renderer/RendererSpec.hpp>
+#include <Renderer/Shared/VertexArray.hpp>
+#include <Renderer/DepthFunction.hpp>
 
 namespace Engine
 {

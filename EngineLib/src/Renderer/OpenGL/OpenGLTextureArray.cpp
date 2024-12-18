@@ -1,5 +1,4 @@
-#include "OpenGLTextureArray.hpp"
-#include <Renderer/TextureArray.hpp>
+#include <Renderer/Shared/TextureArray.hpp>
 #include <Core/Log.hpp>
 
 //TODO: remove
@@ -12,6 +11,11 @@
 
 namespace Engine
 {
+
+    struct TextureArrayData {
+        TextureArraySpec spec;
+        uint32_t id;
+    };
 
     void TextureArray::Load(std::string_view arrayName, const std::unordered_map<uint32_t, std::string>& Path)
     {

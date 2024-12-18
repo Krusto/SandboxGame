@@ -1,11 +1,18 @@
 #include <glad/glad.h>
 #include <Core/Allocator.hpp>
-#include "OpenGLFramebuffer.hpp"
-#include <Renderer/Image.hpp>
-#include <Renderer/Framebuffer.hpp>
+#include <Renderer/Shared/Image.hpp>
+#include <Renderer/Shared/Framebuffer.hpp>
 
 namespace Engine
 {
+
+    struct FramebufferData {
+        uint32_t width{};
+        uint32_t height{};
+        uint32_t fbo{};
+        Image color_attachment{};
+        Image depth_attachment{};
+    };
 
     void Framebuffer::Init(uint32_t width, uint32_t height, bool isDepthMap)
     {

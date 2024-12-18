@@ -1,12 +1,17 @@
 #include <glad/glad.h>
 #include <cassert>
-#include "Renderer/VertexArray.hpp"
-#include "OpenGLVertexArray.hpp"
-#include <Renderer/VertexBuffer.hpp>
-#include <Renderer/IndexBuffer.hpp>
+#include "Renderer/Shared/VertexArray.hpp"
+#include <Renderer/Shared/VertexBuffer.hpp>
+#include <Renderer/Shared/IndexBuffer.hpp>
 
 namespace Engine
 {
+    struct VertexArrayData {
+        uint32_t indexCount{};
+        VertexBuffer vertexBuffer{};
+        IndexBuffer indexBuffer{};
+        uint32_t id{};
+    };
 
     void VertexArray::Init(uint32_t indexCount)
     {

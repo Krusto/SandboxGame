@@ -1,4 +1,5 @@
-#include <Renderer/RendererAPI.hpp>
+#include <Renderer/Shared/RendererAPI.hpp>
+#include <Renderer/RendererSpec.hpp>
 #include <Application/ApplicationSpec.hpp>
 #include <glad/glad.h>
 

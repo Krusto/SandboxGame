@@ -12,6 +12,8 @@ namespace Engine
     class EXPORT_RENDERER VertexBuffer
     {
     public:
+        VertexBuffer() = default;
+        ~VertexBuffer() = default;
         static VertexBuffer Create(VertexArray* va, const VertexLayout& layout, float* data, uint32_t length);
 
     public:
@@ -22,6 +24,6 @@ namespace Engine
         uint32_t GetID() const;
 
     private:
-        VertexBufferData* m_Data;
+        VertexBufferData* m_Data{};
     };
 }// namespace Engine

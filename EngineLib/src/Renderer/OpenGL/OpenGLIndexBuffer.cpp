@@ -1,6 +1,5 @@
 
-#include <Renderer/OpenGL/OpenGLIndexBuffer.hpp>
-#include <Renderer/IndexBuffer.hpp>
+#include <Renderer/Shared/IndexBuffer.hpp>
 #include <Core/Allocator.hpp>
 
 #include <cassert>
@@ -8,6 +7,9 @@
 
 namespace Engine
 {
+    struct IndexBufferData {
+        uint32_t m_ID{};
+    };
 
     void IndexBuffer::Init(VertexArray* va, const uint32_t* data, uint32_t length)
     {

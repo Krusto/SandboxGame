@@ -1,10 +1,12 @@
-#include "OpenGLImage.hpp"
 #include <Core/Allocator.hpp>
-#include <Renderer/Image.hpp>
+#include <Renderer/Shared/Image.hpp>
 #include <glad/glad.h>
 
 namespace Engine
 {
+    struct ImageData {
+        uint32_t id;
+    };
 
     GLint ImageTypeToGL(ImageType type)
     {

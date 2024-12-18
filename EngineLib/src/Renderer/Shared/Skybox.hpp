@@ -1,5 +1,5 @@
 #pragma once
-#include <Renderer/CubemapTexture.hpp>
+#include <Renderer/Shared/CubemapTexture.hpp>
 #include <Renderer/RendererCommand.hpp>
 #include <Renderer/Camera.hpp>
 #include <Renderer/Predefines.hpp>

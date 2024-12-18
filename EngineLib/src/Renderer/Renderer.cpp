@@ -1,5 +1,5 @@
 #include "Renderer.hpp"
-#include "RendererAPI.hpp"
+#include <Renderer/Shared/RendererAPI.hpp>
 
 #include <Application/ApplicationSpec.hpp>
 #include <Renderer/GraphicsContext.hpp>
