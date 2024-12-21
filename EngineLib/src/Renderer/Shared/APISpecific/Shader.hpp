@@ -7,8 +7,8 @@
 #include <glm/glm.hpp>
 
 #include <Renderer/Predefines.hpp>
-#include <Renderer/RendererCommand.hpp>
-#include <Renderer/ShaderUniform.hpp>
+#include <Renderer/Shared/RendererCommand.hpp>
+#include <Renderer/Shared/ShaderUniform.hpp>
 
 namespace Engine
 {

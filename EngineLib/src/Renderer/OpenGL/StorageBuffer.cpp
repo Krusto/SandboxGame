@@ -1,7 +1,7 @@
 #include <glad/glad.h>
 #include <cassert>
 #include <Core/Allocator.hpp>
-#include <Renderer/Shared/StorageBuffer.hpp>
+#include <Renderer/Shared/APISpecific/StorageBuffer.hpp>
 
 namespace Engine
 {

@@ -1,11 +1,11 @@
 #include <Core/Allocator.hpp>
-#include <Renderer/Shared/Skybox.hpp>
+#include <Renderer/Shared/APISpecific/Skybox.hpp>
 #include <Renderer/Renderer.hpp>
-#include <Renderer/VertexLayout.hpp>
-#include <Renderer/ShaderUniform.hpp>
-#include <Renderer/Shared/CubemapTexture.hpp>
-#include <Renderer/Shared/Shader.hpp>
-#include <Renderer/Shared/VertexArray.hpp>
+#include <Renderer/Shared/VertexLayout.hpp>
+#include <Renderer/Shared/ShaderUniform.hpp>
+#include <Renderer/Shared/APISpecific/CubemapTexture.hpp>
+#include <Renderer/Shared/APISpecific/Shader.hpp>
+#include <Renderer/Shared/APISpecific/VertexArray.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 

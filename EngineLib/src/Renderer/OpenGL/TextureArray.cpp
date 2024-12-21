@@ -1,4 +1,4 @@
-#include <Renderer/Shared/TextureArray.hpp>
+#include <Renderer/Shared/APISpecific/TextureArray.hpp>
 #include <Core/Log.hpp>
 
 //TODO: remove

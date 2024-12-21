@@ -1,4 +1,4 @@
-#include <Renderer/GUI/GUIContext.hpp>
+#include <Renderer/Shared/APISpecific/GUIContext.hpp>
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 #include <glfw/glfw3native.h>

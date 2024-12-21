@@ -4,10 +4,10 @@
 #pragma once
 #include <glm/glm.hpp>
 #include <Renderer/Predefines.hpp>
-#include <Renderer/Viewport.hpp>
-#include <Renderer/RendererSpec.hpp>
-#include <Renderer/Shared/VertexArray.hpp>
-#include <Renderer/DepthFunction.hpp>
+#include <Renderer/Shared/Viewport.hpp>
+#include <Renderer/Shared/RendererSpec.hpp>
+#include <Renderer/Shared/APISpecific/VertexArray.hpp>
+#include <Renderer/Shared/DepthFunction.hpp>
 
 typedef struct GLFWwindow GLFWwindow;
 typedef struct ImDrawData ImDrawData;

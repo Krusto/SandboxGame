@@ -1,5 +1,5 @@
 
-#include <Renderer/Shared/IndexBuffer.hpp>
+#include <Renderer/Shared/APISpecific/IndexBuffer.hpp>
 #include <Core/Allocator.hpp>
 
 #include <cassert>

@@ -1,5 +1,5 @@
 ﻿#include "IndexBuffer.hpp"
-#include <Renderer/Shared/RendererAPI.hpp>
+#include <Renderer/Shared/APISpecific/RendererAPI.hpp>
 #include <Core/Allocator.hpp>
 
 namespace Engine

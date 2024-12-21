@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <Renderer/Predefines.hpp>
-#include <Renderer/VertexLayout.hpp>
+#include <Renderer/Shared/VertexLayout.hpp>
 
 namespace Engine
 {
