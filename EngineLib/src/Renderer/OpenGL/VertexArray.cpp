@@ -1,8 +1,8 @@
 #include <glad/glad.h>
 #include <cassert>
-#include "Renderer/Shared/VertexArray.hpp"
-#include <Renderer/Shared/VertexBuffer.hpp>
-#include <Renderer/Shared/IndexBuffer.hpp>
+#include "Renderer/Shared/APISpecific/VertexArray.hpp"
+#include <Renderer/Shared/APISpecific/VertexBuffer.hpp>
+#include <Renderer/Shared/APISpecific/IndexBuffer.hpp>
 
 namespace Engine
 {

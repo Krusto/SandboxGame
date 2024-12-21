@@ -1,5 +1,5 @@
-#include <Renderer/Shared/VertexArray.hpp>
-#include <Renderer/Shared/VertexBuffer.hpp>
+#include <Renderer/Shared/APISpecific/VertexArray.hpp>
+#include <Renderer/Shared/APISpecific/VertexBuffer.hpp>
 
 #include <glad/glad.h>
 #include <utility>

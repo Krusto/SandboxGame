@@ -5,7 +5,7 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 
-#include <Renderer/Shared/Shader.hpp>
+#include <Renderer/Shared/APISpecific/Shader.hpp>
 #include <Core/Log.hpp>
 
 namespace Engine

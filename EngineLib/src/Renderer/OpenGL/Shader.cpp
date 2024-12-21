@@ -1,7 +1,7 @@
 #include <glad/glad.h>
 #include <Renderer/Renderer.hpp>
-#include <Renderer/Shared/Shader.hpp>
-#include <Renderer/ShaderUniform.hpp>
+#include <Renderer/Shared/APISpecific/Shader.hpp>
+#include <Renderer/Shared/ShaderUniform.hpp>
 #include <Util/File.hpp>
 #include <Core/Allocator.hpp>
 #include <string>

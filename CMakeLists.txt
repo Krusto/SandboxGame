@@ -59,8 +59,11 @@ file(GLOB_RECURSE SANDBOX_WORLD_HEADER_FILES ./EngineLib/src/Scene/World/*.hpp)
 file(GLOB_RECURSE UTILS_SOURCE_FILES ./EngineLib/src/Util/*.cpp)
 file(GLOB_RECURSE UTILS_HEADER_FILES ./EngineLib/src/Util/*.hpp ./EngineLib/src/Util/*.h)
 
-file(GLOB_RECURSE RENDERER_SOURCE_FILES ./EngineLib/src/Renderer/*.cpp ./EngineLib/src/Core/Ref.cpp)
-file(GLOB_RECURSE RENDERER_HEADER_FILES ./EngineLib/src/Renderer/*.hpp ./EngineLib/src/Renderer/*.h)
+file(GLOB_RECURSE RENDERER_OPENGL_SOURCE_FILES ./EngineLib/src/Renderer/Renderer.cpp ./EngineLib/src/Renderer/Shared/*.cpp ./EngineLib/src/Renderer/OpenGL/*.cpp ./EngineLib/src/Core/Ref.cpp)
+file(GLOB_RECURSE RENDERER_OPENGL_HEADER_FILES ./EngineLib/src/Renderer/Renderer.hpp ./EngineLib/src/Renderer/Shared/*.hpp ./EngineLib/src/Renderer/OpenGL/*.hpp ./EngineLib/src/Renderer/Shared/*.h)
+
+file(GLOB_RECURSE RENDERER_VULKAN_SOURCE_FILES ./EngineLib/src/Renderer/Renderer.cpp ./EngineLib/src/Renderer/Shared/*.cpp ./EngineLib/src/Renderer/Vulkan/*.cpp ./EngineLib/src/Core/Ref.cpp)
+file(GLOB_RECURSE RENDERER_VULKAN_HEADER_FILES ./EngineLib/src/Renderer/Renderer.hpp ./EngineLib/src/Renderer/Shared/*.hpp ./EngineLib/src/Renderer/Vulkan/*.hpp ./EngineLib/src/Renderer/Shared/*.h)
 
 set(ENGINE_APPLICATION_SOURCE_FILES ./EngineLib/src/Application/Application.cpp )
 set(ENGINE_APPLICATION_HEADER_FILES ./EngineLib/src/Application/Application.hpp )
@@ -83,7 +86,8 @@ add_library(glad ${BUILD_LIB_FLAG} ${GLAD_SOURCE_FILES} ${GLAD_HEADER_FILES})
 
 add_library(EngineUtils ${BUILD_LIB_FLAG} ${UTILS_SOURCE_FILES} ${UTILS_HEADER_FILES})
 
-add_library(Renderer ${BUILD_LIB_FLAG} ${RENDERER_SOURCE_FILES} ${RENDERER_HEADER_FILES})
+add_library(RendererOpenGL ${BUILD_LIB_FLAG} ${RENDERER_OPENGL_SOURCE_FILES} ${RENDERER_OPENGL_HEADER_FILES})
+add_library(RendererVulkan ${BUILD_LIB_FLAG} ${RENDERER_VULKAN_SOURCE_FILES} ${RENDERER_VULKAN_HEADER_FILES})
 
 add_library(EngineLib ${BUILD_LIB_FLAG} ${ENGINE_SOURCE_FILES} ${ENGINE_HEADER_FILES})
 
@@ -143,7 +147,7 @@ target_compile_definitions(glad
     $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:GLAD_GLAPI_EXPORT_BUILD>
     $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:GLAD_GLAPI_EXPORT>
 )
-target_compile_definitions(Renderer
+target_compile_definitions(RendererOpenGL
     PUBLIC
     $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:LINK_SHARED>
     $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:Renderer_EXPORTS>
@@ -155,7 +159,18 @@ target_compile_definitions(Renderer
     $<$<CONFIG:RelWithDebInfo>:_DEBUG>
     $<$<CONFIG:MinSizeRel>:_RELEASE>
 )
-
+target_compile_definitions(RendererVulkan
+    PUBLIC
+    $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:LINK_SHARED>
+    $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:Renderer_EXPORTS>
+    $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:GLAD_GLAPI_EXPORT>
+    $<$<CONFIG:Debug>:ENGINE_ENABLE_VERBOSE_LOG>
+    $<$<CONFIG:Debug>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
+    $<$<CONFIG:Release>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
+    $<$<CONFIG:Release>:_RELEASE>
+    $<$<CONFIG:RelWithDebInfo>:_DEBUG>
+    $<$<CONFIG:MinSizeRel>:_RELEASE>
+)
 target_compile_definitions(EngineEntry
     PUBLIC
     $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:LINK_SHARED>
@@ -202,8 +217,12 @@ target_include_directories(EngineUtils PRIVATE ${INCLUDE_DIRS})
 target_include_directories(EngineLib PRIVATE "./EngineLib/src")
 target_include_directories(EngineLib PRIVATE ${INCLUDE_DIRS})
 
-target_include_directories(Renderer PRIVATE "./EngineLib/src")
-target_include_directories(Renderer PUBLIC ${INCLUDE_DIRS})
+target_include_directories(RendererOpenGL PRIVATE "./EngineLib/src")
+target_include_directories(RendererOpenGL PUBLIC ${INCLUDE_DIRS})
+
+target_include_directories(RendererVulkan PRIVATE "./EngineLib/src")
+target_include_directories(RendererVulkan PUBLIC ${INCLUDE_DIRS})
+
 
 target_include_directories(EngineEntry PRIVATE "./EngineLib/src")
 target_include_directories(EngineEntry PUBLIC ${INCLUDE_DIRS})
@@ -219,11 +238,14 @@ target_link_libraries(imgui PUBLIC glfw glad)
 
 target_link_libraries(EngineInterfaceLibrary INTERFACE EngineUtils glfw imgui glad CUtils FastNoise )
 
-target_link_libraries(Renderer PRIVATE imgui EngineInterfaceLibrary)
-target_link_libraries(EngineLib PRIVATE Renderer EngineInterfaceLibrary)
-target_link_libraries(EngineEntry PRIVATE EngineLib Renderer EngineInterfaceLibrary)
+target_link_libraries(RendererOpenGL PRIVATE imgui EngineInterfaceLibrary)
+target_link_libraries(RendererVulkan PRIVATE imgui EngineInterfaceLibrary)
 
-target_link_libraries(SandboxWorld PRIVATE EngineEntry EngineLib Renderer EngineInterfaceLibrary)
+target_link_libraries(EngineLib PUBLIC RendererOpenGL EngineInterfaceLibrary)
+
+target_link_libraries(EngineEntry PUBLIC EngineLib EngineInterfaceLibrary)
+
+target_link_libraries(SandboxWorld PUBLIC EngineEntry EngineLib EngineInterfaceLibrary)
 
 add_executable(Sandbox ${SANDBOX_HEADER_FILES} ${SANDBOX_SOURCE_FILES})
 target_compile_definitions(Sandbox
@@ -233,10 +255,10 @@ target_compile_definitions(Sandbox
 
 target_include_directories(Sandbox PRIVATE "${CMAKE_SOURCE_DIR}/EngineLib/src")
 target_include_directories(Sandbox PRIVATE "${CMAKE_SOURCE_DIR}/Sandbox/src")
-target_link_libraries(Sandbox SandboxWorld EngineEntry Renderer EngineLib EngineInterfaceLibrary)
+target_link_libraries(Sandbox SandboxWorld)
 
 add_executable(ShaderReflectionTest ./ShaderReflectionTest/main.cpp )
-target_link_libraries(ShaderReflectionTest EngineEntry Renderer EngineLib)
+target_link_libraries(ShaderReflectionTest EngineEntry RendererOpenGL EngineLib)
 target_include_directories(ShaderReflectionTest PRIVATE ./EngineLib/src/Renderer/Reflection)
 target_include_directories(ShaderReflectionTest PRIVATE ./EngineLib/src/)
 

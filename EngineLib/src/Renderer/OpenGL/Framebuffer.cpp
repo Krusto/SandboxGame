@@ -1,7 +1,7 @@
 #include <glad/glad.h>
 #include <Core/Allocator.hpp>
-#include <Renderer/Shared/Image.hpp>
-#include <Renderer/Shared/Framebuffer.hpp>
+#include <Renderer/Shared/APISpecific/Image.hpp>
+#include <Renderer/Shared/APISpecific/Framebuffer.hpp>
 
 namespace Engine
 {

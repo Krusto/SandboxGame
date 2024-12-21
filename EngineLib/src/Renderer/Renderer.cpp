@@ -1,8 +1,8 @@
 #include "Renderer.hpp"
-#include <Renderer/Shared/RendererAPI.hpp>
+#include <Renderer/Shared/APISpecific/RendererAPI.hpp>
 
 #include <Application/ApplicationSpec.hpp>
-#include <Renderer/GraphicsContext.hpp>
+#include <Renderer/Shared/GraphicsContext.hpp>
 #include <Core/Allocator.hpp>
 
 namespace Engine

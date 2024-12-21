@@ -1,7 +1,7 @@
 #pragma once
-#include <Renderer/Shared/CubemapTexture.hpp>
-#include <Renderer/RendererCommand.hpp>
-#include <Renderer/Camera.hpp>
+#include <Renderer/Shared/APISpecific/CubemapTexture.hpp>
+#include <Renderer/Shared/RendererCommand.hpp>
+#include <Renderer/Shared/Camera.hpp>
 #include <Renderer/Predefines.hpp>
 
 namespace Engine

@@ -1,6 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
-#include <Renderer/VertexLayout.hpp>
+#include <Renderer/Shared/VertexLayout.hpp>
 
 namespace Engine
 {

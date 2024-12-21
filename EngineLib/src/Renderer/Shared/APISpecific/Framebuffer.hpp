@@ -1,6 +1,6 @@
 #pragma once
-#include <Renderer/Viewport.hpp>
-#include <Renderer/RendererCommand.hpp>
+#include <Renderer/Shared/Viewport.hpp>
+#include <Renderer/Shared/RendererCommand.hpp>
 #include <Renderer/Predefines.hpp>
 
 #include <glm/glm.hpp>

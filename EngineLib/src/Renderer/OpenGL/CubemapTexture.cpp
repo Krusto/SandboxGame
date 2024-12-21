@@ -1,4 +1,4 @@
-#include <Renderer/Shared/CubemapTexture.hpp>
+#include <Renderer/Shared/APISpecific/CubemapTexture.hpp>
 #include <Core/Allocator.hpp>
 #include <filesystem>
 #include <glad/glad.h>

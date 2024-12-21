@@ -3,7 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
-#include <Renderer/GraphicsContext.hpp>
+#include <Renderer/Shared/GraphicsContext.hpp>
 
 void GraphicsContext::Init()
 {

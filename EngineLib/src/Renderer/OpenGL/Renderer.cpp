@@ -1,12 +1,11 @@
-#include <Renderer/Shared/RendererAPI.hpp>
-#include <Renderer/RendererSpec.hpp>
+#include <Renderer/Shared/APISpecific/RendererAPI.hpp>
+#include <Renderer/Shared/APISpecific/GUIContext.hpp>
+#include <Renderer/Shared/RendererSpec.hpp>
 #include <Application/ApplicationSpec.hpp>
 #include <glad/glad.h>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
-#include <Renderer/Shared/RendererAPI.hpp>
-#include <Renderer/GUI/GUIContext.hpp>
 
 namespace Engine
 {

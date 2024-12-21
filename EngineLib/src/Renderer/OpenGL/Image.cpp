@@ -1,5 +1,5 @@
 #include <Core/Allocator.hpp>
-#include <Renderer/Shared/Image.hpp>
+#include <Renderer/Shared/APISpecific/Image.hpp>
 #include <glad/glad.h>
 
 namespace Engine
