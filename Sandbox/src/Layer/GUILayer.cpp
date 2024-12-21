@@ -1,8 +1,6 @@
 #include "GUILayer.hpp"
 #include <algorithm>
 #include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
 
 GUILayer::GUILayer(const Engine::ApplicationSpec& spec)
 {
@@ -16,31 +14,15 @@ GUILayer::GUILayer(const Engine::ApplicationSpec& spec)
 
 void GUILayer::Init(Engine::Window* window)
 {
-    // Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;// Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;    // IF using Docking Branch
-
-    // Setup Platform/Renderer backends
-    ImGui_ImplGlfw_InitForOpenGL(
-            window->GetRawHandler(),
-            true);// Second param install_callback=true will install GLFW callbacks and chain to existing ones.
-    ImGui_ImplOpenGL3_Init();
+    m_Window = window;
+    Engine::Renderer::InitImGUI(window->GetRawHandler());
 }
 
 void GUILayer::OnAttach() {}
 
 void GUILayer::OnDetach() {}
 
-void GUILayer::Destroy()
-{
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-}
+void GUILayer::Destroy() { Engine::Renderer::DestroyImGUI(); }
 
 void GUILayer::OnUpdate(double dt) { m_DeltaTime = dt; }
 
@@ -50,10 +32,7 @@ void GUILayer::OnWindowResizeEvent(int width, int height) {}
 
 void GUILayer::OnImGuiBegin()
 {
-    // Start the Dear ImGui frame
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
+    Engine::Renderer::ImGuiNewFrame();
     bool p_open = true;
     static bool opt_fullscreen = true;
     static bool opt_padding = false;
@@ -103,13 +82,13 @@ void GUILayer::OnImGuiEnd()
 
     if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
     {
-        GLFWwindow* backup_current_context = glfwGetCurrentContext();
+        GLFWwindow* backup_current_context = m_Window->GetCurrentContext();
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
-        glfwMakeContextCurrent(backup_current_context);
+        m_Window->SetCurrentContext(backup_current_context);
     }
 
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    Engine::Renderer::ImGuiRender(ImGui::GetDrawData());
 }
 
 void GUILayer::OnMouseMoveEvent(int width, int height) {}

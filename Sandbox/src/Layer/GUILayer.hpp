@@ -52,6 +52,7 @@ public:
 
 protected:
     std::string m_Name;
+    Engine::Window* m_Window;
     bool m_ShouldExit = false;
     double m_DeltaTime = 0.0f;
 

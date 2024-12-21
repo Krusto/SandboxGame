@@ -81,11 +81,29 @@ namespace Engine
         if (s_RendererAPI) Engine::Allocator::Deallocate(s_RendererAPI);
     }
 
-    void Renderer::InitImGUI(Window* window) {}
+    void Renderer::InitImGUI(GLFWwindow* window)
+    {
+        if (s_RendererAPI) s_RendererAPI->InitImGUI(window);
+    }
+
+    void Renderer::DestroyImGUI()
+    {
+        if (s_RendererAPI) s_RendererAPI->DestroyImGUI();
+    }
 
     void Renderer::Shutdown()
     {
         if (s_RendererAPI) s_RendererAPI->Shutdown();
+    }
+
+    void Renderer::ImGuiNewFrame()
+    {
+        if (s_RendererAPI) s_RendererAPI->ImGuiNewFrame();
+    }
+
+    void Renderer::ImGuiRender(ImDrawData* drawData)
+    {
+        if (s_RendererAPI) s_RendererAPI->ImGuiRender(drawData);
     }
 
     void Renderer::BeginFrame(){};

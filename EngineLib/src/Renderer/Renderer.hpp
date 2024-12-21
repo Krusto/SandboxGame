@@ -32,12 +32,14 @@
 #include "Shared/VertexBuffer.hpp"
 #include "Shared/VertexArray.hpp"
 
+typedef struct GLFWwindow GLFWwindow;
+typedef struct ImDrawData ImDrawData;
+
 namespace Engine
 {
 
     class Entity;
     class RendererAPI;
-    class Window;
     struct ApplicationSpec;
 
     class EXPORT_RENDERER Renderer
@@ -45,7 +47,10 @@ namespace Engine
     public:
         static void Init(RendererSpec rendererSpec, ApplicationSpec applicationSpec);
         static void Destroy();
-        static void InitImGUI(Window* window);
+        static void InitImGUI(GLFWwindow* window);
+        static void ImGuiNewFrame();
+        static void ImGuiRender(ImDrawData* drawData);
+        static void DestroyImGUI();
         static void Shutdown();
         static void BeginFrame();
         static void EndFrame();

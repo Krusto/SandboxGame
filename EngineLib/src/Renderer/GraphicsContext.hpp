@@ -1,9 +1,9 @@
 ﻿#pragma once
+
 #include <Core/Log.hpp>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <GLFW/glfw3native.h>
 #include <Renderer/Predefines.hpp>
+
+typedef struct GLFWwindow GLFWwindow;
 
 class EXPORT_RENDERER GraphicsContext
 {
@@ -22,6 +22,8 @@ public:
     void Destroy();
     void Init();
     void SwapBuffers();
+    void AddDebugMessanger();
+    void SetupWindowHints();
 
 protected:
     GLFWwindow* p_WindowPtr{};

@@ -9,10 +9,19 @@
 #include <Renderer/Shared/VertexArray.hpp>
 #include <Renderer/DepthFunction.hpp>
 
+typedef struct GLFWwindow GLFWwindow;
+typedef struct ImDrawData ImDrawData;
+
 namespace Engine
 {
 
     struct ApplicationSpec;
+    enum class RendererAPIType
+    {
+        OpenGL,
+        Vulkan
+    };
+    struct RendererAPIData;
 
     class EXPORT_RENDERER RendererAPI
     {
@@ -31,5 +40,13 @@ namespace Engine
         void BindDefaultFramebuffer() const;
         void RenderIndexed(VertexArray vertexArray, uint32_t indexCount) const;
         void ChangeDepthFunction(DepthFunction depthFunction);
+        void InitImGUI(GLFWwindow* window);
+        void DestroyImGUI();
+        void ImGuiNewFrame();
+        void ImGuiRender(ImDrawData* drawData);
+        RendererAPIType GetAPI() const;
+
+    private:
+        RendererAPIData* m_Data{};
     };
 }// namespace Engine

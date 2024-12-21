@@ -4,23 +4,20 @@
 
 #pragma once
 
-#include <Application/Predefines.hpp>
 #include <Application/ApplicationSpec.hpp>
+#include <Core/Predefines.hpp>
 #include <Core/Log.hpp>
 #include <Core/Ref.hpp>
 #include <Renderer/Renderer.hpp>
 #include <Layer/LayerStack.hpp>
 #include <Util/Version.hpp>
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <GLFW/glfw3native.h>
-
 #include <filesystem>
 
 namespace Engine
 {
     class Window;
+    typedef struct GLFWwindow GLFWwindow;
 
     struct WindowSpec {
         std::string_view title;
@@ -28,7 +25,7 @@ namespace Engine
         uint32_t height;
     };
 
-    class EXPORT_ENGINE_ENTRY Window: public RefCounted
+    class EXPORT_ENGINE Window: public RefCounted
     {
     public:
         Window() = default;
@@ -58,6 +55,8 @@ namespace Engine
         WindowSpec* GetSpec();
         const WindowSpec* GetSpec() const;
 
+        GLFWwindow* GetCurrentContext() const;
+        void SetCurrentContext(GLFWwindow* context);
 
     private:
         static void _CloseCallback(GLFWwindow* window);
@@ -65,10 +64,6 @@ namespace Engine
         static void _WindowKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
         static void _WindowMouseMoveCallback(GLFWwindow* window, double x, double y);
         static void _WindowMouseScrollCallback(GLFWwindow* window, double x, double y);
-
-        static void GLAPIENTRY _MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
-                                                GLchar const* message, void const* user_param);
-
         static void _ErrorCallback(int code, const char* err_str);
 
     private:

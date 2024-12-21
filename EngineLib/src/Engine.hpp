@@ -2,7 +2,7 @@
 #include <Util/Version.hpp>
 #include <Layer/LayerStack.hpp>
 #include <Layer/Layer.hpp>
-#include <Application/Window.hpp>
+#include <Window/Window.hpp>
 #include <Renderer/Renderer.hpp>
 #include <Application/Application.hpp>
 #include <Scene/World/WorldGen.hpp>

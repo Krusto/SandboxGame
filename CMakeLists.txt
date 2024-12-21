@@ -23,6 +23,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_CXX_STANDARD 23)
 message("Compiler Version: ${CMAKE_CXX_COMPILER_VERSION}")
 
+# message(STATUS "${PROJECT_NAME}: Finding VulkanSDK...")
+# find_package(Vulkan REQUIRED)
+
 message(STATUS "${PROJECT_NAME}: Finding python...")
 find_package(Python COMPONENTS Interpreter REQUIRED)
 message(STATUS "Found python executable: ${Python_EXECUTABLE}")
@@ -46,10 +49,9 @@ file(GLOB_RECURSE IMGUI_HEADER_FILES imgui_impl_opengl3.h imgui_impl_glfw.h   im
 file(GLOB_RECURSE SANDBOX_SOURCE_FILES ./Sandbox/src/*.cpp)
 file(GLOB_RECURSE SANDBOX_HEADER_FILES ./Sandbox/src/*.h)
 
-file(GLOB_RECURSE ENGINE_SOURCE_FILES ./EngineLib/src/Core/*.cpp ./EngineLib/src/Layer/*.cpp)
-file(GLOB_RECURSE ENGINE_HEADER_FILES ./EngineLib/src/Core/*.hpp ./EngineLib/src/Layer/*.hpp
-./EngineLib/src/Core/*.h ./EngineLib/src/Layer/*.h
-)
+file(GLOB_RECURSE ENGINE_SOURCE_FILES ./EngineLib/src/Core/*.cpp ./EngineLib/src/Layer/*.cpp ./EngineLib/src/Window/*.cpp)
+file(GLOB_RECURSE ENGINE_HEADER_FILES ./EngineLib/src/Core/*.hpp ./EngineLib/src/Layer/*.hpp ./EngineLib/src/Window/*.hpp
+./EngineLib/src/Core/*.h ./EngineLib/src/Layer/*.h)
 
 file(GLOB_RECURSE SANDBOX_WORLD_SOURCE_FILES ./EngineLib/src/Scene/World/*.cpp)
 file(GLOB_RECURSE SANDBOX_WORLD_HEADER_FILES ./EngineLib/src/Scene/World/*.hpp)
@@ -60,8 +62,8 @@ file(GLOB_RECURSE UTILS_HEADER_FILES ./EngineLib/src/Util/*.hpp ./EngineLib/src/
 file(GLOB_RECURSE RENDERER_SOURCE_FILES ./EngineLib/src/Renderer/*.cpp ./EngineLib/src/Core/Ref.cpp)
 file(GLOB_RECURSE RENDERER_HEADER_FILES ./EngineLib/src/Renderer/*.hpp ./EngineLib/src/Renderer/*.h)
 
-set(ENGINE_APPLICATION_SOURCE_FILES ./EngineLib/src/Application/Application.cpp ./EngineLib/src/Application/Window.cpp)
-set(ENGINE_APPLICATION_HEADER_FILES ./EngineLib/src/Application/Application.hpp ./EngineLib/src/Application/Window.hpp)
+set(ENGINE_APPLICATION_SOURCE_FILES ./EngineLib/src/Application/Application.cpp )
+set(ENGINE_APPLICATION_HEADER_FILES ./EngineLib/src/Application/Application.hpp )
 
 add_compile_definitions(GLM_ENABLE_EXPERIMENTAL)
 
@@ -183,7 +185,8 @@ target_include_directories(imgui PRIVATE ${IMGUI_INCLUDE_DIR})
 target_include_directories(imgui PRIVATE ${IMGUI_BACKENDS_INCLUDE_DIR})
 target_include_directories(imgui PRIVATE ${GLFW_INCLDUE_DIR})
 
-set(INCLUDE_DIRS ${GLAD_INCLDUE_DIR}
+set(INCLUDE_DIRS 
+${GLAD_INCLDUE_DIR}
  ${STB_INCLDUE_DIR}
  ${IMGUI_INCLUDE_DIR}
  ${IMGUI_BACKENDS_INCLUDE_DIR}
@@ -200,7 +203,7 @@ target_include_directories(EngineLib PRIVATE "./EngineLib/src")
 target_include_directories(EngineLib PRIVATE ${INCLUDE_DIRS})
 
 target_include_directories(Renderer PRIVATE "./EngineLib/src")
-target_include_directories(Renderer PRIVATE ${INCLUDE_DIRS})
+target_include_directories(Renderer PUBLIC ${INCLUDE_DIRS})
 
 target_include_directories(EngineEntry PRIVATE "./EngineLib/src")
 target_include_directories(EngineEntry PUBLIC ${INCLUDE_DIRS})
@@ -212,11 +215,11 @@ add_library(EngineInterfaceLibrary INTERFACE)
 
 message(STATUS "${PROJECT_NAME}: Linking libraries")
 
-target_link_libraries(imgui PRIVATE glfw glad)
+target_link_libraries(imgui PUBLIC glfw glad)
 
 target_link_libraries(EngineInterfaceLibrary INTERFACE EngineUtils glfw imgui glad CUtils FastNoise )
 
-target_link_libraries(Renderer PRIVATE EngineInterfaceLibrary)
+target_link_libraries(Renderer PRIVATE imgui EngineInterfaceLibrary)
 target_link_libraries(EngineLib PRIVATE Renderer EngineInterfaceLibrary)
 target_link_libraries(EngineEntry PRIVATE EngineLib Renderer EngineInterfaceLibrary)
 

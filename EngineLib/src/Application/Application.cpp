@@ -68,5 +68,4 @@ void Engine::Application::Destroy()
     m_Window->Close();
     m_Window->Destroy();
     Engine::Allocator::Deallocate(m_Window);
-    glfwTerminate();
 }

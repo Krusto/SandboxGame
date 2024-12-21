@@ -1,11 +1,15 @@
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
+
 #include "Window.hpp"
 
 #include <Renderer/Renderer.hpp>
 
 #include <Core/Log.hpp>
 
-EXPORT_ENGINE_ENTRY ViewportSize s_ViewportSize{};
-EXPORT_ENGINE_ENTRY GLFWwindow* s_WindowPtr{};
+EXPORT_ENGINE ViewportSize s_ViewportSize{};
+EXPORT_ENGINE GLFWwindow* s_WindowPtr{};
 
 namespace Engine
 {
@@ -20,14 +24,7 @@ namespace Engine
             exit(-1);
         }
 
-        constexpr auto OPENGL_VERSION_MAJOR = 4;
-        constexpr auto OPENGL_VERSION_MINOR = 6;
-
-        glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, OPENGL_VERSION_MAJOR);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, OPENGL_VERSION_MINOR);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+        GraphicsContext::Get()->SetupWindowHints();
 
         int major, minor, rev;
         glfwGetVersion(&major, &minor, &rev);
@@ -50,12 +47,8 @@ namespace Engine
 
         GraphicsContext::Get()->Create(s_WindowPtr);
         GraphicsContext::Get()->Init();
+        GraphicsContext::Get()->AddDebugMessanger();
 
-        if constexpr (OPENGL_VERSION_MAJOR == 4 && OPENGL_VERSION_MINOR >= 3)
-        {
-            glEnable(GL_DEBUG_OUTPUT);
-            glDebugMessageCallback(Engine::Window::_MessageCallback, 0);
-        }
         glfwSetWindowCloseCallback(s_WindowPtr, _CloseCallback);
         glfwSetWindowSizeCallback(s_WindowPtr, _WindowSizeCallback);
         glfwSetKeyCallback(s_WindowPtr, _WindowKeyCallback);
@@ -68,6 +61,7 @@ namespace Engine
     {
         glfwDestroyWindow(s_WindowPtr);
         GraphicsContext::Get()->Destroy();
+        glfwTerminate();
     }
 
     void Window::Update()
@@ -99,6 +93,10 @@ namespace Engine
 
     const WindowSpec* Window::GetSpec() const { return &m_WindowSpec; }
 
+    GLFWwindow* Window::GetCurrentContext() const { return glfwGetCurrentContext(); }
+
+    void Window::SetCurrentContext(GLFWwindow* context) { glfwMakeContextCurrent(context); }
+
     void Window::_CloseCallback(GLFWwindow* window)
     {
         for (auto& layer: LayerStack::data())
@@ -128,66 +126,6 @@ namespace Engine
     void Window::_WindowMouseScrollCallback(GLFWwindow* window, double x, double y)
     {
         for (auto& layer: LayerStack::data()) { layer->OnMouseScrollEvent(x, y); }
-    }
-
-    void GLAPIENTRY Window::_MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
-                                             GLchar const* message, void const* user_param)
-    {
-        auto const src_str = [source]() {
-            switch (source)
-            {
-                case GL_DEBUG_SOURCE_API:
-                    return "API";
-                case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
-                    return "WINDOW SYSTEM";
-                case GL_DEBUG_SOURCE_SHADER_COMPILER:
-                    return "SHADER COMPILER";
-                case GL_DEBUG_SOURCE_THIRD_PARTY:
-                    return "THIRD PARTY";
-                case GL_DEBUG_SOURCE_APPLICATION:
-                    return "APPLICATION";
-                case GL_DEBUG_SOURCE_OTHER:
-                    return "OTHER";
-            }
-            return "";
-        }();
-
-        auto const type_str = [type]() {
-            switch (type)
-            {
-                case GL_DEBUG_TYPE_ERROR:
-                    return "ERROR";
-                case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-                    return "DEPRECATED_BEHAVIOR";
-                case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-                    return "UNDEFINED_BEHAVIOR";
-                case GL_DEBUG_TYPE_PORTABILITY:
-                    return "PORTABILITY";
-                case GL_DEBUG_TYPE_PERFORMANCE:
-                    return "PERFORMANCE";
-                case GL_DEBUG_TYPE_MARKER:
-                    return "MARKER";
-                case GL_DEBUG_TYPE_OTHER:
-                    return "OTHER";
-            }
-            return "";
-        }();
-
-        auto const severity_str = [severity]() {
-            switch (severity)
-            {
-                case GL_DEBUG_SEVERITY_NOTIFICATION:
-                    return "NOTIFICATION";
-                case GL_DEBUG_SEVERITY_LOW:
-                    return "LOW";
-                case GL_DEBUG_SEVERITY_MEDIUM:
-                    return "MEDIUM";
-                case GL_DEBUG_SEVERITY_HIGH:
-                    return "HIGH";
-            }
-            return "";
-        }();
-        LOG("%s, %s, %s, %u: %s\n", src_str, type_str, severity_str, id, message);
     }
 
     void Window::_ErrorCallback(int code, const char* err_str)
