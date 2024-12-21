@@ -5,11 +5,11 @@
 
 #include <Engine.hpp>
 #include <Core/Ref.hpp>
-#include <Core/Predefines.hpp>
-#include <Application/Window.hpp>
+#include <Application/Predefines.hpp>
 
 namespace Engine
 {
+
     class EXPORT_ENGINE_ENTRY Application
     {
     public:
@@ -36,7 +36,6 @@ namespace Engine
         void Destroy();
 
     protected:
-
         Window* m_Window{};
         ApplicationSpec m_ApplicationSpec{};
     };

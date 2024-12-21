@@ -2,18 +2,38 @@
 #include <Renderer/RendererSpec.hpp>
 #include <Application/ApplicationSpec.hpp>
 #include <glad/glad.h>
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+#include <Renderer/Shared/RendererAPI.hpp>
+#include <Renderer/GUI/GUIContext.hpp>
 
 namespace Engine
 {
+    struct RendererAPIData {
+        GUIContext guiContext;
+    };
+
     void RendererAPI::ClearColor(glm::vec4 color)
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(color.r, color.g, color.b, color.a);
     }
 
-    void RendererAPI::Init(RendererSpec rendererSpec, ApplicationSpec applicationSpec) {}
+    void RendererAPI::Init(RendererSpec rendererSpec, ApplicationSpec applicationSpec)
+    {
+        if (m_Data == nullptr) { return; }
+        m_Data = Allocator::Allocate<RendererAPIData>();
+    }
 
-    void RendererAPI::Shutdown(){};
+    void RendererAPI::Shutdown()
+    {
+        if (m_Data == nullptr) { return; }
+        m_Data->guiContext.Shutdown();
+        Allocator::Deallocate(m_Data);
+        m_Data = nullptr;
+    };
+
     void RendererAPI::BeginFrame(){};
     void RendererAPI::EndFrame(){};
 
@@ -64,4 +84,14 @@ namespace Engine
                 break;
         }
     }
+
+    void RendererAPI::InitImGUI(GLFWwindow* window) { m_Data->guiContext.Init(window); }
+
+    void RendererAPI::DestroyImGUI() { m_Data->guiContext.Shutdown(); }
+
+    void RendererAPI::ImGuiNewFrame() { m_Data->guiContext.NewFrame(); }
+
+    void RendererAPI::ImGuiRender(ImDrawData* drawData) { m_Data->guiContext.Render(drawData); }
+
+    RendererAPIType RendererAPI::GetAPI() const { return RendererAPIType::OpenGL; }
 }// namespace Engine
