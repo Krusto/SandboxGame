@@ -4,3 +4,6 @@
 [submodule "Vendor/PerlinNoise"]
 	path = Vendor/PerlinNoise
 	url = https://github.com/Reputeless/PerlinNoise
+[submodule "Vendor/LibraryLoader"]
+	path = Vendor/LibraryLoader
+	url = https://github.com/Krusto/LibraryLoader
