@@ -1,5 +1,6 @@
 #include "LayerStack.hpp"
 #include <Window/Window.hpp>
+#include <Renderer/Loader.hpp>
 
 namespace Engine
 {
@@ -7,6 +8,7 @@ namespace Engine
 
     void LayerStack::InitLayers(Window* window)
     {
+        Loader::Load();
         for (auto layer: s_Layers) { layer->Init(window); }
     }
 
