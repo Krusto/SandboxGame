@@ -6,7 +6,7 @@ typedef struct ImDrawData ImDrawData;
 namespace Engine
 {
 
-    class EXPORT_RENDERER GUIContext
+    class GUIContext
     {
     public:
         GUIContext() = default;
@@ -20,11 +20,5 @@ namespace Engine
         void NewFrame();
 
         void Render(ImDrawData* drawData);
-
-    private:
-        void _RendererSpecificInit(GLFWwindow* window);
-        void _RendererSpecificShutdown();
-        void _RendererSpecificNewFrame();
-        void _RendererSpecificRender(ImDrawData* drawData);
     };
 }// namespace Engine

@@ -2,12 +2,15 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
+#include <Renderer/Predefines.hpp>
 
-#include <Renderer/Shared/GraphicsContext.hpp>
+EXPORT_RENDERER void RendererContextInit(void* handle) {}
 
-void GraphicsContext::Init()
+EXPORT_RENDERER void RendererContextDestroy(void* handle) {}
+
+EXPORT_RENDERER void RendererContextCreate(void* handle, void* window)
 {
-    glfwMakeContextCurrent(p_WindowPtr);
+    glfwMakeContextCurrent((GLFWwindow*) window);
 
     if (!gladLoadGL())
     {
@@ -32,14 +35,14 @@ void GraphicsContext::Init()
     LOG("OPENGL VERSION %s!\n", version);
 }
 
-void GraphicsContext::SwapBuffers()
+EXPORT_RENDERER void RendererContextSwapBuffers(void* window)
 {
-    glfwSwapBuffers(p_WindowPtr);
+    glfwSwapBuffers((GLFWwindow*) window);
     glfwPollEvents();
 }
 
-EXPORT_RENDERER void GLAPIENTRY _MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
-                                                 GLchar const* message, void const* user_param)
+EXPORT_RENDERER void _MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
+                                      GLchar const* message, void const* user_param)
 {
     auto const src_str = [source]() {
         switch (source)
@@ -98,17 +101,17 @@ EXPORT_RENDERER void GLAPIENTRY _MessageCallback(GLenum source, GLenum type, GLu
     LOG("%s, %s, %s, %u: %s\n", src_str, type_str, severity_str, id, message);
 }
 
-void GraphicsContext::AddDebugMessanger()
+EXPORT_RENDERER void RendererContextAddDebugMessanger(void* window)
 {
-    if (glfwGetWindowAttrib(p_WindowPtr, GLFW_CONTEXT_VERSION_MAJOR) == 4 &&
-        glfwGetWindowAttrib(p_WindowPtr, GLFW_CONTEXT_VERSION_MINOR) >= 3)
+    if (glfwGetWindowAttrib((GLFWwindow*) window, GLFW_CONTEXT_VERSION_MAJOR) == 4 &&
+        glfwGetWindowAttrib((GLFWwindow*) window, GLFW_CONTEXT_VERSION_MINOR) >= 3)
     {
         glEnable(GL_DEBUG_OUTPUT);
         glDebugMessageCallback(_MessageCallback, 0);
     }
 }
 
-void GraphicsContext::SetupWindowHints()
+EXPORT_RENDERER void RendererContextSetupWindowHints(void* window)
 {
     constexpr auto OPENGL_VERSION_MAJOR = 4;
     constexpr auto OPENGL_VERSION_MINOR = 6;

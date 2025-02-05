@@ -1,40 +1,51 @@
 
-#include <Renderer/Shared/APISpecific/IndexBuffer.hpp>
 #include <Core/Allocator.hpp>
+#include <Renderer/Predefines.hpp>
+#include <Renderer/OpenGL/StructDefinitions.hpp>
 
 #include <cassert>
 #include <glad/glad.h>
 
 namespace Engine
 {
-    struct IndexBufferData {
-        uint32_t m_ID{};
-    };
-
-    void IndexBuffer::Init(VertexArray* va, const uint32_t* data, uint32_t length)
+    EXPORT_RENDERER void IndexBufferInit(void** data, void* vertexArray, const uint32_t* indexData, uint32_t length)
     {
-        m_Data = Allocator::Allocate<IndexBufferData>();
-        glCreateBuffers(1, &m_Data->m_ID);
+        if (*data == nullptr) { *data = Allocator::Allocate<IndexBufferData>(); }
 
-        glNamedBufferStorage(m_Data->m_ID, sizeof(uint32_t) * length, data, GL_DYNAMIC_STORAGE_BIT);
+        IndexBufferData* m_Data = static_cast<IndexBufferData*>(*data);
+        glCreateBuffers(1, &m_Data->id);
 
-        indexCount = length;
+        glNamedBufferStorage(m_Data->id, sizeof(uint32_t) * length, data, GL_DYNAMIC_STORAGE_BIT);
+
+        m_Data->stride = sizeof(uint32_t);
+        m_Data->count = length;
     }
 
-    void IndexBuffer::Destroy()
+    EXPORT_RENDERER void IndexBufferDestroy(void** data)
     {
-        if (m_Data == nullptr) { return; }
-        if (m_Data->m_ID != 0) { glDeleteBuffers(1, &m_Data->m_ID); }
+        if (*data == nullptr) { return; }
+
+        IndexBufferData* m_Data = static_cast<IndexBufferData*>(*data);
+        if (m_Data->id != 0) { glDeleteBuffers(1, &m_Data->id); }
         Allocator::Deallocate(m_Data);
-        m_Data = nullptr;
+        *data = nullptr;
     }
 
-    void IndexBuffer::Bind() const
+    EXPORT_RENDERER void IndexBufferBind(void* data)
     {
-        assert(m_Data->m_ID != 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Data->m_ID);
+        IndexBufferData* m_Data = static_cast<IndexBufferData*>(data);
+        assert(m_Data->id != 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Data->id);
     }
 
-    uint32_t IndexBuffer::GetID() const { return m_Data->m_ID; }
+    EXPORT_RENDERER uint32_t IndexBufferGetID(void* data) { return static_cast<IndexBufferData*>(data)->id; }
+
+    EXPORT_RENDERER uint32_t IndexBufferGetSize(void* data)
+    {
+        auto m_Data = static_cast<IndexBufferData*>(data);
+        return m_Data->count * m_Data->stride;
+    }
+
+    EXPORT_RENDERER uint32_t IndexBufferGetLength(void* data) { return static_cast<IndexBufferData*>(data)->count; }
 
 }// namespace Engine

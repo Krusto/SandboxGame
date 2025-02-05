@@ -1,14 +1,15 @@
 #include <Core/Allocator.hpp>
-#include <Renderer/Shared/APISpecific/Image.hpp>
+#include <Renderer/Shared/ImageType.hpp>
+#include <Renderer/Shared/function_pointers.h>
+#include <Renderer/OpenGL/StructDefinitions.hpp>
+#include <Renderer/Predefines.hpp>
+
 #include <glad/glad.h>
 
 namespace Engine
 {
-    struct ImageData {
-        uint32_t id;
-    };
 
-    GLint ImageTypeToGL(ImageType type)
+    EXPORT_RENDERER GLint ImageTypeToGL(uint8_t type)
     {
         switch (type)
         {
@@ -25,15 +26,15 @@ namespace Engine
         }
     }
 
-    void Image::Init(uint8_t* data, size_t width, size_t height, ImageType type)
+    EXPORT_RENDERER void ImageInit(void** data, uint8_t* imageData, size_t width, size_t height, uint8_t type)
     {
-        if (m_Data == nullptr) { m_Data = Engine::Allocator::Allocate<ImageData>(); }
-        glGenTextures(1, &m_Data->id);
+        if (*data == nullptr) { *data = Engine::Allocator::Allocate<ImageData>(); }
+        glGenTextures(1, &asTPtr(*data, ImageData)->id);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, m_Data->id);
+        glBindTexture(GL_TEXTURE_2D, asTPtr(*data, ImageData)->id);
 
         glTexImage2D(GL_TEXTURE_2D, 0, ImageTypeToGL(type), (GLsizei) width, (GLsizei) height, 0, ImageTypeToGL(type),
-                     GL_FLOAT, data);
+                     GL_FLOAT, imageData);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -41,19 +42,19 @@ namespace Engine
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
 
-    void Image::Bind(size_t location) const
+    EXPORT_RENDERER void ImageBind(void* data, size_t location)
     {
         glActiveTexture(GL_TEXTURE0 + location);
-        glBindTexture(GL_TEXTURE_2D, m_Data->id);
+        glBindTexture(GL_TEXTURE_2D, asTPtr(data, ImageData)->id);
     }
 
-    void Image::Destroy()
+    EXPORT_RENDERER void ImageDestroy(void** data)
     {
-        if (m_Data == nullptr) { return; }
-        glDeleteTextures(1, &m_Data->id);
-        Allocator::Deallocate(m_Data);
-        m_Data = nullptr;
+        if (*data == nullptr) { return; }
+        glDeleteTextures(1, &asTPtr(*data, ImageData)->id);
+        Allocator::Deallocate(*data);
+        *data = nullptr;
     }
 
-    uint32_t Image::GetID() const { return m_Data->id; }
+    EXPORT_RENDERER uint32_t ImageGetID(void* data) { return asTPtr(data, ImageData)->id; }
 }// namespace Engine

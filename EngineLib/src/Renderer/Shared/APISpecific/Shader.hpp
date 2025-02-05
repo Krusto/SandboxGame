@@ -12,17 +12,10 @@
 
 namespace Engine
 {
-    enum class ShaderType
-    {
-        None,
-        Vertex,
-        Fragment,
-        Compute,
-        Other
-    };
+
     struct ShaderData;
 
-    class EXPORT_RENDERER Shader
+    class Shader
     {
     public:
         Shader() = default;

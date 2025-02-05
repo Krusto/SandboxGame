@@ -1,11 +1,10 @@
 ﻿#pragma once
 
 #include <Core/Log.hpp>
-#include <Renderer/Predefines.hpp>
 
 typedef struct GLFWwindow GLFWwindow;
 
-class EXPORT_RENDERER GraphicsContext
+class GraphicsContext
 {
 public:
     GraphicsContext() = default;
@@ -16,6 +15,7 @@ public:
 
 public:
     static GraphicsContext* Get();
+    static void SetupWindowHints();
 
 public:
     void Create(GLFWwindow* window);
@@ -23,7 +23,6 @@ public:
     void Init();
     void SwapBuffers();
     void AddDebugMessanger();
-    void SetupWindowHints();
 
 protected:
     GLFWwindow* p_WindowPtr{};

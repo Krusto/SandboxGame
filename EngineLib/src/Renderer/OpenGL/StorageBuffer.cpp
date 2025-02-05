@@ -1,20 +1,19 @@
 #include <glad/glad.h>
 #include <cassert>
 #include <Core/Allocator.hpp>
-#include <Renderer/Shared/APISpecific/StorageBuffer.hpp>
+#include <Renderer/Predefines.hpp>
+#include <Renderer/OpenGL/StructDefinitions.hpp>
 
 namespace Engine
 {
-    struct StorageBufferData {
-        uint32_t id;
-        StorageBufferType type;
-    };
 
-    void StorageBuffer::Init(uint8_t* data, size_t size, StorageBufferType type)
+    EXPORT_RENDERER void StorageBufferInit(void** data, void* vertexArray, char* storageData, unsigned int size,
+                                           int type)
     {
-        if (m_Data == nullptr) { m_Data = Engine::Allocator::Allocate<StorageBufferData>(); }
+        if (*data == nullptr) { *data = Engine::Allocator::Allocate<StorageBufferData>(); }
+        StorageBufferData* m_Data = static_cast<StorageBufferData*>(*data);
         GLenum usage{};
-        switch (type)
+        switch ((StorageBufferType) type)
         {
             case StorageBufferType::DynamicStorage:
                 usage = GL_DYNAMIC_STORAGE_BIT;
@@ -45,24 +44,30 @@ namespace Engine
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     }
 
-    void StorageBuffer::Bind(size_t location) const
+    EXPORT_RENDERER void StorageBufferBind(void* data, unsigned int location)
     {
+        StorageBufferData* m_Data = static_cast<StorageBufferData*>(data);
         assert(m_Data->id != 0);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, location, m_Data->id);
     }
 
-    void StorageBuffer::Unbind() const { glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0); }
+    EXPORT_RENDERER void StorageBufferUnbind(void* data) { glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0); }
 
-    void StorageBuffer::Destroy()
+    EXPORT_RENDERER void StorageBufferDestroy(void** data)
     {
+        StorageBufferData* m_Data = static_cast<StorageBufferData*>(*data);
         if (m_Data)
         {
             glDeleteBuffers(1, &m_Data->id);
             Allocator::Deallocate(m_Data);
-            m_Data = nullptr;
+            *data = nullptr;
         }
     }
 
-    uint32_t StorageBuffer::id() const { return m_Data->id; }
+    EXPORT_RENDERER uint32_t StorageBufferGetID(void* data)
+    {
+        StorageBufferData* m_Data = static_cast<StorageBufferData*>(data);
+        return m_Data->id;
+    }
 
 }// namespace Engine

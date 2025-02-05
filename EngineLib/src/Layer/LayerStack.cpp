@@ -1,14 +1,12 @@
 #include "LayerStack.hpp"
 #include <Window/Window.hpp>
-#include <Renderer/Loader.hpp>
 
 namespace Engine
 {
     inline static std::vector<Layer*> s_Layers;
 
-    void LayerStack::InitLayers(Window* window)
+    void LayerStack::InitLayers(Window* window,const char* working_directory)
     {
-        Loader::Load();
         for (auto layer: s_Layers) { layer->Init(window); }
     }
 

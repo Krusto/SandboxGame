@@ -34,14 +34,11 @@ void LightObject::Init()
 
     m_VertexArray = Engine::VertexArray::Create(36);
     m_VertexArray.Bind();
-    m_VertexArray.AddVertexBuffer(layout, (float*) vertices, sizeof(vertices) / sizeof(float));
+    m_VertexArray.AddVertexBuffer(&layout, (float*) vertices, sizeof(vertices) / sizeof(float));
     m_VertexArray.AddIndexBuffer(indices, 36);
 }
 
-void LightObject::Destroy()
-{
-    m_VertexArray.Destroy();
-}
+void LightObject::Destroy() { m_VertexArray.Destroy(); }
 
 Engine::RendererCommand LightObject::Render(Engine::Shader* shader) const
 {

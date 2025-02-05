@@ -1,10 +1,9 @@
 #pragma once
 #include <cstdint>
-#include <Renderer/Predefines.hpp>
 
 namespace Engine
 {
-    enum class ImageType
+    enum class ImageType : uint8_t
     {
         RGBA,
         RGB,
@@ -13,7 +12,7 @@ namespace Engine
     };
     struct ImageData;
 
-    class EXPORT_RENDERER Image
+    class Image
     {
     public:
         Image() = default;

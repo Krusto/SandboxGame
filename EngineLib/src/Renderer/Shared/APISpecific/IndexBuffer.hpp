@@ -1,13 +1,12 @@
 #pragma once
 #include <cstdint>
-#include <Renderer/Predefines.hpp>
 
 namespace Engine
 {
     class VertexArray;
     struct IndexBufferData;
 
-    class EXPORT_RENDERER IndexBuffer
+    class IndexBuffer
     {
     public:
         static IndexBuffer Create(VertexArray* va, const uint32_t* data, uint32_t length);
@@ -17,9 +16,8 @@ namespace Engine
         void Destroy();
         void Bind() const;
         uint32_t GetID() const;
-
-    public:
-        uint32_t indexCount{};
+        uint32_t GetSize() const;
+        uint32_t GetLength() const;
 
     private:
         IndexBufferData* m_Data{};

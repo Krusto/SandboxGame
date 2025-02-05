@@ -4,6 +4,7 @@
 
 #include "Application.hpp"
 #include <Renderer/Renderer.hpp>
+#include <Renderer/Loader.hpp>
 #include <chrono>
 
 Engine::Application* s_Application{};
@@ -19,9 +20,6 @@ Engine::Application& Engine::Application::Get() { return *s_Application; }
 
 void Engine::Application::Run()
 {
-
-    LayerStack::InitLayers(m_Window);
-
     double dt = 0, before, after;
     while (!m_Window->ShouldClose())
     {
@@ -46,14 +44,19 @@ void Engine::Application::Run()
 
 void Engine::Application::Init(const Engine::ApplicationSpec& spec)
 {
+
+
     m_ApplicationSpec = spec;
     m_ApplicationSpec.WorkingDirectory = std::filesystem::absolute(spec.WorkingDirectory);
+    RendererSharedLoader::Load((m_ApplicationSpec.WorkingDirectory.string()).c_str());
 
     m_Window = Engine::Allocator::Allocate<Window>();
-    m_Window->Create(WindowSpec{m_ApplicationSpec.ApplicationName, m_ApplicationSpec.width, m_ApplicationSpec.height});
 
     RendererSpec rendererSpec = {.SurfaceSize = {m_ApplicationSpec.width, m_ApplicationSpec.height}};
     Renderer::Init(rendererSpec, m_ApplicationSpec);
+
+    m_Window->Create(WindowSpec{m_ApplicationSpec.ApplicationName, m_ApplicationSpec.width, m_ApplicationSpec.height});
+    LayerStack::InitLayers(m_Window, (m_ApplicationSpec.WorkingDirectory.string()).c_str());
 }
 
 void Engine::Application::Destroy()

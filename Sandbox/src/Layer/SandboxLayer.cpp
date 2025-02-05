@@ -84,7 +84,7 @@ void SandboxLayer::Init(Engine::Window* window)
             Engine::VertexLayout({Engine::VertexAttribute{"Position", Engine::ShaderUniformType::Vec3},
                                   Engine::VertexAttribute{"TextureCoord", Engine::ShaderUniformType::Vec2}});
 
-    m_DepthBufferVA.AddVertexBuffer(layout, vertices, length);
+    m_DepthBufferVA.AddVertexBuffer(&layout, vertices, length);
 
     uint32_t indices[] = {0, 1, 2, 0, 2, 3};
     m_DepthBufferVA.AddIndexBuffer(indices, 6);

@@ -8,7 +8,7 @@ namespace Engine
 {
     struct SkyboxData;
 
-    class EXPORT_RENDERER Skybox
+    class Skybox
     {
     public:
         static Skybox Create(std::string_view cubemapName, const std::string& shaderPath,

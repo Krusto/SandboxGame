@@ -6,16 +6,9 @@
 
 namespace Engine
 {
-    struct TextureArraySpec {
-        std::string_view Name;
-        std::string_view Path;
-        int32_t Width;
-        int32_t Height;
-        int32_t Channels;
-    };
     struct TextureArrayData;
 
-    class EXPORT_RENDERER TextureArray
+    class TextureArray
     {
     public:
         TextureArray() = default;

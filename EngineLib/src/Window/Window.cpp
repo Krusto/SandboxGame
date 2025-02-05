@@ -23,8 +23,8 @@ namespace Engine
             LOG_ERROR("GLFW initialization failed!");
             exit(-1);
         }
-
-        GraphicsContext::Get()->SetupWindowHints();
+        Renderer::RendererContextSetupWindowHints(nullptr);
+        //GraphicsContext::SetupWindowHints();
 
         int major, minor, rev;
         glfwGetVersion(&major, &minor, &rev);

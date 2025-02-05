@@ -1,10 +1,9 @@
 #pragma once
 #include <functional>
-#include <Renderer/Predefines.hpp>
 
 namespace Engine
 {
-    class EXPORT_RENDERER RendererCommand
+    class RendererCommand
     {
     public:
         RendererCommand() = default;

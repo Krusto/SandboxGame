@@ -1,10 +1,11 @@
 #pragma once
+#include <cstdint>
 
 namespace Engine
 {
-    enum class DepthFunction
+    enum DepthFunction
     {
-        Never,
+        Never = 0,
         Less,
         Equal,
         LEqual,
