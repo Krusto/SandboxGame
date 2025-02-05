@@ -7,7 +7,6 @@
 #include <string_view>
 
 #include <Core/Core.hpp>
-#include "Renderer/Predefines.hpp"
 #include "ShaderUniform.hpp"
 
 namespace Engine
@@ -18,7 +17,7 @@ namespace Engine
         uint32_t offset{};
     };
 
-    class EXPORT_RENDERER VertexLayout
+    class VertexLayout
     {
     public:
         VertexLayout() = default;

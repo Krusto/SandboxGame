@@ -1,22 +1,12 @@
 #pragma once
 #include <cstdint>
-#include <Renderer/Predefines.hpp>
+#include <Renderer/Shared/StorageBufferType.hpp>
 
 namespace Engine
 {
-    enum class StorageBufferType
-    {
-        None,
-        DynamicStorage,
-        MapReadOnly,
-        MapWriteOnly,
-        MapPersistent,
-        MapCoherent,
-        ClientStorage
-    };
     struct StorageBufferData;
 
-    class EXPORT_RENDERER StorageBuffer
+    class StorageBuffer
     {
     public:
         StorageBuffer() = default;

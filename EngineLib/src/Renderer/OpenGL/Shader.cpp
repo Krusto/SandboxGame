@@ -1,29 +1,21 @@
-#include <glad/glad.h>
-#include <Renderer/Renderer.hpp>
-#include <Renderer/Shared/APISpecific/Shader.hpp>
-#include <Renderer/Shared/ShaderUniform.hpp>
 #include <Util/File.hpp>
 #include <Core/Allocator.hpp>
+#include <Renderer/Shared/ShaderUniform.hpp>
+#include <Renderer/OpenGL/StructDefinitions.hpp>
+#include <Renderer/Predefines.hpp>
+
 #include <string>
 #include <sstream>
 #include <limits>
 #include <fstream>
 #include <filesystem>
 
+#include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
 namespace Engine
 {
-    struct ShaderData {
-        uint32_t rendererID = 0;
-        bool loaded = false;
-        bool compiled = false;
 
-        std::string name, assetPath;
-
-        std::unordered_map<GLenum, std::string> shaderSource;
-        std::vector<ShaderUniformBlockLayout> uniformBlocks;
-    };
 
     void Compile(ShaderData* shaderData, const std::string& vertexData, const std::string& fragmentData);
 
@@ -31,57 +23,60 @@ namespace Engine
 
     std::string ReadShaderFromFile(ShaderData* shaderData, const std::string& filepath, ShaderType shaderType);
 
-    std::unordered_map<GLenum, std::string> PreProcess(ShaderData* shaderData, const std::string& source);
+    std::unordered_map<GLenum, std::string>* PreProcess(ShaderData* shaderData, const std::string& source);
 
-    int32_t GetUniformLocation(ShaderData* shaderData, const std::string& name);
+    int32_t GetUniformLocation(ShaderData* shaderData, const char* name);
 
-    void Shader::Reload(bool forceCompile)
+    EXPORT_RENDERER void ShaderReload(void* data, int recompile)
     {
+        ShaderData* m_Data = (ShaderData*) data;
         m_Data->shaderSource =
-                PreProcess(m_Data, std::filesystem::path(m_Data->assetPath).append(m_Data->name).string());
+                (void*) PreProcess(m_Data, std::filesystem::path(m_Data->assetPath).append(m_Data->name).string());
 
-        Compile(m_Data, m_Data->shaderSource[GL_VERTEX_SHADER], m_Data->shaderSource[GL_FRAGMENT_SHADER]);
+        Compile(m_Data, asTPtr(m_Data->shaderSource, std::unordered_map<GLenum, std::string>)->at(GL_VERTEX_SHADER),
+                asTPtr(m_Data->shaderSource, std::unordered_map<GLenum, std::string>)->at(GL_FRAGMENT_SHADER));
     }
 
-    void Shader::Load(const std::string& path)
+    EXPORT_RENDERER void ShaderLoad(void** data, const char* path)
     {
-        if (m_Data == nullptr) { m_Data = Engine::Allocator::Allocate<ShaderData>(); }
-        m_Data->assetPath = std::filesystem::absolute(path).parent_path().string();
-        m_Data->name = std::filesystem::path(path).filename().string();
-        Reload(true);
-    }
+        ShaderData* m_Data = (ShaderData*) *data;
+        if (m_Data == nullptr) { *data = Engine::Allocator::Allocate<ShaderData>(); }
+        m_Data = (ShaderData*) *data;
 
-    void SubmitShader(Shader* shader, const std::string& vertexData, const std::string& fragmentData) {}
+        m_Data->assetPath = strdup(std::filesystem::absolute(path).parent_path().string().c_str());
+        m_Data->name = strdup(std::filesystem::path(path).filename().string().c_str());
+        ShaderReload(m_Data, 1);
+    }
 
     void Compile(ShaderData* shaderData, const std::string& vertexData, const std::string& fragmentData)
     {
 
-        Renderer::SubmitAndFlush(std::function<void(void)>([&]() {
-            if (shaderData->rendererID != 0) glDeleteProgram(shaderData->rendererID);
+        // Renderer::SubmitAndFlush(std::function<void(void)>([&]() {
+        if (shaderData->rendererID != 0) glDeleteProgram(shaderData->rendererID);
 
-            const char* vShaderCode = vertexData.c_str();
-            const char* fShaderCode = fragmentData.c_str();
-            uint32_t vertex, fragment;
-            GLint result;
-            vertex = glCreateShader(GL_VERTEX_SHADER);
-            glShaderSource(vertex, 1, &vShaderCode, nullptr);
-            glCompileShader(vertex);
-            CheckShader(shaderData, vertex, GL_COMPILE_STATUS, &result, "Unable to compile the vertex shader!");
+        const char* vShaderCode = vertexData.c_str();
+        const char* fShaderCode = fragmentData.c_str();
+        uint32_t vertex, fragment;
+        GLint result;
+        vertex = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(vertex, 1, &vShaderCode, nullptr);
+        glCompileShader(vertex);
+        CheckShader(shaderData, vertex, GL_COMPILE_STATUS, &result, "Unable to compile the vertex shader!");
 
-            fragment = glCreateShader(GL_FRAGMENT_SHADER);
-            glShaderSource(fragment, 1, &fShaderCode, nullptr);
-            glCompileShader(fragment);
-            CheckShader(shaderData, fragment, GL_COMPILE_STATUS, &result, "Unable to compile the fragment shader!");
+        fragment = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(fragment, 1, &fShaderCode, nullptr);
+        glCompileShader(fragment);
+        CheckShader(shaderData, fragment, GL_COMPILE_STATUS, &result, "Unable to compile the fragment shader!");
 
-            shaderData->rendererID = glCreateProgram();
-            glAttachShader(shaderData->rendererID, vertex);
-            glAttachShader(shaderData->rendererID, fragment);
-            glLinkProgram(shaderData->rendererID);
-            CheckShader(shaderData, shaderData->rendererID, GL_LINK_STATUS, &result, "Unable to link the program!");
+        shaderData->rendererID = glCreateProgram();
+        glAttachShader(shaderData->rendererID, vertex);
+        glAttachShader(shaderData->rendererID, fragment);
+        glLinkProgram(shaderData->rendererID);
+        CheckShader(shaderData, shaderData->rendererID, GL_LINK_STATUS, &result, "Unable to link the program!");
 
-            glDeleteShader(vertex);
-            glDeleteShader(fragment);
-        }));
+        glDeleteShader(vertex);
+        glDeleteShader(fragment);
+        // }));
     }
 
     void CheckShader(ShaderData* shaderData, GLuint id, GLuint type, GLint* ret, const char* onfail)
@@ -110,23 +105,22 @@ namespace Engine
         }
     }
 
-    std::unordered_map<GLenum, std::string> PreProcess(ShaderData* shaderData, const std::string& source)
+    std::unordered_map<GLenum, std::string>* PreProcess(ShaderData* shaderData, const std::string& source)
     {
-        std::unordered_map<GLenum, std::string> shaderSources;
+        std::unordered_map<GLenum, std::string>* shaderSources =
+                Allocator::Allocate<std::unordered_map<GLenum, std::string>>();
 
-        shaderSources[GL_VERTEX_SHADER] = ReadShaderFromFile(shaderData, source, ShaderType::Vertex);
-        shaderSources[GL_FRAGMENT_SHADER] = ReadShaderFromFile(shaderData, source, ShaderType::Fragment);
+        shaderSources->emplace(GL_VERTEX_SHADER, ReadShaderFromFile(shaderData, source, ShaderType::Vertex));
+        shaderSources->emplace(GL_FRAGMENT_SHADER, ReadShaderFromFile(shaderData, source, ShaderType::Fragment));
 
         return shaderSources;
     }
 
-    void Shader::Bind() { glUseProgram(m_Data->rendererID); }
+    EXPORT_RENDERER void ShaderBind(void* data) { glUseProgram(asTPtr(data, ShaderData)->rendererID); }
 
-    void Shader::Bind() const { glUseProgram(m_Data->rendererID); }
+    EXPORT_RENDERER unsigned int ShaderGetID(void* data) { return asTPtr(data, ShaderData)->rendererID; }
 
-    uint32_t Shader::ID() const { return m_Data->rendererID; }
-
-    static bool file_read_string(const int8_t* path, size_t* len, std::string* buffer)
+    inline static bool file_read_string(const int8_t* path, size_t* len, std::string* buffer)
     {
         std::ifstream f(std::string((const char*) path), std::ios::in);
         if (f)
@@ -173,78 +167,84 @@ namespace Engine
         return result;
     }
 
-    void Shader::Destroy()
+    EXPORT_RENDERER void ShaderDestroy(void** data)
     {
+        ShaderData* m_Data = (ShaderData*) *data;
         if (m_Data)
         {
             glDeleteProgram(m_Data->rendererID);
+            if (m_Data->name) { free(m_Data->name); }
+            if (m_Data->assetPath) { free(m_Data->assetPath); }
             Allocator::Deallocate(m_Data);
-            m_Data = nullptr;
+            *data = nullptr;
         }
     }
 
-    int32_t GetUniformLocation(ShaderData* shaderData, const std::string& name)
+    int32_t GetUniformLocation(ShaderData* shaderData, const char* name)
     {
-        int32_t result = glGetUniformLocation(shaderData->rendererID, name.c_str());
+        int32_t result = glGetUniformLocation(shaderData->rendererID, name);
         return result;
     }
 
-    void Shader::SetUniform(const std::string& fullname, float value) const
+    EXPORT_RENDERER void ShaderSetUniformF(void* data, const char* fullname, float value)
     {
-        glUniform1f(GetUniformLocation(m_Data, fullname), value);
+        glUniform1f(GetUniformLocation((ShaderData*) data, fullname), value);
     }
 
-    void Shader::SetUniform(const std::string& fullname, int value) const
+    EXPORT_RENDERER void ShaderSetUniformI(void* data, const char* fullname, int32_t value)
     {
-        glUniform1i(GetUniformLocation(m_Data, fullname), value);
+        glUniform1i(GetUniformLocation((ShaderData*) data, fullname), value);
     }
 
-    void Shader::SetUniform(const std::string& fullname, const glm::ivec2& value) const
+    EXPORT_RENDERER void ShaderSetUniformUI(void* data, const char* fullname, uint32_t value)
     {
-        glUniform2i(GetUniformLocation(m_Data, fullname), value.x, value.y);
+        glUniform1ui(GetUniformLocation((ShaderData*) data, fullname), value);
     }
 
-    void Shader::SetUniform(const std::string& fullname, const glm::ivec3& value) const
+    EXPORT_RENDERER void ShaderSetUniform2F(void* data, const char* fullname, float x, float y)
     {
-        glUniform3i(GetUniformLocation(m_Data, fullname), value.x, value.y, value.z);
+        glUniform2f(GetUniformLocation((ShaderData*) data, fullname), x, y);
     }
 
-    void Shader::SetUniform(const std::string& fullname, const glm::ivec4& value) const
+    EXPORT_RENDERER void ShaderSetUniform3F(void* data, const char* fullname, float x, float y, float z)
     {
-        glUniform4i(GetUniformLocation(m_Data, fullname), value.x, value.y, value.z, value.w);
+        glUniform3f(GetUniformLocation((ShaderData*) data, fullname), x, y, z);
     }
 
-    void Shader::SetUniform(const std::string& fullname, uint32_t value) const
+    EXPORT_RENDERER void ShaderSetUniform4F(void* data, const char* fullname, float x, float y, float z, float w)
     {
-        glUniform1ui(GetUniformLocation(m_Data, fullname), value);
+        glUniform4f(GetUniformLocation((ShaderData*) data, fullname), x, y, z, w);
     }
 
-    void Shader::SetUniform(const std::string& fullname, const glm::vec2& value) const
+    EXPORT_RENDERER void ShaderSetUniform2I(void* data, const char* fullname, int32_t x, int32_t y)
     {
-        glUniform2f(GetUniformLocation(m_Data, fullname), value.x, value.y);
+        glUniform2i(GetUniformLocation((ShaderData*) data, fullname), x, y);
     }
 
-    void Shader::SetUniform(const std::string& fullname, const glm::vec3& value) const
+    EXPORT_RENDERER void ShaderSetUniform3I(void* data, const char* fullname, int32_t x, int32_t y, int32_t z)
     {
-        glUniform3f(GetUniformLocation(m_Data, fullname), value.x, value.y, value.z);
+        glUniform3i(GetUniformLocation((ShaderData*) data, fullname), x, y, z);
     }
 
-    void Shader::SetUniform(const std::string& fullname, const glm::vec4& value) const
+    EXPORT_RENDERER void ShaderSetUniform4I(void* data, const char* fullname, int32_t x, int32_t y, int32_t z,
+                                            int32_t w)
     {
-        glUniform4f(GetUniformLocation(m_Data, fullname), value.x, value.y, value.z, value.w);
+        glUniform4i(GetUniformLocation((ShaderData*) data, fullname), x, y, z, w);
     }
 
-    void Shader::SetUniform(const std::string& fullname, const glm::mat3& value) const
+    EXPORT_RENDERER void ShaderSetUniformMat3(void* data, const char* fullname, void* matrix)
     {
-        glUniformMatrix3fv(GetUniformLocation(m_Data, fullname), 1, GL_FALSE, glm::value_ptr(value));
+        glUniformMatrix3fv(GetUniformLocation((ShaderData*) data, fullname), 1, GL_FALSE,
+                           glm::value_ptr(*(glm::mat3*) matrix));
     }
 
-    void Shader::SetUniform(const std::string& fullname, const glm::mat4& value) const
+    EXPORT_RENDERER void ShaderSetUniformMat4(void* data, const char* fullname, void* matrix)
     {
-        glUniformMatrix4fv(GetUniformLocation(m_Data, fullname), 1, GL_FALSE, glm::value_ptr(value));
+        glUniformMatrix4fv(GetUniformLocation((ShaderData*) data, fullname), 1, GL_FALSE,
+                           glm::value_ptr(*(glm::mat4*) matrix));
     }
 
-    const std::string& Shader::GetName() const { return m_Data->name; }
+    EXPORT_RENDERER const char* ShaderGetName(void* data) { return ((ShaderData*) data)->name; }
 
-    const std::string& Shader::GetPath() const { return m_Data->assetPath; };
+    EXPORT_RENDERER const char* ShaderGetPath(void* data) { return ((ShaderData*) data)->assetPath; };
 }// namespace Engine

@@ -1,5 +1,6 @@
 #include "GUIContext.hpp"
 #include <Renderer/Renderer.hpp>
+
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 
@@ -15,16 +16,16 @@ namespace Engine
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;    // IF using Docking Branch
 
-        _RendererSpecificInit(window);
+        Renderer::GUIContextInit(nullptr, window);
     }
 
     void GUIContext::Shutdown()
     {
-        _RendererSpecificShutdown();
+        Renderer::GUIContextDestroy(nullptr);
         ImGui::DestroyContext();
     }
 
-    void GUIContext::NewFrame() { _RendererSpecificNewFrame(); }
+    void GUIContext::NewFrame() { Renderer::GUIContextBegin(nullptr); }
 
-    void GUIContext::Render(ImDrawData* drawData) { _RendererSpecificRender(drawData); }
+    void GUIContext::Render(ImDrawData* drawData) { Renderer::GUIContextEnd(nullptr, drawData); }
 }// namespace Engine

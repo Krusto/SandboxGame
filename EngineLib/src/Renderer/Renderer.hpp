@@ -9,7 +9,6 @@
 
 #include <glm/vec4.hpp>
 
-#include <Renderer/Predefines.hpp>
 #include "Shared/DepthFunction.hpp"
 #include "Shared/GraphicsContext.hpp"
 #include "Shared/RendererCommand.hpp"
@@ -42,7 +41,7 @@ namespace Engine
     class RendererAPI;
     struct ApplicationSpec;
 
-    class EXPORT_RENDERER Renderer
+    class Renderer
     {
     public:
         static void Init(RendererSpec rendererSpec, ApplicationSpec applicationSpec);
@@ -74,5 +73,8 @@ namespace Engine
 
         inline static std::vector<RendererCommand> s_CommandContainer{};
         inline static RendererSpec s_RendererSpec{};
+
+    public:
+#include <Renderer/Shared/function_pointers.h>
     };
 }// namespace Engine

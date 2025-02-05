@@ -15,7 +15,7 @@ namespace Engine
     public:
         LayerStack() = default;
 
-        static void InitLayers(Window* window);
+        static void InitLayers(Window* window,const char* working_directory);
 
         static void PushLayer(Layer* layer);
 

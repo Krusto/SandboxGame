@@ -1,15 +1,13 @@
 #pragma once
 #include <cstdint>
-#include <Core/Ref.hpp>
-#include <Renderer/Shared/Vertex.hpp>
-#include <Renderer/Predefines.hpp>
 
 namespace Engine
 {
     class VertexArray;
+    struct VertexLayout;
     struct VertexBufferData;
 
-    class EXPORT_RENDERER VertexBuffer
+    class VertexBuffer
     {
     public:
         VertexBuffer() = default;

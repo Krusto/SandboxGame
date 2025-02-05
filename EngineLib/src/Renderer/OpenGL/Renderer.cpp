@@ -1,59 +1,58 @@
-#include <Renderer/Shared/APISpecific/RendererAPI.hpp>
-#include <Renderer/Shared/APISpecific/GUIContext.hpp>
-#include <Renderer/Shared/RendererSpec.hpp>
-#include <Application/ApplicationSpec.hpp>
 #include <glad/glad.h>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
+#include <Core/Allocator.hpp>
+#include <Renderer/Predefines.hpp>
+#include <Renderer/OpenGL/StructDefinitions.hpp>
+#include <Renderer/Shared/function_pointers.h>
+#include <Renderer/Shared/DepthFunction.hpp>
+
 namespace Engine
 {
-    struct RendererAPIData {
-        GUIContext guiContext;
-    };
 
-    void RendererAPI::ClearColor(glm::vec4 color)
+    EXPORT_RENDERER void RendererAPISetClearColor(void* data, float r, float g, float b, float a)
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(color.r, color.g, color.b, color.a);
+        glClearColor(r, g, b, a);
     }
 
-    void RendererAPI::Init(RendererSpec rendererSpec, ApplicationSpec applicationSpec)
+    EXPORT_RENDERER void RendererAPIInit(void** data, void* rendererSpec, void* applicationSpec)
     {
-        if (m_Data == nullptr) { return; }
-        m_Data = Allocator::Allocate<RendererAPIData>();
+        RendererAPIData* m_Data = static_cast<RendererAPIData*>(*data);
+        if (m_Data == nullptr) { m_Data = Allocator::Allocate<RendererAPIData>(); }
     }
 
-    void RendererAPI::Shutdown()
+    EXPORT_RENDERER void RendererAPIDestroy(void** data)
     {
+        RendererAPIData* m_Data = static_cast<RendererAPIData*>(*data);
         if (m_Data == nullptr) { return; }
-        m_Data->guiContext.Shutdown();
+        GUIContextDestroy((void**) &m_Data->guiContext);
         Allocator::Deallocate(m_Data);
-        m_Data = nullptr;
+        *data = nullptr;
     };
 
-    void RendererAPI::BeginFrame(){};
-    void RendererAPI::EndFrame(){};
-
-    void RendererAPI::SwitchMode(uint32_t mode)
+    EXPORT_RENDERER void RendererAPISwitchPolygonMode(void* data, unsigned int mode)
     {
+
         if (mode == 0) { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
         else if (mode == 1) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); }
     }
 
-    void RendererAPI::SetViewport(ViewportSize size) { glViewport(0, 0, size.width, size.height); }
-
-    void RendererAPI::BindDefaultFramebuffer() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
-
-    void RendererAPI::RenderIndexed(VertexArray vertexArray, uint32_t indexCount) const
+    EXPORT_RENDERER void RendererAPISetViewport(void* data, float width, float height)
     {
-        vertexArray.Bind();
-        glDrawElements(GL_TRIANGLES, (indexCount == 0) ? vertexArray.IndexCount() : indexCount, GL_UNSIGNED_INT,
-                       nullptr);
+        glViewport(0, 0, width, height);
+    }
+
+    EXPORT_RENDERER void RendererAPIBindDefaultFramebuffer() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
+
+    EXPORT_RENDERER void RendererAPIRenderIndexed(void* data, uint32_t indexCount)
+    {
+        glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
     };
 
-    void RendererAPI::ChangeDepthFunction(DepthFunction depthFunction)
+    EXPORT_RENDERER void RendererAPIChangeDepthFunc(void* data, unsigned int depthFunction)
     {
         switch (depthFunction)
         {
@@ -84,13 +83,27 @@ namespace Engine
         }
     }
 
-    void RendererAPI::InitImGUI(GLFWwindow* window) { m_Data->guiContext.Init(window); }
+    EXPORT_RENDERER void RendererAPIInitIMGUI(void* data, void* window)
+    {
+        RendererAPIData* m_Data = static_cast<RendererAPIData*>(data);
+        GUIContextInit((void**) &m_Data->guiContext, window);
+    }
 
-    void RendererAPI::DestroyImGUI() { m_Data->guiContext.Shutdown(); }
+    EXPORT_RENDERER void RendererAPIDestroyIMGUI(void* data)
+    {
+        RendererAPIData* m_Data = static_cast<RendererAPIData*>(data);
+        GUIContextDestroy((void**) &m_Data->guiContext);
+    }
 
-    void RendererAPI::ImGuiNewFrame() { m_Data->guiContext.NewFrame(); }
+    EXPORT_RENDERER void RendererAPIIMGUIBegin(void* data)
+    {
+        RendererAPIData* m_Data = static_cast<RendererAPIData*>(data);
+        GUIContextBegin(&m_Data->guiContext);
+    }
 
-    void RendererAPI::ImGuiRender(ImDrawData* drawData) { m_Data->guiContext.Render(drawData); }
-
-    RendererAPIType RendererAPI::GetAPI() const { return RendererAPIType::OpenGL; }
+    EXPORT_RENDERER void RendererAPIIMGUIEnd(void* data, void* drawData)
+    {
+        RendererAPIData* m_Data = static_cast<RendererAPIData*>(data);
+        GUIContextEnd(&m_Data->guiContext, drawData);
+    }
 }// namespace Engine

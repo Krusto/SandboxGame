@@ -59,11 +59,19 @@ file(GLOB_RECURSE SANDBOX_WORLD_HEADER_FILES ./EngineLib/src/Scene/World/*.hpp)
 file(GLOB_RECURSE UTILS_SOURCE_FILES ./EngineLib/src/Util/*.cpp)
 file(GLOB_RECURSE UTILS_HEADER_FILES ./EngineLib/src/Util/*.hpp ./EngineLib/src/Util/*.h)
 
-file(GLOB_RECURSE RENDERER_OPENGL_SOURCE_FILES ./EngineLib/src/Renderer/Shared/*.cpp ./EngineLib/src/Renderer/OpenGL/*.cpp ./EngineLib/src/Core/Ref.cpp)
-file(GLOB_RECURSE RENDERER_OPENGL_HEADER_FILES ./EngineLib/src/Renderer/Shared/*.hpp ./EngineLib/src/Renderer/OpenGL/*.hpp ./EngineLib/src/Renderer/Shared/*.h)
+file(GLOB_RECURSE RENDERER_OPENGL_SOURCE_FILES ./EngineLib/src/Renderer/OpenGL/*.cpp ./EngineLib/src/Core/Ref.cpp)
+file(GLOB_RECURSE RENDERER_OPENGL_HEADER_FILES ./EngineLib/src/Renderer/OpenGL/*.hpp)
 
-file(GLOB_RECURSE RENDERER_VULKAN_SOURCE_FILES ./EngineLib/src/Renderer/Shared/*.cpp ./EngineLib/src/Renderer/Vulkan/*.cpp ./EngineLib/src/Core/Ref.cpp)
-file(GLOB_RECURSE RENDERER_VULKAN_HEADER_FILES ./EngineLib/src/Renderer/Shared/*.hpp ./EngineLib/src/Renderer/Vulkan/*.hpp ./EngineLib/src/Renderer/Shared/*.h)
+file(GLOB_RECURSE RENDERER_VULKAN_SOURCE_FILES ./EngineLib/src/Renderer/Vulkan/*.cpp ./EngineLib/src/Core/Ref.cpp)
+file(GLOB_RECURSE RENDERER_VULKAN_HEADER_FILES ./EngineLib/src/Renderer/Vulkan/*.hpp )
+
+file(GLOB_RECURSE RENDERER_SOURCE_FILES ./EngineLib/src/Renderer/Shared/*.cpp ./EngineLib/src/Core/Ref.cpp)
+file(GLOB_RECURSE RENDERER_HEADER_FILES ./EngineLib/src/Renderer/Shared/*.hpp ./EngineLib/src/Shared/*.h)
+
+list(APPEND RENDERER_SOURCE_FILES ./EngineLib/src/Renderer/Renderer.cpp)
+list(APPEND RENDERER_HEADER_FILES ./EngineLib/src/Renderer/Renderer.hpp
+    ./EngineLib/src/Renderer/Loader.hpp
+    ./EngineLib/src/Renderer/Predefines.hpp)
 
 set(ENGINE_APPLICATION_SOURCE_FILES ./EngineLib/src/Application/Application.cpp )
 set(ENGINE_APPLICATION_HEADER_FILES ./EngineLib/src/Application/Application.hpp )
@@ -87,7 +95,7 @@ add_library(glad ${BUILD_LIB_FLAG} ${GLAD_SOURCE_FILES} ${GLAD_HEADER_FILES})
 
 add_library(EngineUtils ${BUILD_LIB_FLAG} ${UTILS_SOURCE_FILES} ${UTILS_HEADER_FILES})
 
-add_library(Renderer Static "./EngineLib/src/Renderer/Renderer.cpp" "./EngineLib/src/Renderer/Renderer.hpp" "./EngineLib/src/Renderer/Loader.hpp")
+add_library(Renderer STATIC ${RENDERER_SOURCE_FILES} ${RENDERER_HEADER_FILES})
 
 add_library(RendererOpenGL ${BUILD_LIB_FLAG} ${RENDERER_OPENGL_SOURCE_FILES} ${RENDERER_OPENGL_HEADER_FILES})
 add_library(RendererVulkan ${BUILD_LIB_FLAG} ${RENDERER_VULKAN_SOURCE_FILES} ${RENDERER_VULKAN_HEADER_FILES})

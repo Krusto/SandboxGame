@@ -1,5 +1,8 @@
-#include <Renderer/Shared/APISpecific/TextureArray.hpp>
+#include <Renderer/Predefines.hpp>
+#include <Renderer/Shared/function_pointers.h>
+#include <Renderer/OpenGL/StructDefinitions.hpp>
 #include <Core/Log.hpp>
+#include <Core/Allocator.hpp>
 
 //TODO: remove
 #define STB_IMAGE_IMPLEMENTATION
@@ -11,21 +14,19 @@
 
 namespace Engine
 {
-
-    struct TextureArrayData {
-        TextureArraySpec spec;
-        uint32_t id;
-    };
-
-    void TextureArray::Load(std::string_view arrayName, const std::unordered_map<uint32_t, std::string>& Path)
+    EXPORT_RENDERER void TextureArrayLoad(void** data, const char* textureName, char** paths, unsigned int count)
     {
-        if (m_Data == nullptr) { m_Data = Engine::Allocator::Allocate<TextureArrayData>(); }
-        m_Data->spec.Name = arrayName;
-        for (auto& [index, file]: Path)
+        if (*data == nullptr) { *data = Allocator::Allocate<TextureArrayData>(); }
+        TextureArrayData* m_Data = (TextureArrayData*) *data;
+
+        m_Data->name = strdup(textureName);
+
+        for (unsigned int i = 0; i < count; i++)
         {
+            auto file = paths[i];
             if (!std::filesystem::exists(file))
             {
-                LOG_ERROR("%s does not exist!\n", file.c_str());
+                LOG_ERROR("%s does not exist!\n", file);
                 return;
             }
         }
@@ -34,32 +35,33 @@ namespace Engine
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D_ARRAY, m_Data->id);
         bool first = true;
-        for (auto& [textureIndex, file]: Path)
+        for (unsigned int textureIndex = 0; textureIndex < count; textureIndex++)
         {
+            auto file = paths[textureIndex];
             stbi_uc* data = nullptr;
             {
-                data = stbi_load(file.data(), &m_Data->spec.Width, &m_Data->spec.Height, &m_Data->spec.Channels, 0);
+                data = stbi_load(file, (int*) &m_Data->width, (int*) &m_Data->height, (int*) &m_Data->channels, 0);
             }
-            if (nullptr == data) { LOG_ERROR("Can not load %s\n", file.c_str()); }
-            else { LOG_INFO("Loaded %s\n", file.c_str()); }
+            if (nullptr == data) { LOG_ERROR("Can not load %s\n", file); }
+            else { LOG_INFO("Loaded %s\n", file); }
 
             GLenum internalFormat = 0, dataFormat = 0;
-            if (m_Data->spec.Channels == 4)
+            if (m_Data->channels == 4)
             {
                 internalFormat = GL_RGBA;
                 dataFormat = GL_RGBA;
             }
-            else if (m_Data->spec.Channels == 3)
+            else if (m_Data->channels == 3)
             {
                 internalFormat = GL_RGB8;
                 dataFormat = GL_RGB;
             }
-            else if (m_Data->spec.Channels == 2)
+            else if (m_Data->channels == 2)
             {
                 internalFormat = GL_RG;
                 dataFormat = GL_RG;
             }
-            else if (m_Data->spec.Channels == 1)
+            else if (m_Data->channels == 1)
             {
                 internalFormat = GL_RED;
                 dataFormat = GL_RED;
@@ -67,83 +69,16 @@ namespace Engine
 
             if (first)
             {
-                glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, internalFormat, m_Data->spec.Width, m_Data->spec.Height,
-                             Path.size(), 0, dataFormat, GL_UNSIGNED_BYTE, nullptr);
+                glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, internalFormat, m_Data->width, m_Data->height, count, 0,
+                             dataFormat, GL_UNSIGNED_BYTE, nullptr);
                 first = false;
             }
 
-            glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, textureIndex, m_Data->spec.Width, m_Data->spec.Height, 1,
-                            dataFormat, GL_UNSIGNED_BYTE, data);
-            glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
-
-            stbi_image_free(data);
-        }
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
-    }
-
-    void TextureArray::Load(std::string_view arrayName, std::initializer_list<std::string> Path)
-    {
-        m_Data->spec.Name = arrayName;
-        for (auto& file: Path)
-        {
-            if (!std::filesystem::exists(file))
-            {
-                LOG_ERROR("%s does not exist!", file.data());
-                return;
-            }
-        }
-
-        glGenTextures(1, &m_Data->id);
-        glActiveTexture(GL_TEXTURE0 + Path.size());
-        glBindTexture(GL_TEXTURE_2D_ARRAY, m_Data->id);
-        bool first = true;
-        int index = 0;
-        for (auto file: Path)
-        {
-            stbi_uc* data = nullptr;
-            {
-                data = stbi_load(file.data(), &m_Data->spec.Width, &m_Data->spec.Height, &m_Data->spec.Channels, 0);
-            }
-
-            GLenum internalFormat = 0, dataFormat = 0;
-            if (m_Data->spec.Channels == 4)
-            {
-                internalFormat = GL_RGBA;
-                dataFormat = GL_RGBA;
-            }
-            else if (m_Data->spec.Channels == 3)
-            {
-                internalFormat = GL_RGB8;
-                dataFormat = GL_RGB;
-            }
-            else if (m_Data->spec.Channels == 2)
-            {
-                internalFormat = GL_RG;
-                dataFormat = GL_RG;
-            }
-            else if (m_Data->spec.Channels == 1)
-            {
-                internalFormat = GL_RED;
-                dataFormat = GL_RED;
-            }
-
-            if (first)
-            {
-                glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, internalFormat, m_Data->spec.Width, m_Data->spec.Height,
-                             Path.size(), 0, dataFormat, GL_UNSIGNED_BYTE, nullptr);
-                first = false;
-            }
-
-            glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, index, m_Data->spec.Width, m_Data->spec.Height, 1, dataFormat,
+            glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, textureIndex, m_Data->width, m_Data->height, 1, dataFormat,
                             GL_UNSIGNED_BYTE, data);
             glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 
             stbi_image_free(data);
-            index++;
         }
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -152,29 +87,58 @@ namespace Engine
         glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
     }
 
-    void TextureArray::Bind(uint32_t slot) const
+    EXPORT_RENDERER void TextureArrayBind(void* data, uint32_t slot)
     {
+        TextureArrayData* m_Data = (TextureArrayData*) data;
         glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D_ARRAY, m_Data->id);
     }
 
-    void TextureArray::Destroy()
+    EXPORT_RENDERER void TextureArrayDestroy(void** data)
     {
-        if (m_Data)
+        if (*data)
         {
+            TextureArrayData* m_Data = (TextureArrayData*) data;
             glDeleteTextures(1, &m_Data->id);
+            if (m_Data->name) { free(m_Data->name); }
             Allocator::Deallocate(m_Data);
-            m_Data = nullptr;
+            *data = nullptr;
         }
     }
 
-    std::string_view TextureArray::GetName() const { return m_Data->spec.Name; }
+    EXPORT_RENDERER char* TextureArrayGetName(void* data)
+    {
+        TextureArrayData* m_Data = (TextureArrayData*) data;
+        return m_Data->name;
+    }
 
-    uint32_t TextureArray::ID() const { return m_Data->id; };
+    EXPORT_RENDERER uint32_t TextureArrayGetID(void* data)
+    {
+        TextureArrayData* m_Data = (TextureArrayData*) data;
+        return m_Data->id;
+    };
 
-    uint32_t TextureArray::Width() const { return m_Data->spec.Width; }
+    EXPORT_RENDERER uint32_t TextureArrayGetWidth(void* data)
+    {
+        TextureArrayData* m_Data = (TextureArrayData*) data;
+        return m_Data->width;
+    }
 
-    uint32_t TextureArray::Height() const { return m_Data->spec.Height; }
+    EXPORT_RENDERER uint32_t TextureArrayGetHeight(void* data)
+    {
+        TextureArrayData* m_Data = (TextureArrayData*) data;
+        return m_Data->height;
+    }
 
-    uint32_t TextureArray::Channels() const { return m_Data->spec.Channels; }
+    EXPORT_RENDERER uint32_t TextureArrayGetChannels(void* data)
+    {
+        TextureArrayData* m_Data = (TextureArrayData*) data;
+        return m_Data->channels;
+    }
+
+    EXPORT_RENDERER uint32_t TextureArrayGetCount(void* data)
+    {
+        TextureArrayData* m_Data = (TextureArrayData*) data;
+        return m_Data->count;
+    }
 }// namespace Engine

@@ -23,7 +23,7 @@ namespace Engine
     };
     struct RendererAPIData;
 
-    class EXPORT_RENDERER RendererAPI
+    class RendererAPI
     {
     public:
         RendererAPI() = default;

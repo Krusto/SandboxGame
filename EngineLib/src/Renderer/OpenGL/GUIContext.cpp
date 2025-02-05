@@ -1,32 +1,32 @@
-#include <Renderer/Shared/APISpecific/GUIContext.hpp>
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 #include <glfw/glfw3native.h>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+#include <Renderer/Predefines.hpp>
 
 namespace Engine
 {
-    void GUIContext::_RendererSpecificInit(GLFWwindow* window)
+    EXPORT_RENDERER void GUIContextInit(void** data, void* window)
     {
         // Setup Platform/Renderer bindings
-        ImGui_ImplGlfw_InitForOpenGL(window, true);
+        ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*) window, true);
         ImGui_ImplOpenGL3_Init("#version 410");
     }
 
-    void GUIContext::_RendererSpecificShutdown()
+    EXPORT_RENDERER void GUIContextDestroy(void** data)
     {
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
     }
 
-    void GUIContext::_RendererSpecificNewFrame()
+    EXPORT_RENDERER void GUIContextBegin(void* data)
     {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
     }
 
-    void GUIContext::_RendererSpecificRender(ImDrawData* drawData) { ImGui_ImplOpenGL3_RenderDrawData(drawData); }
+    EXPORT_RENDERER void GUIContextEnd(void* data, void* drawData) { ImGui_ImplOpenGL3_RenderDrawData((ImDrawData*)drawData); }
 }// namespace Engine

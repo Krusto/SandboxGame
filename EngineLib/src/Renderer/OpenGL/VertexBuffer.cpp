@@ -1,9 +1,11 @@
-#include <Renderer/Shared/APISpecific/VertexArray.hpp>
-#include <Renderer/Shared/APISpecific/VertexBuffer.hpp>
+#include "StructDefinitions.hpp"
+#include <Core/Allocator.hpp>
+#include <Renderer/Shared/Vertex.hpp>
 
 #include <glad/glad.h>
 #include <utility>
 #include <cassert>
+#include <Renderer/Predefines.hpp>
 
 namespace glm
 {
@@ -19,72 +21,76 @@ namespace glm
 
 namespace Engine
 {
-    struct VertexBufferData {
-        uint32_t m_ID;
-    };
-
-    void VertexBuffer::Init(VertexArray* va, const VertexLayout& layout, float* data, uint32_t length)
+    // void VertexBuffer::Init(VertexArray* va, const VertexLayout& layout, float* data, uint32_t length)
+    EXPORT_RENDERER void VertexBufferInit(void** data, void* vertexArray, void* vertexLayout, float* vertices,
+                                          unsigned int length)
     {
-        m_Data = Allocator::Allocate<VertexBufferData>();
+        if (length == 0) return;
+        if (*data == nullptr) { *data = Allocator::Allocate<VertexBufferData>(); }
 
-        glCreateBuffers(1, &m_Data->m_ID);
-        glNamedBufferStorage(m_Data->m_ID, static_cast<GLsizei>(length) * static_cast<GLsizei>(layout.stride), data,
+        VertexBufferData* m_Data = static_cast<VertexBufferData*>(*data);
+
+        VertexLayout& layout = *static_cast<VertexLayout*>(vertexLayout);
+
+        glCreateBuffers(1, &m_Data->id);
+        glNamedBufferStorage(m_Data->id, static_cast<GLsizei>(length) * static_cast<GLsizei>(layout.stride), data,
                              GL_DYNAMIC_STORAGE_BIT);
 
         uint32_t index = 0;
         uint32_t offset = 0;
+        uint32_t vaID = asTPtr(vertexArray, VertexArrayData)->id;
         for (auto& attr: layout.attributes)
         {
-            glEnableVertexArrayAttrib(va->id(), index);
-            glVertexArrayAttribBinding(va->id(), index, 0);
+            glEnableVertexArrayAttrib(vaID, index);
+            glVertexArrayAttribBinding(vaID, index, 0);
             switch (attr.type)
             {
                 case ShaderUniformType::Float:
-                    glVertexArrayAttribIFormat(va->id(), index, 1, GL_FLOAT, attr.offset);
+                    glVertexArrayAttribIFormat(vaID, index, 1, GL_FLOAT, attr.offset);
                     offset += sizeof(float);
                     break;
                 case ShaderUniformType::Int:
-                    glVertexArrayAttribIFormat(va->id(), index, 1, GL_INT, attr.offset);
+                    glVertexArrayAttribIFormat(vaID, index, 1, GL_INT, attr.offset);
                     offset += sizeof(int32_t);
                     break;
                 case ShaderUniformType::UInt:
-                    glVertexArrayAttribIFormat(va->id(), index, 1, GL_UNSIGNED_INT, attr.offset);
+                    glVertexArrayAttribIFormat(vaID, index, 1, GL_UNSIGNED_INT, attr.offset);
                     offset += sizeof(uint32_t);
                     break;
                 case ShaderUniformType::Bool:
-                    glVertexArrayAttribIFormat(va->id(), index, 1, GL_BOOL, attr.offset);
+                    glVertexArrayAttribIFormat(vaID, index, 1, GL_BOOL, attr.offset);
                     offset += sizeof(bool);
                     break;
                 case ShaderUniformType::Vec2:
-                    glVertexArrayAttribFormat(va->id(), index, 2, GL_FLOAT, GL_FALSE, attr.offset);
+                    glVertexArrayAttribFormat(vaID, index, 2, GL_FLOAT, GL_FALSE, attr.offset);
                     offset += sizeof(glm::vec2::value_type) * glm::vec2::length();
                     break;
                 case ShaderUniformType::Vec3:
-                    glVertexArrayAttribFormat(va->id(), index, 3, GL_FLOAT, GL_FALSE, attr.offset);
+                    glVertexArrayAttribFormat(vaID, index, 3, GL_FLOAT, GL_FALSE, attr.offset);
                     offset += sizeof(glm::vec3::value_type) * glm::vec3::length();
                     break;
                 case ShaderUniformType::Vec4:
-                    glVertexArrayAttribFormat(va->id(), index, 4, GL_FLOAT, GL_FALSE, attr.offset);
+                    glVertexArrayAttribFormat(vaID, index, 4, GL_FLOAT, GL_FALSE, attr.offset);
                     offset += sizeof(glm::vec4::value_type) * glm::vec4::length();
                     break;
                 case ShaderUniformType::Mat3:
-                    glVertexArrayAttribFormat(va->id(), index, glm::mat3::length(), GL_FLOAT, GL_FALSE, attr.offset);
+                    glVertexArrayAttribFormat(vaID, index, glm::mat3::length(), GL_FLOAT, GL_FALSE, attr.offset);
                     offset += sizeof(glm::mat3::value_type);
                     break;
                 case ShaderUniformType::Mat4:
-                    glVertexArrayAttribFormat(va->id(), index, glm::mat4::length(), GL_FLOAT, GL_FALSE, attr.offset);
+                    glVertexArrayAttribFormat(vaID, index, glm::mat4::length(), GL_FLOAT, GL_FALSE, attr.offset);
                     offset += sizeof(glm::mat4::value_type);
                     break;
                 case ShaderUniformType::IVec2:
-                    glVertexArrayAttribIFormat(va->id(), index, 2, GL_INT, attr.offset);
+                    glVertexArrayAttribIFormat(vaID, index, 2, GL_INT, attr.offset);
                     offset += sizeof(glm::ivec2::value_type);
                     break;
                 case ShaderUniformType::IVec3:
-                    glVertexArrayAttribIFormat(va->id(), index, 3, GL_INT, attr.offset);
+                    glVertexArrayAttribIFormat(vaID, index, 3, GL_INT, attr.offset);
                     offset += sizeof(glm::ivec3::value_type);
                     break;
                 case ShaderUniformType::IVec4:
-                    glVertexArrayAttribIFormat(va->id(), index, 4, GL_INT, attr.offset);
+                    glVertexArrayAttribIFormat(vaID, index, 4, GL_INT, attr.offset);
                     offset += sizeof(glm::ivec4::value_type);
                     break;
                 case ShaderUniformType::None:
@@ -94,26 +100,27 @@ namespace Engine
         }
     }
 
-    void VertexBuffer::Bind() const
+    EXPORT_RENDERER void VertexBufferBind(void* data)
     {
-        assert(m_Data->m_ID != 0);
-        glBindBuffer(GL_ARRAY_BUFFER, m_Data->m_ID);
+        VertexBufferData* m_Data = static_cast<VertexBufferData*>(data);
+        assert(m_Data->id != 0);
+        glBindBuffer(GL_ARRAY_BUFFER, m_Data->id);
     }
 
-    size_t VertexBuffer::GetSize() const { return sizeof(VertexBuffer); }
+    EXPORT_RENDERER size_t VertexBufferGetSize(void* data) { return asTPtr(data, VertexBufferData)->size; }
 
-    void VertexBuffer::Destroy()
+    EXPORT_RENDERER void VertexBufferDestroy(void** data)
     {
-        if (m_Data == nullptr) { return; }
-        if (m_Data->m_ID)
+        if (*data == nullptr) { return; }
+        if (asTPtr(data, VertexBufferData)->id != 0)
         {
-            glDeleteBuffers(1, &m_Data->m_ID);
-            m_Data->m_ID = 0;
+            glDeleteBuffers(1, &asTPtr(data, VertexBufferData)->id);
+            asTPtr(data, VertexBufferData)->id = 0;
         }
-        Allocator::Deallocate(m_Data);
-        m_Data = nullptr;
+        Allocator::Deallocate(*data);
+        *data = nullptr;
     }
 
-    uint32_t VertexBuffer::GetID() const { return m_Data->m_ID; }
+    EXPORT_RENDERER uint32_t VertexBufferGetID(void* data) { return asTPtr(data, VertexBufferData)->id; }
 
 }// namespace Engine

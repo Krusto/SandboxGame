@@ -1,8 +1,8 @@
-#include <Renderer/Shared/APISpecific/CubemapTexture.hpp>
+#include <Renderer/Predefines.hpp>
+#include <Renderer/Shared/CubemapTextureSpec.hpp>
 #include <Core/Allocator.hpp>
 #include <filesystem>
 #include <glad/glad.h>
-
 //TODO : remove
 #include "stb_image.h"
 
@@ -13,12 +13,14 @@ namespace Engine
         uint32_t id{};
     };
 
-    void CubemapTexture::Load(std::string_view cubemapName,
-                              const std::unordered_map<CubemapTextureFace, std::string>& Path)
+    EXPORT_RENDERER void CubemapTextureLoad(void** data, void* cubemapName, void* paths)
     {
-        if (m_Data == nullptr) { m_Data = Engine::Allocator::Allocate<CubemapTextureData>(); }
-        m_Data->spec.Name = cubemapName;
-        for (auto& [face, file]: Path)
+
+        if (cubemapName == nullptr || paths == nullptr) { return; }
+        if (*data == nullptr) { *data = Engine::Allocator::Allocate<CubemapTextureData>(); }
+        CubemapTextureData* m_Data = static_cast<CubemapTextureData*>(*data);
+
+        for (auto& [face, file]: asUnorderedMap(paths, CubemapTextureFace, std::string))
         {
             if (!std::filesystem::exists(file))
             {
@@ -31,7 +33,7 @@ namespace Engine
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_Data->id);
         bool first = true;
         uint32_t index = 0;
-        for (auto& [face, file]: Path)
+        for (auto& [face, file]: asUnorderedMap(paths, CubemapTextureFace, std::string))
         {
             stbi_uc* data = nullptr;
             {
@@ -75,27 +77,22 @@ namespace Engine
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
     }
 
-    void CubemapTexture::Bind(uint32_t slot) const
+    EXPORT_RENDERER void CubemapTextureBind(void* data, unsigned int slot)
     {
         glActiveTexture(GL_TEXTURE0 + slot);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, m_Data->id);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, asTPtr(data, CubemapTextureData)->id);
     }
 
-    void CubemapTexture::Destroy()
+    EXPORT_RENDERER void CubemapTextureDestroy(void** data)
     {
-        if (m_Data == nullptr) { return; }
-        glDeleteTextures(1, &m_Data->id);
-        Allocator::Deallocate(m_Data);
-        m_Data = nullptr;
+        if (data == nullptr) { return; }
+        glDeleteTextures(1, &(asTPtr(data, CubemapTextureData)->id));
+        Allocator::Deallocate(*data);
+        *data = nullptr;
     }
 
-    std::string_view CubemapTexture::GetName() const { return m_Data->spec.Name; }
+    EXPORT_RENDERER void* CubemapTextureGetSpec(void* data) { return (void*) &asTPtr(data, CubemapTextureData)->spec; }
 
-    uint32_t CubemapTexture::ID() const { return m_Data->id; }
+    EXPORT_RENDERER int CubemapTextureGetID(void* data) { return asTPtr(data, CubemapTextureData)->id; }
 
-    uint32_t CubemapTexture::Width() const { return m_Data->spec.Width; }
-
-    uint32_t CubemapTexture::Height() const { return m_Data->spec.Height; }
-
-    uint32_t CubemapTexture::Channels() const { return m_Data->spec.Channels; }
 }// namespace Engine
