@@ -46,8 +46,8 @@ file(GLOB_RECURSE GLAD_HEADER_FILES ./Vendor/glad/src/*.h)
 file(GLOB_RECURSE IMGUI_SOURCE_FILES imgui_impl_opengl3.cpp imgui_impl_glfw.cpp imgui.cpp imgui_draw.cpp imgui_tables.cpp imgui_widgets.cpp )
 file(GLOB_RECURSE IMGUI_HEADER_FILES imgui_impl_opengl3.h imgui_impl_glfw.h   imgui.h imconfig.h imgui_internal.h imstb_rectpack.h imstb_textedit.h imstb_truetype.h)
 
-file(GLOB_RECURSE SANDBOX_SOURCE_FILES ./Sandbox/src/*.cpp)
-file(GLOB_RECURSE SANDBOX_HEADER_FILES ./Sandbox/src/*.h)
+file(GLOB_RECURSE SANDBOX_SOURCE_FILES ${CMAKE_SOURCE_DIR}/Sandbox/src/*.cpp)
+file(GLOB_RECURSE SANDBOX_HEADER_FILES ${CMAKE_SOURCE_DIR}/Sandbox/src/*.h)
 
 file(GLOB_RECURSE ENGINE_SOURCE_FILES ./EngineLib/src/Core/*.cpp ./EngineLib/src/Layer/*.cpp ./EngineLib/src/Window/*.cpp)
 file(GLOB_RECURSE ENGINE_HEADER_FILES ./EngineLib/src/Core/*.hpp ./EngineLib/src/Layer/*.hpp ./EngineLib/src/Window/*.hpp
@@ -91,7 +91,7 @@ set(LIBRARY_LOADER_INCLUDE_DIR "./Vendor/LibraryLoader/include")
 message(STATUS "${PROJECT_NAME}: Creating imgui lib")
 add_library(imgui ${BUILD_LIB_FLAG} ${IMGUI_SOURCE_FILES} ${IMGUI_HEADER_FILES})
 message(STATUS "${PROJECT_NAME}: Creating glad lib")
-add_library(glad ${BUILD_LIB_FLAG} ${GLAD_SOURCE_FILES} ${GLAD_HEADER_FILES})
+add_library(glad STATIC ${GLAD_SOURCE_FILES} ${GLAD_HEADER_FILES})
 
 add_library(EngineUtils ${BUILD_LIB_FLAG} ${UTILS_SOURCE_FILES} ${UTILS_HEADER_FILES})
 
@@ -100,9 +100,9 @@ add_library(Renderer STATIC ${RENDERER_SOURCE_FILES} ${RENDERER_HEADER_FILES})
 add_library(RendererOpenGL ${BUILD_LIB_FLAG} ${RENDERER_OPENGL_SOURCE_FILES} ${RENDERER_OPENGL_HEADER_FILES})
 add_library(RendererVulkan ${BUILD_LIB_FLAG} ${RENDERER_VULKAN_SOURCE_FILES} ${RENDERER_VULKAN_HEADER_FILES})
 
-add_library(EngineLib ${BUILD_LIB_FLAG} ${ENGINE_SOURCE_FILES} ${ENGINE_HEADER_FILES})
+add_library(EngineLib STATIC ${ENGINE_SOURCE_FILES} ${ENGINE_HEADER_FILES})
 
-add_library(EngineEntry ${BUILD_LIB_FLAG} ${ENGINE_APPLICATION_SOURCE_FILES} ${ENGINE_APPLICATION_HEADER_FILES})
+add_library(EngineEntry STATIC ${ENGINE_APPLICATION_SOURCE_FILES} ${ENGINE_APPLICATION_HEADER_FILES})
 
 add_library(SandboxWorld STATIC ${SANDBOX_WORLD_SOURCE_FILES} ${SANDBOX_WORLD_HEADER_FILES})
 
@@ -110,9 +110,9 @@ add_library(CUtils INTERFACE)
 target_include_directories(CUtils INTERFACE ${CUTILS_INCLDUE_DIR})
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    target_compile_options(EngineLib PRIVATE -static-libstdc++)
-    target_compile_options(EngineLib PRIVATE -Wall)
-    target_compile_options(EngineLib PRIVATE -pedantic)
+    target_compile_options(EngineLib PUBLIC -static-libstdc++)
+    target_compile_options(EngineLib PUBLIC -Wall)
+    target_compile_options(EngineLib PUBLIC -pedantic)
     target_compile_options(CUtils INTERFACE -Wno-fPermissive)
 endif()
 
@@ -120,12 +120,12 @@ if(MSVC AND ${BUILD_LIB_FLAG} STREQUAL "SHARED")
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
 if (WIN32)
-    target_compile_definitions(EngineLib PRIVATE GLFW_EXPOSE_NATIVE_WIN32)
+    target_compile_definitions(EngineLib PUBLIC GLFW_EXPOSE_NATIVE_WIN32)
 else ()
     find_package(X11 REQUIRED)
     link_libraries(${X11_LIBRARIES})
-    target_compile_definitions(EngineLib PRIVATE _LINUX)
-    target_compile_definitions(EngineLib PRIVATE GLFW_EXPOSE_NATIVE_X11)
+    target_compile_definitions(EngineLib PUBLIC _LINUX)
+    target_compile_definitions(EngineLib PUBLIC GLFW_EXPOSE_NATIVE_X11)
 endif ()
 
 target_compile_definitions(EngineUtils
@@ -153,7 +153,7 @@ target_compile_definitions(EngineLib
 )
 
 target_compile_definitions(glad
-    PRIVATE
+    PUBLIC
     $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:LINK_SHARED>
     $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:GLAD_GLAPI_EXPORT_BUILD>
     $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:GLAD_GLAPI_EXPORT>
@@ -214,11 +214,11 @@ target_compile_definitions(SandboxWorld
     $<$<CONFIG:MinSizeRel>:_RELEASE>
 )
 
-target_include_directories(glad PRIVATE ${GLAD_INCLDUE_DIR})
+target_include_directories(glad PUBLIC ${GLAD_INCLDUE_DIR})
 
-target_include_directories(imgui PRIVATE ${IMGUI_INCLUDE_DIR})
-target_include_directories(imgui PRIVATE ${IMGUI_BACKENDS_INCLUDE_DIR})
-target_include_directories(imgui PRIVATE ${GLFW_INCLDUE_DIR})
+target_include_directories(imgui PUBLIC ${IMGUI_INCLUDE_DIR})
+target_include_directories(imgui PUBLIC ${IMGUI_BACKENDS_INCLUDE_DIR})
+target_include_directories(imgui PUBLIC ${GLFW_INCLDUE_DIR})
 
 set(INCLUDE_DIRS 
 ${GLAD_INCLDUE_DIR}
@@ -233,26 +233,26 @@ ${GLAD_INCLDUE_DIR}
  ${LIBRARY_LOADER_INCLUDE_DIR}
  )
 
-target_include_directories(EngineUtils PRIVATE "./EngineLib/src")
-target_include_directories(EngineUtils PRIVATE ${INCLUDE_DIRS})
+target_include_directories(EngineUtils PUBLIC "./EngineLib/src")
+target_include_directories(EngineUtils PUBLIC ${INCLUDE_DIRS})
 
-target_include_directories(EngineLib PRIVATE "./EngineLib/src")
-target_include_directories(EngineLib PRIVATE ${INCLUDE_DIRS})
+target_include_directories(EngineLib PUBLIC "./EngineLib/src")
+target_include_directories(EngineLib PUBLIC ${INCLUDE_DIRS})
 
-target_include_directories(RendererOpenGL PRIVATE "./EngineLib/src")
+target_include_directories(RendererOpenGL PUBLIC "./EngineLib/src")
 target_include_directories(RendererOpenGL PUBLIC ${INCLUDE_DIRS})
 
-target_include_directories(RendererVulkan PRIVATE "./EngineLib/src")
+target_include_directories(RendererVulkan PUBLIC "./EngineLib/src")
 target_include_directories(RendererVulkan PUBLIC ${INCLUDE_DIRS})
 
-target_include_directories(Renderer PRIVATE "./EngineLib/src")
+target_include_directories(Renderer PUBLIC "./EngineLib/src")
 target_include_directories(Renderer PUBLIC ${INCLUDE_DIRS})
 
-target_include_directories(EngineEntry PRIVATE "./EngineLib/src")
+target_include_directories(EngineEntry PUBLIC "./EngineLib/src")
 target_include_directories(EngineEntry PUBLIC ${INCLUDE_DIRS})
 
-target_include_directories(SandboxWorld PRIVATE "./EngineLib/src")
-target_include_directories(SandboxWorld PRIVATE ${INCLUDE_DIRS})
+target_include_directories(SandboxWorld PUBLIC "./EngineLib/src")
+target_include_directories(SandboxWorld PUBLIC ${INCLUDE_DIRS})
 
 add_library(EngineInterfaceLibrary INTERFACE)
 
@@ -262,9 +262,9 @@ target_link_libraries(imgui PUBLIC glfw glad)
 
 target_link_libraries(EngineInterfaceLibrary INTERFACE EngineUtils glfw imgui glad CUtils FastNoise )
 
-target_link_libraries(RendererOpenGL PRIVATE imgui EngineInterfaceLibrary)
-target_link_libraries(RendererVulkan PRIVATE imgui EngineInterfaceLibrary)
-target_link_libraries(Renderer PRIVATE imgui EngineInterfaceLibrary)
+target_link_libraries(RendererOpenGL PUBLIC glad imgui EngineInterfaceLibrary)
+target_link_libraries(RendererVulkan PUBLIC imgui EngineInterfaceLibrary)
+target_link_libraries(Renderer PUBLIC imgui EngineInterfaceLibrary)
 
 target_link_libraries(EngineLib PUBLIC Renderer EngineInterfaceLibrary)
 
@@ -278,15 +278,15 @@ target_compile_definitions(Sandbox
     $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:LINK_SHARED>
 )
 
-target_include_directories(Sandbox PRIVATE "${CMAKE_SOURCE_DIR}/EngineLib/src")
-target_include_directories(Sandbox PRIVATE "${CMAKE_SOURCE_DIR}/Sandbox/src")
+target_include_directories(Sandbox PUBLIC "${CMAKE_SOURCE_DIR}/EngineLib/src")
+target_include_directories(Sandbox PUBLIC "${CMAKE_SOURCE_DIR}/Sandbox/src")
 target_link_libraries(Sandbox SandboxWorld)
 
 add_executable(ShaderReflectionTest ./ShaderReflectionTest/main.cpp )
 target_link_libraries(ShaderReflectionTest EngineInterfaceLibrary )
-target_include_directories(ShaderReflectionTest PRIVATE ./EngineLib/src/Reflection)
-target_include_directories(ShaderReflectionTest PRIVATE ./EngineLib/src/)
-target_include_directories(ShaderReflectionTest PRIVATE  ${INCLUDE_DIRS})
+target_include_directories(ShaderReflectionTest PUBLIC ./EngineLib/src/Reflection)
+target_include_directories(ShaderReflectionTest PUBLIC ./EngineLib/src/)
+target_include_directories(ShaderReflectionTest PUBLIC  ${INCLUDE_DIRS})
 
 # if(BUILD_ENGINE_SHARED EQUAL "ON")
 #     target_compile_definitions(EngineUtils PUBLIC ENGINE_UTILS_BUILD_DLL)

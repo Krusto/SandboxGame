@@ -44,16 +44,15 @@ void Engine::Application::Run()
 
 void Engine::Application::Init(const Engine::ApplicationSpec& spec)
 {
-
-
     m_ApplicationSpec = spec;
     m_ApplicationSpec.WorkingDirectory = std::filesystem::absolute(spec.WorkingDirectory);
     RendererSharedLoader::Load((m_ApplicationSpec.WorkingDirectory.string()).c_str());
 
-    m_Window = Engine::Allocator::Allocate<Window>();
-
     RendererSpec rendererSpec = {.SurfaceSize = {m_ApplicationSpec.width, m_ApplicationSpec.height}};
     Renderer::Init(rendererSpec, m_ApplicationSpec);
+    LOG_DEBUG("%p\n", Renderer::GetInstance());
+    m_Window = Engine::Allocator::Allocate<Window>();
+    LOG_DEBUG("%p\n", Renderer::GetInstance());
 
     m_Window->Create(WindowSpec{m_ApplicationSpec.ApplicationName, m_ApplicationSpec.width, m_ApplicationSpec.height});
     LayerStack::InitLayers(m_Window, (m_ApplicationSpec.WorkingDirectory.string()).c_str());

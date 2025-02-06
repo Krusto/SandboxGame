@@ -4,7 +4,7 @@
 
 // Graphics Context
 typedef void (*RendererContextCreate_T)(void* handle, void* window);
-inline static RendererContextCreate_T RendererContextCreate;
+static RendererContextCreate_T RendererContextCreate;
 
 typedef void (*RendererContextInit_T)(void* handle);
 inline static RendererContextInit_T RendererContextInit;
@@ -240,7 +240,7 @@ inline static RendererAPIChangeDepthFunc_T RendererAPIChangeDepthFunc;
 // typedef void (*RendererAPIChangeBlendFunc_T)(void* data, unsigned int src, unsigned int dst);
 // inline static  RendererAPIChangeBlendFunc_T RendererAPIChangeBlendFunc;
 
-typedef void (*RendererAPIInitIMGUI_T)(void* data, void* window);
+typedef void (*RendererAPIInitIMGUI_T)(void* renderer_instance, void* data, void* window);
 inline static RendererAPIInitIMGUI_T RendererAPIInitIMGUI;
 
 typedef void (*RendererAPIDestroyIMGUI_T)(void* data);

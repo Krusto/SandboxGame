@@ -16,16 +16,16 @@ namespace Engine
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;    // IF using Docking Branch
 
-        Renderer::GUIContextInit(nullptr, window);
+        Renderer::GetInstance()->GUIContextInit(nullptr, window);
     }
 
     void GUIContext::Shutdown()
     {
-        Renderer::GUIContextDestroy(nullptr);
+        Renderer::GetInstance()->GUIContextDestroy(nullptr);
         ImGui::DestroyContext();
     }
 
-    void GUIContext::NewFrame() { Renderer::GUIContextBegin(nullptr); }
+    void GUIContext::NewFrame() { Renderer::GetInstance()->GUIContextBegin(nullptr); }
 
-    void GUIContext::Render(ImDrawData* drawData) { Renderer::GUIContextEnd(nullptr, drawData); }
+    void GUIContext::Render(ImDrawData* drawData) { Renderer::GetInstance()->GUIContextEnd(nullptr, drawData); }
 }// namespace Engine
