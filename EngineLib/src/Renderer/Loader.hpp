@@ -4,7 +4,7 @@
 #include <string>
 #define _LibStr(n) #n
 #define LibName _LibStr(RendererOpenGL_)
-#define _LoadSymbol2(funcName, funcNameStr) Renderer::funcName = s_Loader.GetSymbol<decltype(Renderer::funcName)>(funcNameStr)
+#define _LoadSymbol2(funcName, funcNameStr) Renderer::s_Renderer->funcName = s_Loader.GetSymbol<decltype(Renderer::funcName)>(funcNameStr)
 #define _LoadSymbol(funcName) _LoadSymbol2(funcName, #funcName)
 
 namespace Engine
@@ -16,7 +16,10 @@ namespace Engine
         {
             std::string path = std::string(working_directory.data()) + "/build/bin/Debug/RendererOpenGL.dll";
             if (!s_Loader.Init(path)) { return; }
-
+               
+            Renderer::Create();
+            Renderer::RendererContextCreate_T a = s_Loader.GetSymbol<Renderer::RendererContextCreate_T>
+                ("RendererContextCreate");
             //Graphics Context
             _LoadSymbol(RendererContextCreate);
             _LoadSymbol(RendererContextDestroy);

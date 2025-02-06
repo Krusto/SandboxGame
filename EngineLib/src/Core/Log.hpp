@@ -44,6 +44,8 @@ inline static void LOG_INFO(const T* format)
 #endif
 }
 
+#define ENGINE_ENABLE_DEBUG_LOG
+
 template <typename... Args>
 inline static void LOG_DEBUG(const char* format, Args... args)
 {

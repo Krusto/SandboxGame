@@ -4,11 +4,11 @@
 
 #pragma once
 
+#include <Renderer/Renderer.hpp>
 #include <Application/ApplicationSpec.hpp>
 #include <Core/Predefines.hpp>
 #include <Core/Log.hpp>
 #include <Core/Ref.hpp>
-#include <Renderer/Renderer.hpp>
 #include <Layer/LayerStack.hpp>
 #include <Util/Version.hpp>
 

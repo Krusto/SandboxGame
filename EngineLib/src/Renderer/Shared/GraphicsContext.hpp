@@ -16,9 +16,9 @@ public:
 public:
     static GraphicsContext* Get();
     static void SetupWindowHints();
+    static void Create(GLFWwindow* window);
 
 public:
-    void Create(GLFWwindow* window);
     void Destroy();
     void Init();
     void SwapBuffers();

@@ -113,13 +113,5 @@ EXPORT_RENDERER void RendererContextAddDebugMessanger(void* window)
 
 EXPORT_RENDERER void RendererContextSetupWindowHints(void* window)
 {
-    constexpr auto OPENGL_VERSION_MAJOR = 4;
-    constexpr auto OPENGL_VERSION_MINOR = 6;
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, OPENGL_VERSION_MAJOR);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, OPENGL_VERSION_MINOR);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#ifdef _DEBUG
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-#endif
+
 }

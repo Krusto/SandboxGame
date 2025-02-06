@@ -10,22 +10,22 @@ void GraphicsContext::Create(GLFWwindow* window)
 {
     s_Context.p_WindowPtr = window;
 
-    Engine::Renderer::RendererContextCreate(this, window);
+    Engine::Renderer::GetInstance()->RendererContextCreate(Get(), window);
 }
 
 void GraphicsContext::Destroy()
 {
     s_Context.p_WindowPtr = nullptr;
-    Engine::Renderer::RendererContextDestroy(this);
+    Engine::Renderer::GetInstance()->RendererContextDestroy(this);
 }
 
-void GraphicsContext::Init() { Engine::Renderer::RendererContextInit(this); }
+void GraphicsContext::Init() { Engine::Renderer::GetInstance()->RendererContextInit(this); }
 
-void GraphicsContext::SwapBuffers() { Engine::Renderer::RendererContextSwapBuffers(p_WindowPtr); }
+void GraphicsContext::SwapBuffers() { Engine::Renderer::GetInstance()->RendererContextSwapBuffers(p_WindowPtr); }
 
-void GraphicsContext::AddDebugMessanger() { Engine::Renderer::RendererContextAddDebugMessanger(p_WindowPtr); }
+void GraphicsContext::AddDebugMessanger() { Engine::Renderer::GetInstance()->RendererContextAddDebugMessanger(p_WindowPtr); }
 
 void GraphicsContext::SetupWindowHints() 
 { 
-    //Engine::Renderer::RendererContextSetupWindowHints(nullptr); 
+    //Engine::Renderer::GetInstance()->RendererContextSetupWindowHints(nullptr); 
 }

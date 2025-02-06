@@ -1,10 +1,9 @@
+#include <Renderer/Renderer.hpp>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
 #include "Window.hpp"
-
-#include <Renderer/Renderer.hpp>
 
 #include <Core/Log.hpp>
 
@@ -15,6 +14,7 @@ namespace Engine
 {
     void Window::Create(WindowSpec spec)
     {
+        LOG_DEBUG("%p\n", Renderer::GetInstance());
         this->m_WindowSpec = spec;
         glfwSetErrorCallback(_ErrorCallback);
 
@@ -23,7 +23,16 @@ namespace Engine
             LOG_ERROR("GLFW initialization failed!");
             exit(-1);
         }
-        Renderer::RendererContextSetupWindowHints(nullptr);
+        constexpr auto OPENGL_VERSION_MAJOR = 4;
+        constexpr auto OPENGL_VERSION_MINOR = 6;
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, OPENGL_VERSION_MAJOR);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, OPENGL_VERSION_MINOR);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#ifdef _DEBUG
+        glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+#endif
+        //Renderer::GetInstance()->RendererContextSetupWindowHints(nullptr);
         //GraphicsContext::SetupWindowHints();
 
         int major, minor, rev;
@@ -45,7 +54,7 @@ namespace Engine
 
         glfwMakeContextCurrent(s_WindowPtr);
 
-        GraphicsContext::Get()->Create(s_WindowPtr);
+        GraphicsContext::Create(s_WindowPtr);
         GraphicsContext::Get()->Init();
         GraphicsContext::Get()->AddDebugMessanger();
 
