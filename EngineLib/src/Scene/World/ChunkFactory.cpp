@@ -56,7 +56,7 @@ namespace Engine
 
                 s_ChunkGenerationWorkers[chunkPos] =
                         std::async(std::launch::async, [settings = s_TerrainGenerationSettings, chunkPos]() {
-                            Chunk* chunk = Engine::Allocator::Allocate < Chunk>();
+                            Chunk* chunk = Engine::Allocator::Allocate<Chunk>();
                             chunk->terrainShape = GenerateTerrainShape(settings, chunkPos);
                             chunk->blockData = GenerateBlockData(settings, chunk->terrainShape, chunkPos);
                             chunk->mesh = GenerateChunkMesh(chunk->blockData);
@@ -128,8 +128,7 @@ namespace Engine
     BlockData* ChunkFactory::GenerateBlockData(TerrainGenerationSettings settings, TerrainShape* shapeData,
                                                glm::ivec3 chunkPosition)
     {
-        BlockData* ptr =  
-        Engine::Allocator::Allocate < BlockData>();
+        BlockData* ptr = Engine::Allocator::Allocate<BlockData>();
         ptr->Init(settings.Seed);
         TerrainGenerator::GenerateBlocks(settings, shapeData, ptr, chunkPosition);
         return ptr;
@@ -146,8 +145,7 @@ namespace Engine
 
     TerrainShape* ChunkFactory::GenerateTerrainShape(TerrainGenerationSettings settings, glm::ivec3 chunkPosition)
     {
-        TerrainShape* ptr =  
-        Engine::Allocator::Allocate < TerrainShape>();
+        TerrainShape* ptr = Engine::Allocator::Allocate<TerrainShape>();
         TerrainGenerator::GenerateTerrainShape(settings, ptr, chunkPosition);
         return ptr;
     }
@@ -163,7 +161,7 @@ namespace Engine
 
     ChunkMesh* ChunkFactory::GenerateChunkMesh(BlockData* blockData)
     {
-        ChunkMesh* ptr = Engine::Allocator::Allocate < ChunkMesh>();
+        ChunkMesh* ptr = Engine::Allocator::Allocate<ChunkMesh>();
         ptr->Generate(blockData);
         return ptr;
     }

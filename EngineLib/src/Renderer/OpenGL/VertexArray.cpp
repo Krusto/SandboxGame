@@ -3,7 +3,7 @@
 #include <Core/Allocator.hpp>
 #include <Renderer/Predefines.hpp>
 #include <Renderer/OpenGL/StructDefinitions.hpp>
-#include <Renderer/Shared/function_pointers.h>
+#include <Renderer/OpenGL/ExportedFunctions.hpp>
 #include <Renderer/Shared/Vertex.hpp>
 
 namespace Engine
@@ -12,8 +12,10 @@ namespace Engine
     EXPORT_RENDERER void VertexArrayInit(void** data, uint32_t indexCount)
     {
         if (*data == nullptr) { *data = Allocator::Allocate<VertexArrayData>(); }
-        glCreateVertexArrays(1, &asTPtr(data, VertexArrayData)->id);
-        asTPtr(data, VertexArrayData)->indexCount = indexCount;
+
+        VertexArrayData* arrayData = (VertexArrayData*)*data;
+        glCreateVertexArrays(1, &arrayData->id);
+        arrayData->indexCount = indexCount;
     }
 
     EXPORT_RENDERER void VertexArrayBind(void* data)
@@ -55,7 +57,7 @@ namespace Engine
         VertexArrayData* m_Data = static_cast<VertexArrayData*>(data);
         VertexArrayBind(data);
         IndexBufferInit((void**) &m_Data->indexBufferData, data, indexData, length);
-        glVertexArrayElementBuffer(m_Data->id, m_Data->indexBufferData.id);
+        glVertexArrayElementBuffer(m_Data->id, m_Data->indexBufferData->id);
     }
 
     EXPORT_RENDERER uint32_t VertexArrayGetIndexCount(void* data)

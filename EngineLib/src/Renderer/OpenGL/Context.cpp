@@ -111,7 +111,4 @@ EXPORT_RENDERER void RendererContextAddDebugMessanger(void* window)
     }
 }
 
-EXPORT_RENDERER void RendererContextSetupWindowHints(void* window)
-{
-
-}
+EXPORT_RENDERER void RendererContextSetupWindowHints(void* window) {}

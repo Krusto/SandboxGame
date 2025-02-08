@@ -8,6 +8,8 @@
 #include <Renderer/OpenGL/StructDefinitions.hpp>
 #include <Renderer/Shared/DepthFunction.hpp>
 #include <Renderer/Renderer.hpp>
+#include "ExportedFunctions.hpp"
+
 namespace Engine
 {
 
@@ -27,7 +29,7 @@ namespace Engine
     {
         RendererAPIData* m_Data = static_cast<RendererAPIData*>(*data);
         if (m_Data == nullptr) { return; }
-        Renderer::s_Renderer->GUIContextDestroy((void**) &m_Data->guiContext);
+        GUIContextDestroy((void**) &m_Data->guiContext);
         Allocator::Deallocate(m_Data);
         *data = nullptr;
     };
@@ -82,27 +84,27 @@ namespace Engine
         }
     }
 
-    EXPORT_RENDERER void RendererAPIInitIMGUI(void* renderer_instance,void* data, void* window)
+    EXPORT_RENDERER void RendererAPIInitIMGUI(void* renderer_instance, void* data, void* window)
     {
         RendererAPIData* m_Data = static_cast<RendererAPIData*>(data);
-        ((Engine::Renderer*)renderer_instance)->GUIContextInit((void**) &m_Data->guiContext, window);
+        GUIContextInit((void**) &m_Data->guiContext, window);
     }
 
     EXPORT_RENDERER void RendererAPIDestroyIMGUI(void* data)
     {
         RendererAPIData* m_Data = static_cast<RendererAPIData*>(data);
-        Renderer::s_Renderer->GUIContextDestroy((void**) &m_Data->guiContext);
+        GUIContextDestroy((void**) &m_Data->guiContext);
     }
 
     EXPORT_RENDERER void RendererAPIIMGUIBegin(void* data)
     {
         RendererAPIData* m_Data = static_cast<RendererAPIData*>(data);
-        Renderer::s_Renderer->GUIContextBegin(&m_Data->guiContext);
+        GUIContextBegin(&m_Data->guiContext);
     }
 
     EXPORT_RENDERER void RendererAPIIMGUIEnd(void* data, void* drawData)
     {
         RendererAPIData* m_Data = static_cast<RendererAPIData*>(data);
-        Renderer::s_Renderer->GUIContextEnd(&m_Data->guiContext, drawData);
+        GUIContextEnd(&m_Data->guiContext, drawData);
     }
 }// namespace Engine

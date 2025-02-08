@@ -1,5 +1,5 @@
 #include <Renderer/Predefines.hpp>
-#include <Renderer/Shared/function_pointers.h>
+#include <Renderer/OpenGL/ExportedFunctions.hpp>
 #include <Renderer/OpenGL/StructDefinitions.hpp>
 #include <Core/Log.hpp>
 #include <Core/Allocator.hpp>

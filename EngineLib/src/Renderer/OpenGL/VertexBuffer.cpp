@@ -35,7 +35,7 @@ namespace Engine
         glCreateBuffers(1, &m_Data->id);
         glNamedBufferStorage(m_Data->id, static_cast<GLsizei>(length) * static_cast<GLsizei>(layout.stride), data,
                              GL_DYNAMIC_STORAGE_BIT);
-
+        m_Data->size = layout.stride;
         uint32_t index = 0;
         uint32_t offset = 0;
         uint32_t vaID = asTPtr(vertexArray, VertexArrayData)->id;

@@ -1,5 +1,5 @@
 #include "StorageBuffer.hpp"
-#include <Renderer/Shared/function_pointers.h>
+#include <Renderer/Renderer.hpp>
 
 namespace Engine
 {
@@ -13,16 +13,19 @@ namespace Engine
 
     void StorageBuffer::Init(uint8_t* data, size_t size, StorageBufferType type)
     {
-        StorageBufferInit((void**) &m_Data, nullptr, (char*) data, size, (int) type);
+        Renderer::GetInstance()->StorageBufferInit((void**) &m_Data, nullptr, (char*) data, size, (int) type);
     }
 
-    void StorageBuffer::Bind(size_t location) const { StorageBufferBind((void*) m_Data, location); }
+    void StorageBuffer::Bind(size_t location) const
+    {
+        Renderer::GetInstance()->StorageBufferBind((void*) m_Data, location);
+    }
 
-    void StorageBuffer::Unbind() const { StorageBufferUnbind((void*) m_Data); }
+    void StorageBuffer::Unbind() const { Renderer::GetInstance()->StorageBufferUnbind((void*) m_Data); }
 
-    void StorageBuffer::Destroy() { StorageBufferDestroy((void**) &m_Data); }
+    void StorageBuffer::Destroy() { Renderer::GetInstance()->StorageBufferDestroy((void**) &m_Data); }
 
-    uint32_t StorageBuffer::id() const { return StorageBufferGetID((void*) m_Data); }
+    uint32_t StorageBuffer::id() const { return Renderer::GetInstance()->StorageBufferGetID((void*) m_Data); }
 
 
 }// namespace Engine

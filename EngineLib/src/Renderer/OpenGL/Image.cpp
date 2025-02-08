@@ -1,6 +1,6 @@
 #include <Core/Allocator.hpp>
 #include <Renderer/Shared/ImageType.hpp>
-#include <Renderer/Shared/function_pointers.h>
+#include <Renderer/OpenGL/ExportedFunctions.hpp>
 #include <Renderer/OpenGL/StructDefinitions.hpp>
 #include <Renderer/Predefines.hpp>
 
