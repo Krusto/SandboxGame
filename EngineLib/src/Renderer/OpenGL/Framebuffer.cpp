@@ -3,8 +3,8 @@
 #include <Core/Allocator.hpp>
 #include <Renderer/Predefines.hpp>
 #include <Renderer/OpenGL/StructDefinitions.hpp>
+#include <Renderer/OpenGL/ExportedFunctions.hpp>
 #include <Renderer/Shared/ImageType.hpp>
-#include <Renderer/Shared/function_pointers.h>
 #include <Renderer/Shared/Viewport.hpp>
 
 namespace Engine

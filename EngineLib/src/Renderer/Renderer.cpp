@@ -8,11 +8,14 @@
 namespace Engine
 {
     RendererAPI* s_RendererAPI = nullptr;
+
     const RendererAPI* Renderer::GetAPIInstance() { return s_RendererAPI; }
 
-    Renderer* Renderer::GetInstance() { return Renderer::s_Renderer; }
-
-    void Renderer::Create() { Renderer::s_Renderer = Allocator::Allocate<Renderer>(); }
+    Renderer* Renderer::Create()
+    {
+        s_Renderer = Allocator::Allocate<Renderer>();
+        return (Renderer*) s_Renderer;
+    }
 
     void Renderer::SwitchWireframeMode()
     {
@@ -75,7 +78,7 @@ namespace Engine
     void Renderer::Init(RendererSpec rendererSpec, ApplicationSpec applicationSpec)
     {
         s_RendererAPI = Allocator::Allocate<RendererAPI>();
-           
+
         if (s_RendererAPI) s_RendererAPI->Init(rendererSpec, applicationSpec);
     }
 

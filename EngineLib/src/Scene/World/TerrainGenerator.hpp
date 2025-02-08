@@ -10,7 +10,7 @@ namespace Engine
     struct TerrainGenerationSettings {
         uint32_t Seed{};
         std::filesystem::path AssetsDirectory;
-        uint32_t GenerationDistance = 10;
+        uint32_t GenerationDistance = 1;
         uint32_t minTerrainHeight = 10;
         uint32_t maxTerrainHeight = 150;
     };

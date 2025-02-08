@@ -30,7 +30,7 @@ namespace Engine
     struct VertexArrayData {
         uint32_t indexCount{};
         VertexBufferData* vertexBufferData{};
-        IndexBufferData indexBufferData{};
+        IndexBufferData* indexBufferData{};
         uint32_t id{};
     };
 

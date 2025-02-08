@@ -37,11 +37,8 @@ namespace Engine
                 break;
         }
 
-        glGenBuffers(1, &m_Data->id);
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_Data->id);
-        glBufferData(GL_SHADER_STORAGE_BUFFER, size, data, GL_STATIC_DRAW);
-
-        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+        glCreateBuffers(1, &m_Data->id);
+        glNamedBufferStorage(m_Data->id, size, storageData, GL_DYNAMIC_STORAGE_BIT);
     }
 
     EXPORT_RENDERER void StorageBufferBind(void* data, unsigned int location)

@@ -266,6 +266,8 @@ target_link_libraries(RendererOpenGL PUBLIC glad imgui EngineInterfaceLibrary)
 target_link_libraries(RendererVulkan PUBLIC imgui EngineInterfaceLibrary)
 target_link_libraries(Renderer PUBLIC imgui EngineInterfaceLibrary)
 
+add_dependencies(Renderer RendererOpenGL)
+
 target_link_libraries(EngineLib PUBLIC Renderer EngineInterfaceLibrary)
 
 target_link_libraries(EngineEntry PUBLIC EngineLib EngineInterfaceLibrary)

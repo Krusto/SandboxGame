@@ -4,7 +4,8 @@
 #include <string>
 #define _LibStr(n) #n
 #define LibName _LibStr(RendererOpenGL_)
-#define _LoadSymbol2(funcName, funcNameStr) Renderer::s_Renderer->funcName = s_Loader.GetSymbol<decltype(Renderer::funcName)>(funcNameStr)
+#define _LoadSymbol2(funcName, funcNameStr)                                                                            \
+    Renderer::GetInstance()->funcName = s_Loader.GetSymbol<decltype(Renderer::funcName)>(funcNameStr)
 #define _LoadSymbol(funcName) _LoadSymbol2(funcName, #funcName)
 
 namespace Engine
@@ -16,10 +17,8 @@ namespace Engine
         {
             std::string path = std::string(working_directory.data()) + "/build/bin/Debug/RendererOpenGL.dll";
             if (!s_Loader.Init(path)) { return; }
-               
+
             Renderer::Create();
-            Renderer::RendererContextCreate_T a = s_Loader.GetSymbol<Renderer::RendererContextCreate_T>
-                ("RendererContextCreate");
             //Graphics Context
             _LoadSymbol(RendererContextCreate);
             _LoadSymbol(RendererContextDestroy);
@@ -61,6 +60,11 @@ namespace Engine
             _LoadSymbol(VertexArrayInit);
             _LoadSymbol(VertexArrayDestroy);
             _LoadSymbol(VertexArrayBind);
+            _LoadSymbol(VertexArrayUnbind);
+            _LoadSymbol(VertexArrayGetID);
+            _LoadSymbol(VertexArrayAddVertexBuffer);
+            _LoadSymbol(VertexArrayAddIndexBuffer);
+            _LoadSymbol(VertexArrayGetIndexCount);
             _LoadSymbol(VertexArrayGetID);
 
             //Vertex Buffer
@@ -125,6 +129,7 @@ namespace Engine
             _LoadSymbol(ShaderGetName);
             _LoadSymbol(ShaderGetPath);
             _LoadSymbol(ShaderSetUniformI);
+            _LoadSymbol(ShaderSetUniformUI);
             _LoadSymbol(ShaderSetUniformF);
             _LoadSymbol(ShaderSetUniform2F);
             _LoadSymbol(ShaderSetUniform3F);

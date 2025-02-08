@@ -10,6 +10,13 @@ namespace Engine
 {
     EXPORT_RENDERER void GUIContextInit(void** data, void* window)
     {
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGuiIO& io = ImGui::GetIO();
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;// Enable Keyboard Controls
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls
+        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;    // IF using Docking Branch
+
         // Setup Platform/Renderer bindings
         ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*) window, true);
         ImGui_ImplOpenGL3_Init("#version 410");
@@ -28,5 +35,8 @@ namespace Engine
         ImGui::NewFrame();
     }
 
-    EXPORT_RENDERER void GUIContextEnd(void* data, void* drawData) { ImGui_ImplOpenGL3_RenderDrawData((ImDrawData*)drawData); }
+    EXPORT_RENDERER void GUIContextEnd(void* data, void* drawData)
+    {
+        ImGui_ImplOpenGL3_RenderDrawData((ImDrawData*) drawData);
+    }
 }// namespace Engine
