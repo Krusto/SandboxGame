@@ -71,18 +71,16 @@ void SandboxLayer::Init(Engine::Window* window)
     m_Light->ambient = glm::vec3(1.0, 0.73, 0.0);
     m_Light->diffuse = glm::vec3(0.78, 0.63, 0.16);
 
-
     m_DepthBufferVA = Engine::VertexArray::Create(6);
     float vertices[] = {
-            -1, 1,  0.0, 0, 1,//
-            -1, -1, 0.0, 0, 0,//
-            1,  -1, 0.0, 1, 0,//
-            1,  1,  0.0, 1, 1,//
+            -1, 1,  0.0,//
+            -1, -1, 0.0,//
+            1,  -1, 0.0,//
+            1,  1,  0.0,//
     };
     uint32_t length = sizeof(vertices) / sizeof(float);
     Engine::VertexLayout layout =
-            Engine::VertexLayout({Engine::VertexAttribute{"Position", Engine::ShaderUniformType::Vec3},
-                                  Engine::VertexAttribute{"TextureCoord", Engine::ShaderUniformType::Vec2}});
+            Engine::VertexLayout({Engine::VertexAttribute{"Position", Engine::ShaderUniformType::Vec3}});
 
     m_DepthBufferVA.AddVertexBuffer(&layout, vertices, length);
 
@@ -169,7 +167,7 @@ void SandboxLayer::RenderWorld()
 
     Renderer::Submit(m_World->RenderWorldCommand(&m_Shader, m_Camera.GetPosition()));
 
-    //Render light debug object
+    // Render light debug object
     Renderer::Submit(m_LightShader.BindCommand());
     Renderer::Submit(m_Camera.UploadCommand(&m_LightShader));
     Renderer::Submit(m_Light->Render(&m_LightShader));

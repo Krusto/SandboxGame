@@ -15,7 +15,7 @@ namespace Engine
         IndexBufferData* m_Data = static_cast<IndexBufferData*>(*data);
         glCreateBuffers(1, &m_Data->id);
 
-        glNamedBufferStorage(m_Data->id, sizeof(uint32_t) * length, data, GL_DYNAMIC_STORAGE_BIT);
+        glNamedBufferStorage(m_Data->id, sizeof(uint32_t) * length, indexData, GL_DYNAMIC_STORAGE_BIT);
 
         m_Data->stride = sizeof(uint32_t);
         m_Data->count = length;

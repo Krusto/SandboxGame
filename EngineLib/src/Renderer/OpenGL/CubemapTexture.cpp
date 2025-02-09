@@ -35,11 +35,12 @@ namespace Engine
         uint32_t index = 0;
         for (auto& [face, file]: asUnorderedMap(paths, CubemapTextureFace, std::string))
         {
-            stbi_uc* data = nullptr;
+            stbi_uc* image_data = nullptr;
             {
-                data = stbi_load(file.data(), &m_Data->spec.Width, &m_Data->spec.Height, &m_Data->spec.Channels, 0);
+                image_data =
+                        stbi_load(file.data(), &m_Data->spec.Width, &m_Data->spec.Height, &m_Data->spec.Channels, 0);
             }
-            if (nullptr == data) { LOG_ERROR("Can not load %s\n", file.c_str()); }
+            if (nullptr == image_data) { LOG_ERROR("Can not load %s\n", file.c_str()); }
             else { LOG_INFO("Loaded %s\n", file.c_str()); }
 
             GLenum internalFormat = 0, dataFormat = 0;
@@ -50,7 +51,7 @@ namespace Engine
             }
             else if (m_Data->spec.Channels == 3)
             {
-                internalFormat = GL_RGB8;
+                internalFormat = GL_RGB;
                 dataFormat = GL_RGB;
             }
             else if (m_Data->spec.Channels == 2)
@@ -65,8 +66,8 @@ namespace Engine
             }
 
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + index, 0, internalFormat, m_Data->spec.Width,
-                         m_Data->spec.Height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
-            stbi_image_free(data);
+                         m_Data->spec.Height, 0, dataFormat, GL_UNSIGNED_BYTE, image_data);
+            stbi_image_free(image_data);
             index++;
         }
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

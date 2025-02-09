@@ -28,10 +28,11 @@ namespace Engine
 
     EXPORT_RENDERER void ImageInit(void** data, uint8_t* imageData, size_t width, size_t height, uint8_t type)
     {
-        if (*data == nullptr) { *data = Engine::Allocator::Allocate<ImageData>(); }
-        glGenTextures(1, &asTPtr(*data, ImageData)->id);
+        if (*data == nullptr) { *data = (void*)Engine::Allocator::Allocate<ImageData>(); }
+        ImageData* m_ImageData = (ImageData*) *data;
+        glGenTextures(1, &asTPtr(m_ImageData, ImageData)->id);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, asTPtr(*data, ImageData)->id);
+        glBindTexture(GL_TEXTURE_2D, asTPtr(m_ImageData, ImageData)->id);
 
         glTexImage2D(GL_TEXTURE_2D, 0, ImageTypeToGL(type), (GLsizei) width, (GLsizei) height, 0, ImageTypeToGL(type),
                      GL_FLOAT, imageData);
