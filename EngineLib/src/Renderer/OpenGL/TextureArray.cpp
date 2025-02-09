@@ -38,11 +38,12 @@ namespace Engine
         for (unsigned int textureIndex = 0; textureIndex < count; textureIndex++)
         {
             auto file = paths[textureIndex];
-            stbi_uc* data = nullptr;
+            stbi_uc* image_data = nullptr;
             {
-                data = stbi_load(file, (int*) &m_Data->width, (int*) &m_Data->height, (int*) &m_Data->channels, 0);
+                image_data =
+                        stbi_load(file, (int*) &m_Data->width, (int*) &m_Data->height, (int*) &m_Data->channels, 0);
             }
-            if (nullptr == data) { LOG_ERROR("Can not load %s\n", file); }
+            if (nullptr == image_data) { LOG_ERROR("Can not load %s\n", file); }
             else { LOG_INFO("Loaded %s\n", file); }
 
             GLenum internalFormat = 0, dataFormat = 0;
@@ -75,10 +76,10 @@ namespace Engine
             }
 
             glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, textureIndex, m_Data->width, m_Data->height, 1, dataFormat,
-                            GL_UNSIGNED_BYTE, data);
+                            GL_UNSIGNED_BYTE, image_data);
             glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 
-            stbi_image_free(data);
+            stbi_image_free(image_data);
         }
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);

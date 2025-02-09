@@ -8,6 +8,7 @@
 #include <Renderer/Shared/APISpecific/VertexArray.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
+#include <glad/glad.h>
 
 namespace Engine
 {
@@ -104,7 +105,6 @@ namespace Engine
             shader.SetUniform("camera.view", view);
 
             cubemap.Bind(0);
-            va.Bind();
             Renderer::RenderIndexed(va);
             Renderer::ChangeDepthFunction(DepthFunction::Less);
         });

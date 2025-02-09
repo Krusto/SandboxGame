@@ -68,7 +68,7 @@ namespace Engine
                     shader->SetUniform("model", model);
                     shader->SetUniform("offset", glm::vec3{pos.x * CHUNK_SIZE, pos.y * CHUNK_SIZE, pos.z * CHUNK_SIZE});
                     mesh->GetVertexArray().Bind();
-                    Engine::Renderer::RenderIndexed(mesh->GetVertexArray());
+                    Engine::Renderer::RenderIndexed(mesh->GetVertexArray(),mesh->GetVertexArray().IndexCount());
                     mesh->GetVertexArray().Unbind();
                 }
             }

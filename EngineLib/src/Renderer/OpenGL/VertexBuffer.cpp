@@ -33,7 +33,7 @@ namespace Engine
         VertexLayout& layout = *static_cast<VertexLayout*>(vertexLayout);
 
         glCreateBuffers(1, &m_Data->id);
-        glNamedBufferStorage(m_Data->id, static_cast<GLsizei>(length) * static_cast<GLsizei>(layout.stride), data,
+        glNamedBufferStorage(m_Data->id, static_cast<GLsizei>(length) * static_cast<GLsizei>(layout.stride), vertices,
                              GL_DYNAMIC_STORAGE_BIT);
         m_Data->size = layout.stride;
         uint32_t index = 0;

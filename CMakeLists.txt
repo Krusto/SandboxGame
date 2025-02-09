@@ -46,9 +46,6 @@ file(GLOB_RECURSE GLAD_HEADER_FILES ./Vendor/glad/src/*.h)
 file(GLOB_RECURSE IMGUI_SOURCE_FILES imgui_impl_opengl3.cpp imgui_impl_glfw.cpp imgui.cpp imgui_draw.cpp imgui_tables.cpp imgui_widgets.cpp )
 file(GLOB_RECURSE IMGUI_HEADER_FILES imgui_impl_opengl3.h imgui_impl_glfw.h   imgui.h imconfig.h imgui_internal.h imstb_rectpack.h imstb_textedit.h imstb_truetype.h)
 
-file(GLOB_RECURSE SANDBOX_SOURCE_FILES ${CMAKE_SOURCE_DIR}/Sandbox/src/*.cpp)
-file(GLOB_RECURSE SANDBOX_HEADER_FILES ${CMAKE_SOURCE_DIR}/Sandbox/src/*.h)
-
 file(GLOB_RECURSE ENGINE_SOURCE_FILES ./EngineLib/src/Core/*.cpp ./EngineLib/src/Layer/*.cpp ./EngineLib/src/Window/*.cpp)
 file(GLOB_RECURSE ENGINE_HEADER_FILES ./EngineLib/src/Core/*.hpp ./EngineLib/src/Layer/*.hpp ./EngineLib/src/Window/*.hpp
 ./EngineLib/src/Core/*.h ./EngineLib/src/Layer/*.h)
@@ -274,25 +271,21 @@ target_link_libraries(EngineEntry PUBLIC EngineLib EngineInterfaceLibrary)
 
 target_link_libraries(SandboxWorld PUBLIC EngineEntry EngineLib EngineInterfaceLibrary)
 
-add_executable(Sandbox ${SANDBOX_HEADER_FILES} ${SANDBOX_SOURCE_FILES})
-target_compile_definitions(Sandbox
-    PUBLIC
-    $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:LINK_SHARED>
-)
+function(add_game_project name)
 
-target_include_directories(Sandbox PUBLIC "${CMAKE_SOURCE_DIR}/EngineLib/src")
-target_include_directories(Sandbox PUBLIC "${CMAKE_SOURCE_DIR}/Sandbox/src")
-target_link_libraries(Sandbox SandboxWorld)
+    file(GLOB_RECURSE SANDBOX_SOURCE_FILES ${CMAKE_SOURCE_DIR}/${name}/src/*.cpp)
+    file(GLOB_RECURSE SANDBOX_HEADER_FILES ${CMAKE_SOURCE_DIR}/${name}/src/*.h ${CMAKE_SOURCE_DIR}/${name}/src/*.hpp)
 
-add_executable(ShaderReflectionTest ./ShaderReflectionTest/main.cpp )
-target_link_libraries(ShaderReflectionTest EngineInterfaceLibrary )
-target_include_directories(ShaderReflectionTest PUBLIC ./EngineLib/src/Reflection)
-target_include_directories(ShaderReflectionTest PUBLIC ./EngineLib/src/)
-target_include_directories(ShaderReflectionTest PUBLIC  ${INCLUDE_DIRS})
+    add_executable(${name} ${SANDBOX_HEADER_FILES} ${SANDBOX_SOURCE_FILES})
+    target_compile_definitions(${name}
+        PUBLIC
+        $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:LINK_SHARED>
+    )
 
-# if(BUILD_ENGINE_SHARED EQUAL "ON")
-#     target_compile_definitions(EngineUtils PUBLIC ENGINE_UTILS_BUILD_DLL)
-#     target_compile_definitions(EngineLib PUBLIC ENGINE_BUILD_DLL FASTNOISE_SHARED_LIB)
-#     target_compile_definitions(Renderer PUBLIC ENGINE_RENDERER_BUILD_DLL FASTNOISE_SHARED_LIB)
-#     target_compile_definitions(EngineEntry PUBLIC ENGINE_ENTRY_BUILD_DLL FASTNOISE_SHARED_LIB)
-# endif()
+    target_include_directories(${name} PUBLIC "${CMAKE_SOURCE_DIR}/EngineLib/src")
+    target_include_directories(${name} PUBLIC "${CMAKE_SOURCE_DIR}/${name}/src")
+    target_link_libraries(${name} SandboxWorld)
+endfunction(add_game_project name)
+
+add_game_project(Sandbox)
+add_game_project(TestLayer)

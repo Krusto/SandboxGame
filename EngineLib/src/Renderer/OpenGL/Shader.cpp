@@ -116,7 +116,11 @@ namespace Engine
         return shaderSources;
     }
 
-    EXPORT_RENDERER void ShaderBind(void* data) { glUseProgram(asTPtr(data, ShaderData)->rendererID); }
+    EXPORT_RENDERER void ShaderBind(void* data)
+    {
+        ShaderData* m_Data = (ShaderData*) data;
+        glUseProgram(m_Data->rendererID);
+    }
 
     EXPORT_RENDERER unsigned int ShaderGetID(void* data) { return asTPtr(data, ShaderData)->rendererID; }
 

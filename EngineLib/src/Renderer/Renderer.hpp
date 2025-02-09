@@ -41,14 +41,6 @@ namespace Engine
     class RendererAPI;
     struct ApplicationSpec;
 
-    extern "C" {
-#ifndef Renderer_EXPORTS
-    inline __declspec(dllexport) void* s_Renderer;
-#else
-    __declspec(dllimport) void* s_Renderer;
-#endif
-    }
-
     class Renderer
     {
     public:
@@ -56,7 +48,7 @@ namespace Engine
         ~Renderer() = default;
 
     public:
-        inline static Renderer* GetInstance() { return (Renderer*) s_Renderer; }
+        static Renderer* GetInstance();
 
         static Renderer* Create();
 
