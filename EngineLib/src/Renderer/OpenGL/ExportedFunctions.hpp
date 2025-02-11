@@ -1,6 +1,7 @@
 #pragma once
 #include <Renderer/Predefines.hpp>
 #include <Renderer/OpenGL/StructDefinitions.hpp>
+#include <Renderer/Shared/VertexLayout.hpp>
 
 EXPORT_RENDERER void RendererContextInit(void* handle);
 EXPORT_RENDERER void RendererContextDestroy(void* handle);
@@ -97,17 +98,19 @@ EXPORT_RENDERER uint32_t TextureArrayGetChannels(void* data);
 EXPORT_RENDERER uint32_t TextureArrayGetCount(void* data);
 
 EXPORT_RENDERER void VertexArrayInit(Engine::VertexArrayData** data, uint32_t indexCount);
-EXPORT_RENDERER void VertexArrayBind(void* data);
-EXPORT_RENDERER void VertexArrayUnbind(void* data);
-EXPORT_RENDERER void VertexArrayDestroy(void** data);
-EXPORT_RENDERER void VertexArrayAddVertexBuffer(void* data, void* layout, float* vertexData, unsigned int length);
-EXPORT_RENDERER void VertexArrayAddIndexBuffer(void* data, unsigned int* indexData, unsigned int length);
-EXPORT_RENDERER uint32_t VertexArrayGetIndexCount(void* data);
-EXPORT_RENDERER uint32_t VertexArrayGetID(void* data);
+EXPORT_RENDERER void VertexArrayBind(Engine::VertexArrayData* data);
+EXPORT_RENDERER void VertexArrayUnbind(Engine::VertexArrayData* data);
+EXPORT_RENDERER void VertexArrayDestroy(Engine::VertexArrayData** data);
+EXPORT_RENDERER void VertexArrayAddVertexBuffer(Engine::VertexArrayData* data, void* layout, float* vertexData,
+                                                unsigned int length);
+EXPORT_RENDERER void VertexArrayAddIndexBuffer(Engine::VertexArrayData* data, unsigned int* indexData,
+                                               unsigned int length);
+EXPORT_RENDERER uint32_t VertexArrayGetIndexCount(Engine::VertexArrayData* data);
+EXPORT_RENDERER uint32_t VertexArrayGetID(Engine::VertexArrayData* data);
 
-EXPORT_RENDERER void VertexBufferInit(void** data, void* vertexArray, void* vertexLayout, float* vertices,
-                                      unsigned int length);
-EXPORT_RENDERER void VertexBufferBind(void* data);
-EXPORT_RENDERER size_t VertexBufferGetSize(void* data);
-EXPORT_RENDERER void VertexBufferDestroy(void** data);
-EXPORT_RENDERER uint32_t VertexBufferGetID(void* data);
+EXPORT_RENDERER void VertexBufferInit(Engine::VertexBufferData** data, Engine::VertexArrayData* vertexArray,
+                                      Engine::VertexLayout* vertexLayout, float* vertices, unsigned int length);
+EXPORT_RENDERER void VertexBufferBind(Engine::VertexBufferData* data);
+EXPORT_RENDERER size_t VertexBufferGetSize(Engine::VertexBufferData* data);
+EXPORT_RENDERER void VertexBufferDestroy(Engine::VertexBufferData** data);
+EXPORT_RENDERER uint32_t VertexBufferGetID(Engine::VertexBufferData* data);
