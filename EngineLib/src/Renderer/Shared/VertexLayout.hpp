@@ -1,34 +1,62 @@
 //
 // Created by Stoyanov, Krusto (K.S.) on 6/23/2022.
 //
-#pragma once
+#ifndef ENGINE_VERTEXLAYOUT_H
+#define ENGINE_VERTEXLAYOUT_H
 
-#include <vector>
-#include <string_view>
+/*---------------------------------------------------------------------------------------------------
+Includes
+---------------------------------------------------------------------------------------------------*/
+#include "ShaderUniform.h"
 
-#include <Core/Core.hpp>
-#include "ShaderUniform.hpp"
-
+#ifdef __cplusplus
 namespace Engine
 {
+#endif
+
+//----------------------------------------------------------------------------------------------------
+//Macro Definitions
+//----------------------------------------------------------------------------------------------------
+#define VertexLayoutGetStride(layout) ((VertexLayout*) layout)->stride
+#define VERTEX_MAX_ATTRIBUTES 16
+
+    //---------------------------------------------------------------------------------------------------
+    //Structures
+    //---------------------------------------------------------------------------------------------------
     struct VertexAttribute {
-        std::string_view name{};
-        ShaderUniformType type;
-        uint32_t offset{};
+        const char* name;
+        uint8_t type;
+        uint32_t offset;
     };
 
-    class VertexLayout
+    struct VertexAttributeList {
+        VertexAttribute attributes[VERTEX_MAX_ATTRIBUTES];
+        uint32_t count;
+    };
+
+    struct VertexLayout {
+        VertexAttributeList attributes;
+        size_t stride;
+    };
+
+    //---------------------------------------------------------------------------------------------------
+    //Functions
+    //---------------------------------------------------------------------------------------------------
+    inline static VertexLayout CreateVertexLayout(VertexAttributeList attributes)
     {
-    public:
-        VertexLayout() = default;
-        VertexLayout(const VertexLayout&) = default;
-        ~VertexLayout() = default;
+        VertexLayout layout;
+        layout.attributes = attributes;
+        layout.stride = 0;
+        for (size_t i = 0; i < attributes.count && attributes.attributes[i].name != nullptr; i++)
+        {
+            layout.attributes.attributes[i].offset = layout.stride;
+            layout.stride += ShaderDataTypeGetSize((ShaderUniformType) attributes.attributes[i].type);
+        }
+        return layout;
+    }
 
-        VertexLayout(std::initializer_list<VertexAttribute> attributes);
 
-        std::vector<VertexAttribute> attributes;
-        uint32_t stride{};
-
-        VertexLayout& operator=(const VertexLayout& other) = default;
-    };
+#ifdef __cplusplus
 }// namespace Engine
+#endif
+#endif

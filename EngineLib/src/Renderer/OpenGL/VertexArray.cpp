@@ -9,13 +9,12 @@
 namespace Engine
 {
 
-    EXPORT_RENDERER void VertexArrayInit(void** data, uint32_t indexCount)
+    EXPORT_RENDERER void VertexArrayInit(VertexArrayData** data, uint32_t indexCount)
     {
         if (*data == nullptr) { *data = Allocator::Allocate<VertexArrayData>(); }
 
-        VertexArrayData* arrayData = (VertexArrayData*)*data;
-        glCreateVertexArrays(1, &arrayData->id);
-        arrayData->indexCount = indexCount;
+        glCreateVertexArrays(1, &(*data)->id);
+        (*data)->indexCount = indexCount;
     }
 
     EXPORT_RENDERER void VertexArrayBind(void* data)
@@ -39,7 +38,7 @@ namespace Engine
                 IndexBufferDestroy((void**) &m_Data->indexBufferData);
             }
             Allocator::Deallocate(m_Data);
-            m_Data = nullptr;
+            *data = nullptr;
         }
     }
 
@@ -49,7 +48,7 @@ namespace Engine
         VertexArrayData* m_Data = static_cast<VertexArrayData*>(data);
         VertexBufferInit((void**) &m_Data->vertexBufferData, data, layout, vertexData, length);
         glVertexArrayVertexBuffer(m_Data->id, 0, ((VertexBufferData*) (m_Data->vertexBufferData))->id, 0,
-                                  ((VertexLayout*) layout)->stride);
+                                  VertexLayoutGetStride(layout));
     }
 
     EXPORT_RENDERER void VertexArrayAddIndexBuffer(void* data, unsigned int* indexData, unsigned int length)

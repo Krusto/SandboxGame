@@ -1,6 +1,6 @@
 #pragma once
 #include <Renderer/Predefines.hpp>
-#include <cstdint>
+#include <Renderer/OpenGL/StructDefinitions.hpp>
 
 EXPORT_RENDERER void RendererContextInit(void* handle);
 EXPORT_RENDERER void RendererContextDestroy(void* handle);
@@ -96,7 +96,7 @@ EXPORT_RENDERER uint32_t TextureArrayGetHeight(void* data);
 EXPORT_RENDERER uint32_t TextureArrayGetChannels(void* data);
 EXPORT_RENDERER uint32_t TextureArrayGetCount(void* data);
 
-EXPORT_RENDERER void VertexArrayInit(void** data, uint32_t indexCount);
+EXPORT_RENDERER void VertexArrayInit(Engine::VertexArrayData** data, uint32_t indexCount);
 EXPORT_RENDERER void VertexArrayBind(void* data);
 EXPORT_RENDERER void VertexArrayUnbind(void* data);
 EXPORT_RENDERER void VertexArrayDestroy(void** data);

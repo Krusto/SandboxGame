@@ -14,9 +14,11 @@ namespace Engine
 
         static VertexLayout GetLayout()
         {
-            return {{"Position", ShaderUniformType::Vec3},
-                    {"Normal", ShaderUniformType::Vec3},
-                    {"TextureCoord", ShaderUniformType::Vec2}};
+            return CreateVertexLayout({{
+                                        {"Position", (uint8_t) ShaderUniformType::Vec3, 0},
+                                             {"Normal", (uint8_t)ShaderUniformType::Vec3,0},
+                                             {"TextureCoord", (uint8_t)ShaderUniformType::Vec2,0}
+                                            },3});
         }
     };
 }// namespace Engine

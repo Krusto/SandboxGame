@@ -13,7 +13,7 @@
 #include "Shared/GraphicsContext.hpp"
 #include "Shared/RendererCommand.hpp"
 #include "Shared/ShaderDataType.hpp"
-#include "Shared/ShaderUniform.hpp"
+#include "Shared/ShaderUniform.h"
 #include "Shared/VertexLayout.hpp"
 #include "Shared/Viewport.hpp"
 #include "Shared/RendererSpec.hpp"

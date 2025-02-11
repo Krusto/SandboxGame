@@ -8,7 +8,7 @@
 
 #include <Renderer/Predefines.hpp>
 #include <Renderer/Shared/RendererCommand.hpp>
-#include <Renderer/Shared/ShaderUniform.hpp>
+#include <Renderer/Shared/ShaderUniform.h>
 #include <Renderer/OpenGL/StructDefinitions.hpp>
 
 namespace Engine

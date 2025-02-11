@@ -6,12 +6,4 @@
 namespace Engine
 {
 
-    VertexLayout::VertexLayout(std::initializer_list<VertexAttribute> attributes) : attributes(attributes)
-    {
-        for (auto& [name, type, offset]: this->attributes)
-        {
-            offset = stride;
-            stride += (uint32_t) ShaderDataType::Size(type);
-        }
-    }
 }// namespace Engine

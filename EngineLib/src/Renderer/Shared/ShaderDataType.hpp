@@ -3,7 +3,7 @@
 //
 #pragma once
 #include <cstdint>
-#include "ShaderUniform.hpp"
+#include "ShaderUniform.h"
 
 namespace Engine
 {

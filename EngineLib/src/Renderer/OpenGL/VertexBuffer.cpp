@@ -39,11 +39,12 @@ namespace Engine
         uint32_t index = 0;
         uint32_t offset = 0;
         uint32_t vaID = asTPtr(vertexArray, VertexArrayData)->id;
-        for (auto& attr: layout.attributes)
+        for (size_t i = 0; i < layout.attributes.count && layout.attributes.attributes[i].name != nullptr; ++i)
         {
+            auto& attr = layout.attributes.attributes[i];
             glEnableVertexArrayAttrib(vaID, index);
             glVertexArrayAttribBinding(vaID, index, 0);
-            switch (attr.type)
+            switch ((ShaderUniformType)attr.type)
             {
                 case ShaderUniformType::Float:
                     glVertexArrayAttribIFormat(vaID, index, 1, GL_FLOAT, attr.offset);
@@ -63,35 +64,35 @@ namespace Engine
                     break;
                 case ShaderUniformType::Vec2:
                     glVertexArrayAttribFormat(vaID, index, 2, GL_FLOAT, GL_FALSE, attr.offset);
-                    offset += sizeof(glm::vec2::value_type) * glm::vec2::length();
+                    offset += sizeof(float) * 2;
                     break;
                 case ShaderUniformType::Vec3:
                     glVertexArrayAttribFormat(vaID, index, 3, GL_FLOAT, GL_FALSE, attr.offset);
-                    offset += sizeof(glm::vec3::value_type) * glm::vec3::length();
+                    offset += sizeof(float) * 3;
                     break;
                 case ShaderUniformType::Vec4:
                     glVertexArrayAttribFormat(vaID, index, 4, GL_FLOAT, GL_FALSE, attr.offset);
-                    offset += sizeof(glm::vec4::value_type) * glm::vec4::length();
+                    offset += sizeof(float) * 4;
                     break;
                 case ShaderUniformType::Mat3:
-                    glVertexArrayAttribFormat(vaID, index, glm::mat3::length(), GL_FLOAT, GL_FALSE, attr.offset);
-                    offset += sizeof(glm::mat3::value_type);
+                    glVertexArrayAttribFormat(vaID, index, 3, GL_FLOAT, GL_FALSE, attr.offset);
+                    offset += sizeof(float) * 3 * 3;
                     break;
                 case ShaderUniformType::Mat4:
-                    glVertexArrayAttribFormat(vaID, index, glm::mat4::length(), GL_FLOAT, GL_FALSE, attr.offset);
-                    offset += sizeof(glm::mat4::value_type);
+                    glVertexArrayAttribFormat(vaID, index, 4, GL_FLOAT, GL_FALSE, attr.offset);
+                    offset += sizeof(float) * 4 * 4;
                     break;
                 case ShaderUniformType::IVec2:
                     glVertexArrayAttribIFormat(vaID, index, 2, GL_INT, attr.offset);
-                    offset += sizeof(glm::ivec2::value_type);
+                    offset += sizeof(int) * 2;
                     break;
                 case ShaderUniformType::IVec3:
                     glVertexArrayAttribIFormat(vaID, index, 3, GL_INT, attr.offset);
-                    offset += sizeof(glm::ivec3::value_type);
+                    offset += sizeof(int) * 3;
                     break;
                 case ShaderUniformType::IVec4:
                     glVertexArrayAttribIFormat(vaID, index, 4, GL_INT, attr.offset);
-                    offset += sizeof(glm::ivec4::value_type);
+                    offset += sizeof(int) * 4;
                     break;
                 case ShaderUniformType::None:
                     break;
