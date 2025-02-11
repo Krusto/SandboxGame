@@ -23,6 +23,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_CXX_STANDARD 23)
 message("Compiler Version: ${CMAKE_CXX_COMPILER_VERSION}")
 
+# string(REGEX REPLACE "/RTC(su|[1su])" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+# message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}\n")
+# add_compile_options(-fsanitize=address)
+
 message(STATUS "${PROJECT_NAME}: Finding VulkanSDK...")
 find_package(Vulkan REQUIRED)
 

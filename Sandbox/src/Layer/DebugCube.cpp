@@ -30,8 +30,10 @@ void DebugCube::Init()
                               // Bottom face
                               0, 1, 4, 1, 5, 4};
 
-    Engine::VertexLayout layout(
-            {{"Position", Engine::ShaderUniformType::Vec3}, {"TexCoord", Engine::ShaderUniformType::Vec2}});
+    Engine::VertexLayout layout = Engine::CreateVertexLayout(Engine::VertexAttributeList{
+            {Engine::VertexAttribute{"Position", (uint8_t) Engine::ShaderUniformType::Vec3},
+             Engine::VertexAttribute{"TextureCoord", (uint8_t) Engine::ShaderUniformType::Vec2}},
+            2});
 
     m_VertexArray = Engine::VertexArray::Create(36);
     m_VertexArray.Bind();

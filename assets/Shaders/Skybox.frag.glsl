@@ -10,7 +10,7 @@ const float upperLimit = 1.4;
 
 void main()
 {
-    vec3 fogColor = vec3(0.7);
+    vec3 fogColor = vec3(0.7, 0.7, 0.7);
     vec3 coord = vec3(texCoords.x, texCoords.y, texCoords.z);
     vec4 finalColor = texture(skybox, coord);
 
@@ -18,5 +18,4 @@ void main()
     factor = clamp(factor, 0.0, 1.0);
 
     FragColor = mix(vec4(fogColor, 1.0), finalColor, factor);
-    FragColor = vec4(1.0, 0, 0, 1);
 }

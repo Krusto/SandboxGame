@@ -4,6 +4,7 @@
 
 namespace Engine
 {
+
     struct ImageData {
         uint32_t id;
     };

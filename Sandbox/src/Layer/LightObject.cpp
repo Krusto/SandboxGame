@@ -30,7 +30,12 @@ void LightObject::Init()
                               // Bottom face
                               0, 1, 4, 1, 5, 4};
 
-    Engine::VertexLayout layout({{"Position", Engine::ShaderUniformType::Vec3}});
+    Engine::VertexLayout layout=Engine::CreateVertexLayout(
+            Engine::VertexAttributeList{
+                    {
+                        Engine::VertexAttribute{"Position", (uint8_t) Engine::ShaderUniformType::Vec3}
+                    },
+                      1});
 
     m_VertexArray = Engine::VertexArray::Create(36);
     m_VertexArray.Bind();

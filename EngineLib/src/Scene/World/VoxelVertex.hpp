@@ -10,7 +10,12 @@ namespace Engine
 
         static Engine::VertexLayout GetLayout()
         {
-            return {{"CompressedData", Engine::ShaderUniformType::UInt}};
+            return CreateVertexLayout(VertexAttributeList{
+                {
+                    VertexAttribute{"CompressedData", (uint8_t)Engine::ShaderUniformType::UInt}
+                },
+                1
+            });
         }
     };
 }// namespace Engine

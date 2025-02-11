@@ -317,11 +317,22 @@ namespace Engine
             {
                 size_t elementSize = s_Allocations[ptr].size;
                 size_t count = s_Allocations[ptr].count;
-                for (size_t i = 0; i < count; i++)
+                if (s_Allocations[ptr].destructor == nullptr) 
+                { 
+                    s_AllocatedMemorySize -= elementSize * count;
+                }
+                else
                 {
-                    char* newptr = (char*) ptr;
-                    newptr += i * elementSize;
-                    if (std::invoke(s_Allocations[ptr].destructor, newptr)) { s_AllocatedMemorySize -= elementSize; }
+                    for (size_t i = 0; i < count; i++)
+                    {
+                        char* newptr = (char*) ptr;
+                        newptr += i * elementSize;
+
+                        if (std::invoke(s_Allocations[ptr].destructor, newptr))
+                        {
+                            s_AllocatedMemorySize -= elementSize;
+                        }
+                    }
                 }
                 s_Allocations.erase(ptr);
                 std::free(ptr);
@@ -355,8 +366,15 @@ namespace Engine
 
             std::unique_lock<std::recursive_mutex> lock(Allocator::s_Mutex);
             s_AllocatedMemorySize += TypeSize * count;
-            s_Allocations.emplace((void*) ptr,
-                                  PointerMetaData{.size = TypeSize, .count = count, .destructor = &_Destructor<T>});
+            if (std::is_integral<T>::value) {
+                s_Allocations.emplace((void*) ptr,
+                                      PointerMetaData{.size = TypeSize, .count = count, .destructor = nullptr});
+            }
+            else
+            {
+                s_Allocations.emplace((void*) ptr,
+                                      PointerMetaData{.size = TypeSize, .count = count, .destructor = &_Destructor<T>});
+            }
             return ptr;
         }
 
@@ -369,8 +387,15 @@ namespace Engine
 
             std::unique_lock<std::recursive_mutex> lock(Allocator::s_Mutex);
             s_AllocatedMemorySize += TypeSize;
-            s_Allocations.emplace((void*) ptr,
-                                  PointerMetaData{.size = TypeSize, .count = 1, .destructor = &_Destructor<T>});
+            if (std::is_integral<T>::value) {
+                s_Allocations.emplace((void*) ptr,
+                                      PointerMetaData{.size = TypeSize, .count = 1, .destructor = nullptr});
+            }
+            else
+            {
+                s_Allocations.emplace((void*) ptr,
+                                      PointerMetaData{.size = TypeSize, .count = 1, .destructor = &_Destructor<T>});
+            }
             return ptr;
         }
 

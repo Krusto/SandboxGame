@@ -41,6 +41,39 @@ namespace Engine
         Other
     };
 
+    inline static size_t ShaderDataTypeGetSize(ShaderUniformType type)
+    {
+        switch (type)
+        {
+            case ShaderUniformType::Bool:
+                return sizeof(bool);
+            case ShaderUniformType::Int:
+                return sizeof(int);
+            case ShaderUniformType::UInt:
+                return sizeof(uint32_t);
+            case ShaderUniformType::Float:
+                return sizeof(float);
+            case ShaderUniformType::Vec2:
+                return 2 * sizeof(float);
+            case ShaderUniformType::Vec3:
+                return 3 * sizeof(float);
+            case ShaderUniformType::Vec4:
+                return 4 * sizeof(float);
+            case ShaderUniformType::Mat3:
+                return 3 * 3 * sizeof(float);
+            case ShaderUniformType::Mat4:
+                return 4 * 4 * sizeof(float);
+            case ShaderUniformType::IVec2:
+                return 2 * sizeof(int);
+            case ShaderUniformType::IVec3:
+                return 3 * sizeof(int);
+            case ShaderUniformType::IVec4:
+                return 4 * sizeof(int);
+            default:
+                return 0;
+        }
+    }
+
     class ShaderDataType
     {
     public:
@@ -52,39 +85,6 @@ namespace Engine
         static std::string ShaderBlockMemoryLayoutString(ShaderBlockMemoryLayout layout);
 
         static std::string ShaderDataTypeString(ShaderUniformType type);
-
-        static size_t Size(ShaderUniformType Type)
-        {
-            switch (Type)
-            {
-                case ShaderUniformType::Bool:
-                    return sizeof(bool);
-                case ShaderUniformType::Int:
-                    return sizeof(int);
-                case ShaderUniformType::UInt:
-                    return sizeof(uint32_t);
-                case ShaderUniformType::Float:
-                    return sizeof(float);
-                case ShaderUniformType::Vec2:
-                    return 2 * sizeof(float);
-                case ShaderUniformType::Vec3:
-                    return 3 * sizeof(float);
-                case ShaderUniformType::Vec4:
-                    return 4 * sizeof(float);
-                case ShaderUniformType::Mat3:
-                    return 3 * 3 * sizeof(float);
-                case ShaderUniformType::Mat4:
-                    return 4 * 4 * sizeof(float);
-                case ShaderUniformType::IVec2:
-                    return 2 * sizeof(int);
-                case ShaderUniformType::IVec3:
-                    return 3 * sizeof(int);
-                case ShaderUniformType::IVec4:
-                    return 4 * sizeof(int);
-                default:
-                    return 0;
-            }
-        }
     };
 
     struct ShaderUniformDeclaration {

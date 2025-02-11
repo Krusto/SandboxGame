@@ -2,7 +2,7 @@
 #include <Renderer/Shared/APISpecific/Skybox.hpp>
 #include <Renderer/Renderer.hpp>
 #include <Renderer/Shared/VertexLayout.hpp>
-#include <Renderer/Shared/ShaderUniform.hpp>
+#include <Renderer/Shared/ShaderUniform.h>
 #include <Renderer/Shared/APISpecific/CubemapTexture.hpp>
 #include <Renderer/Shared/APISpecific/Shader.hpp>
 #include <Renderer/Shared/APISpecific/VertexArray.hpp>
@@ -60,7 +60,9 @@ namespace Engine
                                     // Front
                                     3, 7, 6, 6, 2, 3};
 
-        VertexLayout layout({{"Position", ShaderUniformType::Vec3}});
+        VertexLayout layout = CreateVertexLayout(Engine::VertexAttributeList{
+                {Engine::VertexAttribute{"Position", (uint8_t) Engine::ShaderUniformType::Vec3}},
+                1});
 
         m_Data->m_VertexArray.Bind();
         m_Data->m_VertexArray.AddVertexBuffer(&layout, (float*) skyboxVertices, 8);
@@ -105,7 +107,7 @@ namespace Engine
             shader.SetUniform("camera.view", view);
 
             cubemap.Bind(0);
-            Renderer::RenderIndexed(va);
+            Renderer::RenderIndexed(va,va.IndexCount());
             Renderer::ChangeDepthFunction(DepthFunction::Less);
         });
     }

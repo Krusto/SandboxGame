@@ -118,11 +118,8 @@ namespace Engine
     {
 
         DestroyTerrainShape(chunk.terrainShape);
-        chunk.terrainShape = nullptr;
         DestroyBlockData(chunk.blockData);
-        chunk.blockData = nullptr;
         DestroyChunkMesh(chunk.mesh);
-        chunk.mesh = nullptr;
     }
 
     BlockData* ChunkFactory::GenerateBlockData(TerrainGenerationSettings settings, TerrainShape* shapeData,

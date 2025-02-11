@@ -24,6 +24,7 @@ namespace Engine
     void World::Destroy()
     {
         for (auto& [pos, chunk]: m_Chunks) { m_ChunkFactory.DestroyChunk(chunk); }
+        m_Chunks.clear();
         BlockRegistry::Destroy();
         m_BlockTextures.Destroy();
     }

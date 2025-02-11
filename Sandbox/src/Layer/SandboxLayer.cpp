@@ -48,19 +48,16 @@ void SandboxLayer::Init(Engine::Window* window)
 
     Engine::TerrainGenerationSettings settings = {.Seed = 0,
                                                   .AssetsDirectory = m_AssetsDirectory,
-                                                  .GenerationDistance = 1};
+                                                  .GenerationDistance = 3};
     m_World->Init(settings, m_TexturesDirectory);
 
     m_Camera.Init(Engine::CameraSpec({m_AppSpec.width, m_AppSpec.height}, 45.0f, 0.1f, 1000.0f));
 
     glm::vec3 offset{(settings.GenerationDistance / 2) * 32, 0, (settings.GenerationDistance / 2) * 32};
     glm::vec3 startPosition = glm::vec3(0, 150, 3);
-
     m_Camera.Move(startPosition + offset);
     m_Camera.Update(m_DeltaTime, 1, 1);
-
     std::string cubeShaderPath = m_ShadersDirectory.string() + "/Cube";
-
     m_CubeShader = Engine::Shader::Create(cubeShaderPath);
     m_LightShader = Engine::Shader::Create(lightShaderPath);
 
@@ -79,8 +76,12 @@ void SandboxLayer::Init(Engine::Window* window)
             1,  1,  0.0,//
     };
     uint32_t length = sizeof(vertices) / sizeof(float);
-    Engine::VertexLayout layout =
-            Engine::VertexLayout({Engine::VertexAttribute{"Position", Engine::ShaderUniformType::Vec3}});
+    Engine::VertexLayout layout = Engine::CreateVertexLayout(
+            Engine::VertexAttributeList{
+            {
+                    Engine::VertexAttribute{"Position", (uint8_t) Engine::ShaderUniformType::Vec3}
+            },
+            1});
 
     m_DepthBufferVA.AddVertexBuffer(&layout, vertices, length);
 
@@ -101,7 +102,7 @@ void SandboxLayer::Init(Engine::Window* window)
     {
         for (int x = 0; x < worldSize * 2; x++)
         {
-            if (z * z + x * x > worldSize * worldSize) { continue; }
+            //if (z * z + x * x > worldSize * worldSize) { continue; }
             for (int y = 0; y < maxChunksY; y++)
             {
                 currentChunkPos = glm::ivec3(x, y, z) + playerChunkPos;

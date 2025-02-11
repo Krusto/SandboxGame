@@ -1,6 +1,6 @@
 #include <Util/File.hpp>
 #include <Core/Allocator.hpp>
-#include <Renderer/Shared/ShaderUniform.hpp>
+#include <Renderer/Shared/ShaderUniform.h>
 #include <Renderer/OpenGL/StructDefinitions.hpp>
 #include <Renderer/Predefines.hpp>
 
