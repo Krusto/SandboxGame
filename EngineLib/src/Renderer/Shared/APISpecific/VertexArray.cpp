@@ -11,10 +11,7 @@ namespace Engine
         return ptr;
     }
 
-    void VertexArray::Init(uint32_t indexCount)
-    {
-        Renderer::GetInstance()->VertexArrayInit((void**) &m_Data, indexCount);
-    }
+    void VertexArray::Init(uint32_t indexCount) { m_Data = Renderer::GetInstance()->VertexArrayInit(indexCount); }
 
     void VertexArray::Bind() const { Renderer::GetInstance()->VertexArrayBind((void*) m_Data); }
 

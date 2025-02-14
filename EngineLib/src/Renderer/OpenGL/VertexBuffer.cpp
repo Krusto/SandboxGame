@@ -5,9 +5,12 @@
 #include <Renderer/Predefines.hpp>
 #include <Renderer/Shared/VertexLayout.hpp>
 
+#ifdef __cplusplus
 namespace Engine
-{  
-    inline static void SpecifyVertexArrayAttribute(uint32_t vertexArrayID, uint32_t index, uint32_t offset, ShaderUniformType type)
+{
+#endif
+    inline static void SpecifyVertexArrayAttribute(uint32_t vertexArrayID, uint32_t index, uint32_t offset,
+                                                   ShaderUniformType type)
     {
         switch (type)
         {
@@ -51,23 +54,23 @@ namespace Engine
                 break;
         }
     }
-    
-    EXPORT_RENDERER void VertexBufferInit(VertexBufferData** data, VertexArrayData* vertexArray,
-                                          Engine::VertexLayout* vertexLayout, float* vertices, unsigned int length)
-    {
-        if (length == 0) return;
-        if (*data == nullptr) { *data = Allocator::Allocate<VertexBufferData>(); }
 
-        glCreateBuffers(1, &(*data)->id);
-        glNamedBufferStorage((*data)->id, (GLsizei) (length * vertexLayout->stride), vertices, GL_DYNAMIC_STORAGE_BIT);
-        (*data)->size = vertexLayout->stride;
+    EXPORT_RENDERER VertexBufferData* VertexBufferInit(VertexArrayData* vertexArray, VertexLayout* vertexLayout,
+                                                       float* vertices, unsigned int length)
+    {
+        if (length == 0) return nullptr;
+        VertexBufferData* data = Allocator::Allocate<VertexBufferData>();
+
+        glCreateBuffers(1, &data->id);
+        glNamedBufferStorage(data->id, (GLsizei) (length * vertexLayout->stride), vertices, GL_DYNAMIC_STORAGE_BIT);
+        data->size = vertexLayout->stride;
         for (size_t i = 0; i < vertexLayout->attributes.count && vertexLayout->attributes.attributes[i].name != nullptr;
              ++i)
         {
             auto& attr = vertexLayout->attributes.attributes[i];
             glEnableVertexArrayAttrib(vertexArray->id, i);
             glVertexArrayAttribBinding(vertexArray->id, i, 0);
-            SpecifyVertexArrayAttribute(vertexArray->id, i, attr.offset, (ShaderUniformType)attr.type);
+            SpecifyVertexArrayAttribute(vertexArray->id, i, attr.offset, (ShaderUniformType) attr.type);
         }
     }
 
@@ -92,5 +95,6 @@ namespace Engine
     }
 
     EXPORT_RENDERER uint32_t VertexBufferGetID(VertexBufferData* data) { return data->id; }
-
+#ifdef __cplusplus
 }// namespace Engine
+#endif
