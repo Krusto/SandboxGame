@@ -13,7 +13,7 @@ namespace Engine
 
     void VertexBuffer::Init(VertexArray* va, const VertexLayout& layout, float* data, uint32_t length)
     {
-        Renderer::GetInstance()->VertexBufferInit((void**) &m_Data, va, (void*) &layout, data, length);
+        m_Data = Renderer::GetInstance()->VertexBufferInit(va, (void*) &layout, data, length);
     }
 
     void VertexBuffer::Bind() const { Renderer::GetInstance()->VertexBufferBind(m_Data); }

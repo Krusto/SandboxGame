@@ -179,7 +179,7 @@ namespace Engine
         FramebufferGetHeight_T FramebufferGetHeight;
 
         //Vertex Array
-        typedef void (*VertexArrayInit_T)(void** data, unsigned int indexCount);
+        typedef VertexArrayData* (*VertexArrayInit_T)(unsigned int indexCount);
         VertexArrayInit_T VertexArrayInit;
 
         typedef void (*VertexArrayDestroy_T)(void** data);
@@ -191,7 +191,7 @@ namespace Engine
         typedef void (*VertexArrayUnbind_T)(void* data);
         VertexArrayUnbind_T VertexArrayUnbind;
 
-        typedef void (*VertexArrayAddVertexBuffer_T)(void* data, void* layout, float* vertexData, unsigned int length);
+        typedef void(*VertexArrayAddVertexBuffer_T)(void* data, void* layout, float* vertexData, unsigned int length);
         VertexArrayAddVertexBuffer_T VertexArrayAddVertexBuffer;
 
         typedef void (*VertexArrayAddIndexBuffer_T)(void* data, unsigned int* indexData, unsigned int length);
@@ -204,8 +204,8 @@ namespace Engine
         VertexArrayGetID_T VertexArrayGetID;
 
         //Vertex Buffer
-        typedef void (*VertexBufferInit_T)(void** data, void* vertexArray, void* vertexLayout, float* vertices,
-                                           unsigned int length);
+        typedef VertexBufferData* (*VertexBufferInit_T)(void* vertexArray, void* vertexLayout, float* vertices,
+                                                        unsigned int length);
         VertexBufferInit_T VertexBufferInit;
 
         typedef void (*VertexBufferDestroy_T)(void** data);

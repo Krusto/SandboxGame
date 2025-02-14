@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <Renderer/Shared/StorageBufferType.hpp>
+#include <Renderer/Shared/CubemapTextureSpec.hpp>
 
 namespace Engine
 {
@@ -70,4 +71,10 @@ namespace Engine
         void* uniformBlocks;
         // std::vector<ShaderUniformBlockLayout> uniformBlocks;
     };
+
+    struct CubemapTextureData {
+        CubemapTextureSpec spec{};
+        uint32_t id{};
+    };
+
 }// namespace Engine

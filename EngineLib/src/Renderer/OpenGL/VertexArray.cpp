@@ -5,15 +5,18 @@
 #include <Renderer/OpenGL/StructDefinitions.hpp>
 #include <Renderer/OpenGL/ExportedFunctions.hpp>
 #include <Renderer/Shared/VertexLayout.hpp>
+#ifdef __cplusplus
 namespace Engine
 {
+#endif
 
-    EXPORT_RENDERER void VertexArrayInit(VertexArrayData** data, uint32_t indexCount)
+    EXPORT_RENDERER VertexArrayData* VertexArrayInit(uint32_t indexCount)
     {
-        if (*data == nullptr) { *data = Allocator::Allocate<VertexArrayData>(); }
+        VertexArrayData* data = Allocator::Allocate<VertexArrayData>();
+        glCreateVertexArrays(1, &data->id);
+        data->indexCount = indexCount;
 
-        glCreateVertexArrays(1, &(*data)->id);
-        (*data)->indexCount = indexCount;
+        return data;
     }
 
     EXPORT_RENDERER void VertexArrayBind(VertexArrayData* data)
@@ -31,7 +34,7 @@ namespace Engine
             if ((*data)->id != 0)
             {
                 glDeleteVertexArrays(1, &(*data)->id);
-                VertexBufferDestroy( &(*data)->vertexBufferData);
+                VertexBufferDestroy(&(*data)->vertexBufferData);
                 IndexBufferDestroy((void**) &(*data)->indexBufferData);
             }
             Allocator::Deallocate(*data);
@@ -39,11 +42,11 @@ namespace Engine
         }
     }
 
-    EXPORT_RENDERER void VertexArrayAddVertexBuffer(VertexArrayData* data, void* layout, float* vertexData,
+    EXPORT_RENDERER void VertexArrayAddVertexBuffer(VertexArrayData* data, VertexLayout* layout, float* vertexData,
                                                     unsigned int length)
     {
         VertexArrayBind(data);
-        VertexBufferInit(&data->vertexBufferData, data, layout, vertexData, length);
+        data->vertexBufferData = VertexBufferInit( data, layout, vertexData, length);
         glVertexArrayVertexBuffer(data->id, 0, data->vertexBufferData->id, 0, VertexLayoutGetStride(layout));
     }
 
@@ -57,4 +60,6 @@ namespace Engine
     EXPORT_RENDERER uint32_t VertexArrayGetIndexCount(VertexArrayData* data) { return data->indexCount; }
 
     EXPORT_RENDERER uint32_t VertexArrayGetID(VertexArrayData* data) { return data->id; }
+#ifdef __cplusplus
 }// namespace Engine
+#endif
