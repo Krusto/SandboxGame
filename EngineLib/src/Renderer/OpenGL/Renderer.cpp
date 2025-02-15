@@ -13,47 +13,45 @@
 namespace Engine
 {
 
-    EXPORT_RENDERER void RendererAPISetClearColor(void* data, float r, float g, float b, float a)
+    EXPORT_RENDERER void RendererAPISetClearColor(RendererAPIData* data, float r, float g, float b, float a)
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(r, g, b, a);
     }
 
-    EXPORT_RENDERER void RendererAPIInit(void** data, void* rendererSpec, void* applicationSpec)
+    EXPORT_RENDERER void RendererAPIInit(RendererAPIData** data, void* rendererSpec, void* applicationSpec)
     {
-        RendererAPIData* m_Data = static_cast<RendererAPIData*>(*data);
-        if (m_Data == nullptr) { m_Data = Allocator::Allocate<RendererAPIData>(); }
+        if (data == nullptr) { *data = Allocator::Allocate<RendererAPIData>(); }
     }
 
-    EXPORT_RENDERER void RendererAPIDestroy(void** data)
+    EXPORT_RENDERER void RendererAPIDestroy(RendererAPIData** data)
     {
-        RendererAPIData* m_Data = static_cast<RendererAPIData*>(*data);
-        if (m_Data == nullptr) { return; }
-        GUIContextDestroy((void**) &m_Data->guiContext);
-        Allocator::Deallocate(m_Data);
+        if (data == nullptr) { return; }
+        GUIContextDestroy((void**) &(*data)->guiContext);
+        Allocator::Deallocate(data);
         *data = nullptr;
     };
 
-    EXPORT_RENDERER void RendererAPISwitchPolygonMode(void* data, unsigned int mode)
+    EXPORT_RENDERER void RendererAPISwitchPolygonMode(RendererAPIData* data, unsigned int mode)
     {
 
         if (mode == 0) { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
         else if (mode == 1) { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); }
     }
 
-    EXPORT_RENDERER void RendererAPISetViewport(void* data, float width, float height)
+    EXPORT_RENDERER void RendererAPISetViewport(RendererAPIData* data, float width, float height)
     {
         glViewport(0, 0, width, height);
     }
 
     EXPORT_RENDERER void RendererAPIBindDefaultFramebuffer() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
 
-    EXPORT_RENDERER void RendererAPIRenderIndexed(void* data, uint32_t indexCount)
+    EXPORT_RENDERER void RendererAPIRenderIndexed(RendererAPIData* data, uint32_t indexCount)
     {
         glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
     };
 
-    EXPORT_RENDERER void RendererAPIChangeDepthFunc(void* data, unsigned int depthFunction)
+    EXPORT_RENDERER void RendererAPIChangeDepthFunc(RendererAPIData* data, unsigned int depthFunction)
     {
         switch (depthFunction)
         {
@@ -84,27 +82,20 @@ namespace Engine
         }
     }
 
-    EXPORT_RENDERER void RendererAPIInitIMGUI(void* renderer_instance, void* data, void* window)
+    EXPORT_RENDERER void RendererAPIInitIMGUI(void* renderer_instance, RendererAPIData* data, void* window)
     {
-        RendererAPIData* m_Data = static_cast<RendererAPIData*>(data);
-        GUIContextInit((void**) &m_Data->guiContext, window);
+        GUIContextInit((void**) &data->guiContext, window);
     }
 
-    EXPORT_RENDERER void RendererAPIDestroyIMGUI(void* data)
+    EXPORT_RENDERER void RendererAPIDestroyIMGUI(RendererAPIData* data)
     {
-        RendererAPIData* m_Data = static_cast<RendererAPIData*>(data);
-        GUIContextDestroy((void**) &m_Data->guiContext);
+        GUIContextDestroy((void**) &data->guiContext);
     }
 
-    EXPORT_RENDERER void RendererAPIIMGUIBegin(void* data)
-    {
-        RendererAPIData* m_Data = static_cast<RendererAPIData*>(data);
-        GUIContextBegin(&m_Data->guiContext);
-    }
+    EXPORT_RENDERER void RendererAPIIMGUIBegin(RendererAPIData* data) { GUIContextBegin(&data->guiContext); }
 
-    EXPORT_RENDERER void RendererAPIIMGUIEnd(void* data, void* drawData)
+    EXPORT_RENDERER void RendererAPIIMGUIEnd(RendererAPIData* data, void* drawData)
     {
-        RendererAPIData* m_Data = static_cast<RendererAPIData*>(data);
-        GUIContextEnd(&m_Data->guiContext, drawData);
+        GUIContextEnd(&data->guiContext, drawData);
     }
 }// namespace Engine
