@@ -72,6 +72,8 @@ namespace Engine
             glVertexArrayAttribBinding(vertexArray->id, i, 0);
             SpecifyVertexArrayAttribute(vertexArray->id, i, attr.offset, (ShaderUniformType) attr.type);
         }
+
+        return data;
     }
 
     EXPORT_RENDERER void VertexBufferBind(VertexBufferData* data)

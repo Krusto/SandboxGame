@@ -22,7 +22,7 @@ namespace Engine
     };
 
     Skybox Skybox::Create(std::string_view cubemapName, const std::string& shaderPath,
-                          const std::unordered_map<CubemapTextureFace, std::string>& Path)
+                          const Vector<Pair<CubemapTextureFace, const char*>>* Path)
     {
         Skybox ptr;
         ptr.Load(cubemapName, shaderPath, Path);
@@ -30,7 +30,7 @@ namespace Engine
     }
 
     void Skybox::Load(std::string_view cubemapName, const std::string& shaderPath,
-                      const std::unordered_map<CubemapTextureFace, std::string>& Path)
+                      const Vector<Pair<CubemapTextureFace, const char*>>* Path)
     {
         m_Data = Allocator::Allocate<SkyboxData>();
 
@@ -107,7 +107,7 @@ namespace Engine
             shader.SetUniform("camera.view", view);
 
             cubemap.Bind(0);
-            Renderer::RenderIndexed(va,va.IndexCount());
+            Renderer::RenderIndexed(va, va.IndexCount());
             Renderer::ChangeDepthFunction(DepthFunction::Less);
         });
     }

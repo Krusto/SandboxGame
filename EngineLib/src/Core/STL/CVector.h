@@ -37,11 +37,14 @@
 
 #ifdef __cplusplus
 #include <cstdint>
-namespace Engine::Containers
+namespace Engine
 {
 #else
 #include <stdint.h>
 #endif
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 /***********************************************************************************************************************
 Macro Definitions
 ***********************************************************************************************************************/
@@ -88,7 +91,7 @@ Type definitions
  * @typedef CVectorU32T
  * @brief A vector of uint32_t.
  */
-    typedef CVectorT CvectorU32T;
+    typedef CVectorT CVectorU32T;
 
     /**
  * @typedef CVectorI32T
@@ -534,6 +537,15 @@ Static functions declaration
     static void* cvector_get_ptr(CVectorT* vector, size_t index);
 
     /**
+ * @brief Get a const pointer to a value in the vector.
+ * @param cvector[in] The vector.
+ * @param index[in] The index of the element to get.
+ * @return A pointer to the value at the given index.
+ */
+    static const void* cvector_get_ptr_const(const CVectorT* vector, size_t index);
+
+
+    /**
  * @brief Get a pointer to a value in the vector, safely.
  *
  * This function is like cvector_get_ptr, but it will return NULL if the index
@@ -596,7 +608,7 @@ Static functions declaration
  * @param cvector[in] The vector.
  * @return TRUE if the vector is empty, FALSE otherwise.
  */
-    static BOOL cvector_is_empty(CVectorT* vector);
+    static bool cvector_is_empty(CVectorT* vector);
 
     /**
  * @brief Get the length of the vector.
@@ -668,19 +680,19 @@ Static functions implementation
     {
         if (index < vector->length + 1)
         {
-            cvector_resize(vector, darr->length + 1);
+            cvector_resize(vector, vector->length + 1);
             if (index < vector->length)
             {
                 void* resultPtr = NULL;
                 if (NULL != vector->data)
                 {
                     size_t len = (vector->length) - (index + 1);
-                    void* next = (void*) &vector->data[index * vector->elementSize + darr->elementSize];
+                    void* next = (void*) &vector->data[index * vector->elementSize + vector->elementSize];
                     void* current = &vector->data[index * vector->elementSize];
-                    resultPtr = CMEMCPY(next, current, len * vector->elementSize);
+                    resultPtr = memcpy(next, current, len * vector->elementSize);
                     if (NULL != resultPtr)
                     {
-                        CMEMCPY(&vector->data[index * vector->elementSize], valuePtr, darr->elementSize);
+                        memcpy(&vector->data[index * vector->elementSize], valuePtr, vector->elementSize);
                     }
                 }
             }
@@ -719,40 +731,45 @@ Static functions implementation
 
     inline static void* cvector_get_ptr(CVectorT* vector, size_t index)
     {
-        return &darr->data[index * darr->elementSize];
+        return &vector->data[index * vector->elementSize];
+    }
+
+    inline static const void* cvector_get_ptr_const(const CVectorT* vector, size_t index)
+    {
+        return &vector->data[index * vector->elementSize];
     }
 
     inline static void* cvector_get_ptr_safe(CVectorT* vector, size_t index)
     {
         void* result = NULL;
-        if (NULL == cvector) {}
-        else if (index < vector->length) { result = vector_get_ptr(darr, index); }
+        if (NULL == vector) {}
+        else if (index < vector->length) { result = cvector_get_ptr(vector, index); }
         return result;
     }
 
     inline static uint32_t cvector_get_u32(CVectorU32T* vector, size_t index)
     {
-        return *((uint32_t*) darr_get_ptr(darr, index));
+        return *((uint32_t*) cvector_get_ptr(vector, index));
     }
 
     inline static uint32_t cvector_get_u32_safe(CVectorU32T* vector, size_t index)
     {
         uint32_t result = 0;
-        if (NULL == cvector) {}
-        else if (index < vector->length) { result = vector_get_u32(darr, index); }
+        if (NULL == vector) {}
+        else if (index < vector->length) { result = cvector_get_u32(vector, index); }
         return result;
     }
 
     inline static int32_t cvector_get_i32(CVectorI32T* vector, size_t index)
     {
-        return *((int32_t*) darr_get_ptr(darr, index));
+        return *((int32_t*) cvector_get_ptr(vector, index));
     }
 
     inline static int32_t cvector_get_i32_safe(CVectorI32T* vector, size_t index)
     {
         int32_t result = 0;
-        if (NULL == cvector) {}
-        else if (index < vector->length) { result = vector_get_i32(darr, index); }
+        if (NULL == vector) {}
+        else if (index < vector->length) { result = cvector_get_i32(vector, index); }
         return result;
     }
 
@@ -764,8 +781,8 @@ Static functions implementation
     inline uint32_t* cvector_get_u32_ptr_safe(CVectorU32T* vector, size_t index)
     {
         uint32_t* result = NULL;
-        if (NULL == cvector) {}
-        else if (index < vector->length) { result = vector_get_u32_ptr(darr, index); }
+        if (NULL == vector) {}
+        else if (index < vector->length) { result = cvector_get_u32_ptr(vector, index); }
         return result;
     }
 
@@ -777,19 +794,19 @@ Static functions implementation
     inline int32_t* cvector_get_i32_ptr_safe(CVectorU32T* vector, size_t index)
     {
         int32_t* result = NULL;
-        if (NULL == cvector) {}
-        else if (index < vector->length) { result = vector_get_i32_ptr(darr, index); }
+        if (NULL == vector) {}
+        else if (index < vector->length) { result = cvector_get_i32_ptr(vector, index); }
         return result;
     }
 
     inline static uint16_t cvector_get_u16(CVectorU16T* vector, size_t index)
     {
-        return *((uint16_t*) darr_get_ptr(darr, index));
+        return *((uint16_t*) cvector_get_ptr(vector, index));
     }
 
     inline static int16_t cvector_get_i16(CVectorI16T* vector, size_t index)
     {
-        return *((int16_t*) darr_get_ptr(darr, index));
+        return *((int16_t*) cvector_get_ptr(vector, index));
     }
 
     inline static uint16_t* cvector_get_u16_ptr(CVectorU16T* vector, size_t index)
@@ -805,128 +822,128 @@ Static functions implementation
     inline static int16_t cvector_get_i16_safe(CVectorI16T* vector, size_t index)
     {
         int16_t result = 0;
-        if (NULL == cvector) {}
-        else if (index < vector->length) { result = vector_get_i16(darr, index); }
+        if (NULL == vector) {}
+        else if (index < vector->length) { result = cvector_get_i16(vector, index); }
         return result;
     }
 
     inline static uint16_t* cvector_get_u16_ptr_safe(CVectorU16T* vector, size_t index)
     {
         uint16_t* result = NULL;
-        if (NULL == cvector) {}
-        else if (index < vector->length) { result = vector_get_u16_ptr(darr, index); }
+        if (NULL == vector) {}
+        else if (index < vector->length) { result = cvector_get_u16_ptr(vector, index); }
         return result;
     }
 
     inline static int16_t* cvector_get_i16_ptr_safe(CVectorI16T* vector, size_t index)
     {
         int16_t* result = NULL;
-        if (NULL == cvector) {}
-        else if (index < vector->length) { result = vector_get_i16_ptr(darr, index); }
+        if (NULL == vector) {}
+        else if (index < vector->length) { result = cvector_get_i16_ptr(vector, index); }
         return result;
     }
 
     inline static uint8_t cvector_get_u8(CVectorU8T* vector, size_t index)
     {
-        return *((uint8_t*) darr_get_ptr(darr, index));
+        return *((uint8_t*) cvector_get_ptr(vector, index));
     }
 
     inline static int8_t cvector_get_i8(CVectorI8T* vector, size_t index)
     {
-        return *((int8_t*) darr_get_ptr(darr, index));
+        return *((int8_t*) cvector_get_ptr(vector, index));
     }
 
     inline static uint8_t* cvector_get_u8_ptr(CVectorU8T* vector, size_t index)
     {
-        return ((uint8_t*) darr_get_ptr(darr, index));
+        return ((uint8_t*) cvector_get_ptr(vector, index));
     }
 
     inline static int8_t* cvector_get_i8_ptr(CVectorI8T* vector, size_t index)
     {
-        return ((int8_t*) darr_get_ptr(darr, index));
+        return ((int8_t*) cvector_get_ptr(vector, index));
     }
 
     inline static uint8_t cvector_get_u8_safe(CVectorU8T* vector, size_t index)
     {
         uint8_t result = 0;
-        if (NULL == cvector) {}
-        else if (index < vector->length) { result = vector_get_u8(darr, index); }
+        if (NULL == vector) {}
+        else if (index < vector->length) { result = cvector_get_u8(vector, index); }
         return result;
     }
 
     inline static int8_t cvector_get_i8_safe(CVectorI8T* vector, size_t index)
     {
         int8_t result = 0;
-        if (NULL == cvector) {}
-        else if (index < vector->length) { result = vector_get_i8(darr, index); }
+        if (NULL == vector) {}
+        else if (index < vector->length) { result = cvector_get_i8(vector, index); }
         return result;
     }
 
     inline static uint8_t* cvector_get_u8_ptr_safe(CVectorU8T* vector, size_t index)
     {
         uint8_t* result = NULL;
-        if (NULL == cvector) {}
-        else if (index < vector->length) { result = vector_get_u8_ptr(darr, index); }
+        if (NULL == vector) {}
+        else if (index < vector->length) { result = cvector_get_u8_ptr(vector, index); }
         return result;
     }
 
     inline static int8_t* cvector_get_i8_ptr_safe(CVectorI8T* vector, size_t index)
     {
         int8_t* result = NULL;
-        if (NULL == cvector) {}
-        else if (index < vector->length) { result = vector_get_i8_ptr(darr, index); }
+        if (NULL == vector) {}
+        else if (index < vector->length) { result = cvector_get_i8_ptr(vector, index); }
         return result;
     }
 
-    inline static void* cvector_front_ptr(CVectorT* vector) { return darr_get_ptr(darr, 0); }
+    inline static void* cvector_front_ptr(CVectorT* vector) { return cvector_get_ptr(vector, 0); }
 
-    inline static void* cvector_back_ptr(CVectorT* vector) { return darr_get_ptr(darr, darr->length - 1); }
+    inline static void* cvector_back_ptr(CVectorT* vector) { return cvector_get_ptr(vector, vector->length - 1); }
 
     inline static void* cvector_front_ptr_safe(CVectorT* vector)
     {
         void* result = NULL;
-        if (NULL == cvector) {}
-        else if (vector->length > 0) { result = vector_get_ptr(darr, 0); }
+        if (NULL == vector) {}
+        else if (vector->length > 0) { result = cvector_get_ptr(vector, 0); }
         return result;
     }
 
     inline static void* cvector_back_ptr_safe(CVectorT* vector)
     {
         void* result = NULL;
-        if (NULL == cvector) {}
-        else if (vector->length > 0) { result = vector_get_ptr(darr, darr->length - 1); }
+        if (NULL == vector) {}
+        else if (vector->length > 0) { result = cvector_get_ptr(vector, vector->length - 1); }
         return result;
     }
 
-    inline static void cvector_push_u32(CVectorU32T* vector, uint32_t value) { darr_push_generic(darr, &value); }
+    inline static void cvector_push_u32(CVectorU32T* vector, uint32_t value) { cvector_push_generic(vector, &value); }
 
-    inline static void cvector_push_i32(CVectorI32T* vector, int32_t value) { darr_push_generic(darr, &value); }
+    inline static void cvector_push_i32(CVectorI32T* vector, int32_t value) { cvector_push_generic(vector, &value); }
 
-    inline static void cvector_push_u16(CVectorU16T* vector, uint16_t value) { darr_push_generic(darr, &value); }
+    inline static void cvector_push_u16(CVectorU16T* vector, uint16_t value) { cvector_push_generic(vector, &value); }
 
-    inline static void cvector_push_i16(CVectorI16T* vector, int16_t value) { darr_push_generic(darr, &value); }
+    inline static void cvector_push_i16(CVectorI16T* vector, int16_t value) { cvector_push_generic(vector, &value); }
 
-    inline static void cvector_push_u8(CVectorU8T* vector, uint8_t value) { darr_push_generic(darr, &value); }
+    inline static void cvector_push_u8(CVectorU8T* vector, uint8_t value) { cvector_push_generic(vector, &value); }
 
-    inline static void cvector_push_i8(CVectorI8T* vector, int8_t value) { darr_push_generic(darr, &value); }
+    inline static void cvector_push_i8(CVectorI8T* vector, int8_t value) { cvector_push_generic(vector, &value); }
 
     inline static void cvector_push_generic(CVectorT* vector, void* value)
     {
-        cvector_resize(vector, darr->length + 1);
-        CMEMCPY(&vector->data[vector->length * darr->elementSize - darr->elementSize], value, darr->elementSize);
+        cvector_resize(vector, vector->length + 1);
+        memcpy(&vector->data[vector->length * vector->elementSize - vector->elementSize], value, vector->elementSize);
     }
 
     inline static void cvector_push_ptr(CVectorT* vector, void* value)
     {
-        cvector_resize(vector, darr->length + 1);
-        CMEMCPY(&vector->data[vector->length * darr->elementSize - darr->elementSize], &value, darr->elementSize);
+        cvector_resize(vector, vector->length + 1);
+        memcpy(&vector->data[vector->length * vector->elementSize - vector->elementSize], &value, vector->elementSize);
     }
 
-    inline static BOOL cvector_is_empty(CVectorT* vector) { return (0u == darr->length); }
+    inline static bool cvector_is_empty(const CVectorT* vector) { return (0u == vector->length); }
 
-    inline static size_t cvector_length(CVectorT* vector) { return darr->length; }
+    inline static size_t cvector_length(const CVectorT* vector) { return vector->length; }
 
-    inline static size_t cvector_capacity(CVectorT* vector) { return darr->capacity; }
+    inline static size_t cvector_capacity(const CVectorT* vector) { return vector->capacity; }
 
     inline static void cvector_resize(CVectorT* vector, size_t newLength)
     {
@@ -937,9 +954,9 @@ Static functions implementation
                 int8_t* resultPtr;
                 size_t newCapacity = newLength * CVECTOR_RESIZE_FACTOR;
 
-                if (NULL == vector->data) { resultPtr = (int8_t*) CMALLOC(newCapacity * (vector->elementSize)); }
-                else { resultPtr = (int8_t*) CREALLOC(vector->data, newCapacity * (vector->elementSize)); }
-                if (NULL == resultPtr) { LOG_ERROR("Can not allocate cvector!\n"); }
+                if (NULL == vector->data) { resultPtr = (int8_t*) malloc(newCapacity * (vector->elementSize)); }
+                else { resultPtr = (int8_t*) realloc(vector->data, newCapacity * (vector->elementSize)); }
+                if (NULL == resultPtr) { printf("Can not allocate cvector!\n"); }
                 if (NULL != resultPtr)
                 {
                     vector->data = resultPtr;
@@ -954,35 +971,35 @@ Static functions implementation
 
     inline static void cvector_destroy(CVectorT* vector)
     {
-        CFREE(vector->data, vector->length);
-        CFREE(cvector, sizeof(vector));
+        free(vector->data);
+        free(vector);
     }
 
-    inline static CVectorU32T* cvector_create_u32() { return vector_create_generic(sizeof(uint32_t)); }
+    inline static CVectorU32T* cvector_create_u32() { return cvector_create_generic(sizeof(uint32_t)); }
 
-    inline static CVectorI32T* cvector_create_i32() { return vector_create_generic(sizeof(int32_t)); }
+    inline static CVectorI32T* cvector_create_i32() { return cvector_create_generic(sizeof(int32_t)); }
 
-    inline static CVectorU16T* cvector_create_u16() { return vector_create_generic(sizeof(uint16_t)); }
+    inline static CVectorU16T* cvector_create_u16() { return cvector_create_generic(sizeof(uint16_t)); }
 
-    inline static CVectorI16T* cvector_create_i16() { return vector_create_generic(sizeof(int16_t)); }
+    inline static CVectorI16T* cvector_create_i16() { return cvector_create_generic(sizeof(int16_t)); }
 
-    inline static CVectorU8T* cvector_create_u8() { return vector_create_generic(sizeof(uint8_t)); }
+    inline static CVectorU8T* cvector_create_u8() { return cvector_create_generic(sizeof(uint8_t)); }
 
-    inline static CVectorI8T* cvector_create_i8() { return vector_create_generic(sizeof(int8_t)); }
+    inline static CVectorI8T* cvector_create_i8() { return cvector_create_generic(sizeof(int8_t)); }
 
     inline static CVectorT* cvector_create_generic(size_t typeSize)
     {
         CVectorT* result = NULL;
 
-        if (typeSize > 0) { result = (CVectorT*) CMALLOC(sizeof(cvectorT)); }
-        if (NULL == result) { LOG_ERROR("Can not allocate cvector!\n"); }
+        if (typeSize > 0) { result = (CVectorT*) malloc(sizeof(CVectorT)); }
+        if (NULL == result) { printf("Can not allocate cvector!\n"); }
         else
         {
             result->length = 0;                         // set length to 0
             result->capacity = CVECTOR_INITIAL_CAPACITY;// set capacity to cvector_INITIAL_CAPACITY
             result->elementSize = typeSize;             // set element size to stride
-            int8_t* dataPtr = (int8_t*) CMALLOC(typeSize);
-            if (NULL == dataPtr) { LOG_ERROR("Can not allocate cvector data buffer!\n"); }
+            int8_t* dataPtr = (int8_t*) malloc(typeSize);
+            if (NULL == dataPtr) { printf("Can not allocate cvector data buffer!\n"); }
             else { result->data = dataPtr; }
         }
 
@@ -996,16 +1013,16 @@ Static functions implementation
         {
             void* dest = &(vector->data[index]);
             void* src = &(vector->data[index + vector->elementSize]);
-            resultPtr = (int8_t*) CMEMCPY(dest, src, (vector->length - index));
-            if (NULL == resultPtr) { LOG_ERROR("Can not copy cvector !\n"); }
+            resultPtr = (int8_t*) memcpy(dest, src, (vector->length - index));
+            if (NULL == resultPtr) { printf("Can not copy cvector !\n"); }
         }
         if (NULL != resultPtr) { vector->length -= 1; }
     }
 
     inline static void cvector_erase_safe(CVectorT* vector, size_t index)
     {
-        if (NULL == cvector) {}
-        else if (index < vector->length) { vector_erase(darr, index); }
+        if (NULL == vector) {}
+        else if (index < vector->length) { cvector_erase(vector, index); }
     }
 
     inline static void cvector_shrink_to_fit(CVectorT* vector)
@@ -1015,9 +1032,15 @@ Static functions implementation
             int8_t* resultPtr = NULL;
             if (NULL != vector->data)
             {
-                resultPtr = (int8_t*) CREALLOC(vector->data, darr->length * darr->elementSize);
+                if (vector->length == 0)
+                {
+                    vector->length = 1;
+                    free(vector->data);
+                    resultPtr = (int8_t*) malloc(vector->length * vector->elementSize);
+                }
+                else { resultPtr = (int8_t*) realloc(vector->data, vector->length * vector->elementSize); }
             }
-            if (NULL == resultPtr) { LOG_ERROR("Can not reallocate cvector !\n"); }
+            if (NULL == resultPtr) { printf("Can not reallocate cvector !\n"); }
             if (NULL != resultPtr)
             {
                 vector->capacity = vector->length;
@@ -1032,10 +1055,10 @@ Static functions implementation
         {
             int8_t* resultPtr;
 
-            if (NULL == vector->data) { resultPtr = (int8_t*) CMALLOC(newCapacity * vector->elementSize); }
-            else { resultPtr = (int8_t*) CREALLOC(vector->data, newCapacity * vector->elementSize); }
+            if (NULL == vector->data) { resultPtr = (int8_t*) malloc(newCapacity * vector->elementSize); }
+            else { resultPtr = (int8_t*) realloc(vector->data, newCapacity * vector->elementSize); }
 
-            if (NULL == resultPtr) { LOG_ERROR("Can not allocate cvector !\n"); }
+            if (NULL == resultPtr) { printf("Can not allocate cvector !\n"); }
             if (NULL != resultPtr)
             {
                 vector->data = resultPtr;
@@ -1055,9 +1078,9 @@ Static functions implementation
     inline static void* cvector_pop_safe(CVectorT* vector)
     {
         void* valuePtr = NULL;
-        if (NULL == cvector) {}
-        else if (vector->length > 0) { valuePtr = vector_pop(darr); }
-        else { LOG_ERROR("Can not pop from cvector with size < 0!\n"); }
+        if (NULL == vector) {}
+        else if (vector->length > 0) { valuePtr = cvector_pop(vector); }
+        else { printf("Can not pop from cvector with size < 0!\n"); }
         return valuePtr;
     }
 #ifdef __cplusplus

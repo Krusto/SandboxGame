@@ -1,12 +1,13 @@
 #ifndef CPAIR_H
 #define CPAIR_H
 
+#include "CStringView.h"
+
 #ifdef __cplusplus
 namespace Engine
 {
 #endif
 
-#include "CStringView.h"
 
 #define DeclareCPair(first_type, second_type, pair_type_name)                                                          \
     typedef struct {                                                                                                   \

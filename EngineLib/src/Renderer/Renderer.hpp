@@ -9,6 +9,8 @@
 
 #include <glm/vec4.hpp>
 
+#include <Core/STL/Containers.hpp>
+
 #include "Shared/DepthFunction.hpp"
 #include "Shared/GraphicsContext.hpp"
 #include "Shared/RendererCommand.hpp"
@@ -109,7 +111,7 @@ namespace Engine
         _MessageCallback_T _MessageCallback;
 
         //Cubemap texture
-        typedef void (*CubemapTextureLoad_T)(void** data, void* cubemapName, void* paths);
+        typedef CubemapTextureData* (*CubemapTextureLoad_T)(const char* cubemapName, const CVectorT* paths);
         CubemapTextureLoad_T CubemapTextureLoad;
 
         typedef void (*CubemapTextureDestroy_T)(void** data);
@@ -191,7 +193,7 @@ namespace Engine
         typedef void (*VertexArrayUnbind_T)(void* data);
         VertexArrayUnbind_T VertexArrayUnbind;
 
-        typedef void(*VertexArrayAddVertexBuffer_T)(void* data, void* layout, float* vertexData, unsigned int length);
+        typedef void (*VertexArrayAddVertexBuffer_T)(void* data, void* layout, float* vertexData, unsigned int length);
         VertexArrayAddVertexBuffer_T VertexArrayAddVertexBuffer;
 
         typedef void (*VertexArrayAddIndexBuffer_T)(void* data, unsigned int* indexData, unsigned int length);

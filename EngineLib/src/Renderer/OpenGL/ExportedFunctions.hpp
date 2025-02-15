@@ -2,6 +2,7 @@
 #include <Renderer/Predefines.hpp>
 #include <Renderer/OpenGL/StructDefinitions.hpp>
 #include <Renderer/Shared/VertexLayout.hpp>
+#include <Core/STL/CVector.h>
 #ifdef __cplusplus
 namespace Engine
 {
@@ -13,7 +14,7 @@ namespace Engine
     EXPORT_RENDERER void RendererContextAddDebugMessanger(void* window);
     EXPORT_RENDERER void RendererContextSetupWindowHints(void* window);
 
-    EXPORT_RENDERER void CubemapTextureLoad(CubemapTextureData** data, void* cubemapName, void* paths);
+    EXPORT_RENDERER void CubemapTextureLoad(CubemapTextureData** data, const char* cubemapName, const CVectorT* paths);
     EXPORT_RENDERER void CubemapTextureBind(CubemapTextureData* data, unsigned int slot);
     EXPORT_RENDERER void CubemapTextureDestroy(CubemapTextureData** data);
     EXPORT_RENDERER CubemapTextureSpec* CubemapTextureGetSpec(CubemapTextureData* data);

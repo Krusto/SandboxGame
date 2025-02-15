@@ -4,23 +4,22 @@
 namespace Engine
 {
     CubemapTexture CubemapTexture::Create(std::string_view cubemapName,
-                                          const std::unordered_map<CubemapTextureFace, std::string>& Path)
+                                          const Vector<Pair<CubemapTextureFace, const char*>>* Path)
     {
         CubemapTexture ptr;
         ptr.Load(cubemapName, Path);
         return ptr;
     }
 
-    void CubemapTexture::Load(std::string_view cubemapName,
-                              const std::unordered_map<CubemapTextureFace, std::string>& Path)
+    void CubemapTexture::Load(std::string_view cubemapName, const Vector<Pair<CubemapTextureFace, const char*>>* Path)
     {
-        Renderer::GetInstance()->CubemapTextureLoad((void**) &m_Data, (void*) &cubemapName, (void*) &Path);
+        m_Data = Renderer::GetInstance()->CubemapTextureLoad(cubemapName.data(), Path->Raw());
     }
 
     void CubemapTexture::Destroy() { Renderer::GetInstance()->CubemapTextureDestroy((void**) &m_Data); }
 
     const CubemapTextureSpec* CubemapTexture::GetSpec() const
-    { 
+    {
         return (CubemapTextureSpec*) Renderer::GetInstance()->CubemapTextureGetSpec((void*) m_Data);
     }
 
