@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <imgui.h>
 #include <GLFW/glfw3.h>
+#include <Core/STL/Containers.hpp>
 
 SandboxLayer::SandboxLayer(const Engine::ApplicationSpec& spec)
 {
@@ -32,17 +33,27 @@ void SandboxLayer::Init(Engine::Window* window)
 
     m_Shader = Engine::Shader::Create(worldShaderPath);
     m_DepthBufferShader = Engine::Shader::Create(depthShaderPath);
-
-    std::string skyboxName = "skybox_day";
-    std::unordered_map<Engine::CubemapTextureFace, std::string> faces = {
-            {Engine::CubemapTextureFace::Right, m_SkyboxDirectory.string() + "/" + skyboxName + "_right.png"},
-            {Engine::CubemapTextureFace::Left, m_SkyboxDirectory.string() + "/" + skyboxName + "_left.png"},
-            {Engine::CubemapTextureFace::Top, m_SkyboxDirectory.string() + "/" + skyboxName + "_top.png"},
-            {Engine::CubemapTextureFace::Bottom, m_SkyboxDirectory.string() + "/" + skyboxName + "_bottom.png"},
-            {Engine::CubemapTextureFace::Front, m_SkyboxDirectory.string() + "/" + skyboxName + "_front.png"},
-            {Engine::CubemapTextureFace::Back, m_SkyboxDirectory.string() + "/" + skyboxName + "_back.png"},
-    };
-    m_Skybox = Engine::Skybox::Create(skyboxName, skyboxShaderPath, faces);
+    {
+        std::string skyboxName = "skybox_day";
+        std::string skyboxPath = m_SkyboxDirectory.string() + "/" + skyboxName;
+        std::string skyboxPath_right = skyboxPath + "_right.png";
+        std::string skyboxPath_left = skyboxPath + "_left.png";
+        std::string skyboxPath_top = skyboxPath + "_top.png";
+        std::string skyboxPath_bottom = skyboxPath + "_bottom.png";
+        std::string skyboxPath_front = skyboxPath + "_front.png";
+        std::string skyboxPath_back = skyboxPath + "_back.png";
+        using Engine::CubemapTextureFace;
+        using Engine::Pair;
+        using Engine::Vector;
+        Vector<Pair<CubemapTextureFace, const char*>> faces(
+                {Pair<CubemapTextureFace, const char*>(CubemapTextureFace::Right, skyboxPath_right.c_str()),
+                 Pair<CubemapTextureFace, const char*>(CubemapTextureFace::Left, skyboxPath_left.c_str()),
+                 Pair<CubemapTextureFace, const char*>(CubemapTextureFace::Top, skyboxPath_top.c_str()),
+                 Pair<CubemapTextureFace, const char*>(CubemapTextureFace::Bottom, skyboxPath_bottom.c_str()),
+                 Pair<CubemapTextureFace, const char*>(CubemapTextureFace::Front, skyboxPath_front.c_str()),
+                 Pair<CubemapTextureFace, const char*>(CubemapTextureFace::Back, skyboxPath_back.c_str())});
+        m_Skybox = Engine::Skybox::Create(skyboxName, skyboxShaderPath, &faces);
+    }
 
     m_World = std::make_unique<Engine::World>();
 
@@ -76,11 +87,8 @@ void SandboxLayer::Init(Engine::Window* window)
             1,  1,  0.0,//
     };
     uint32_t length = sizeof(vertices) / sizeof(float);
-    Engine::VertexLayout layout = Engine::CreateVertexLayout(
-            Engine::VertexAttributeList{
-            {
-                    Engine::VertexAttribute{"Position", (uint8_t) Engine::ShaderUniformType::Vec3}
-            },
+    Engine::VertexLayout layout = Engine::CreateVertexLayout(Engine::VertexAttributeList{
+            {Engine::VertexAttribute{"Position", (uint8_t) Engine::ShaderUniformType::Vec3}},
             1});
 
     m_DepthBufferVA.AddVertexBuffer(&layout, vertices, length);

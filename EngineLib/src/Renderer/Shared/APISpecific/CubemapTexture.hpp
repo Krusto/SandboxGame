@@ -2,6 +2,7 @@
 
 #include <string>
 #include <Core/Ref.hpp>
+#include <Core/STL/Containers.hpp>
 #include <Renderer/Shared/CubemapTextureSpec.hpp>
 
 namespace Engine
@@ -16,10 +17,10 @@ namespace Engine
         ~CubemapTexture() = default;
 
         static CubemapTexture Create(std::string_view cubemapName,
-                                     const std::unordered_map<CubemapTextureFace, std::string>& Path);
+                                     const Vector<Pair<CubemapTextureFace, const char*>>* Path);
 
     public:
-        void Load(std::string_view cubemapName, const std::unordered_map<CubemapTextureFace, std::string>& Path);
+        void Load(std::string_view cubemapName, const Vector<Pair<CubemapTextureFace, const char*>>* Path);
         void Destroy();
 
         const CubemapTextureSpec* GetSpec() const;

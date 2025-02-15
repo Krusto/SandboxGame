@@ -3,6 +3,7 @@
 #include <Renderer/Shared/RendererCommand.hpp>
 #include <Renderer/Shared/Camera.hpp>
 #include <Renderer/Predefines.hpp>
+#include <Core/STL/Containers.hpp>
 
 namespace Engine
 {
@@ -12,11 +13,11 @@ namespace Engine
     {
     public:
         static Skybox Create(std::string_view cubemapName, const std::string& shaderPath,
-                             const std::unordered_map<CubemapTextureFace, std::string>& Path);
+                             const Vector<Pair<CubemapTextureFace, const char*>>* Path);
 
     public:
         void Load(std::string_view cubemapName, const std::string& shaderPath,
-                  const std::unordered_map<CubemapTextureFace, std::string>& Path);
+                  const Vector<Pair<CubemapTextureFace, const char*>>* Path);
 
         void Destroy();
 

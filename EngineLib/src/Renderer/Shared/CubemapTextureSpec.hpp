@@ -4,7 +4,7 @@
 
 namespace Engine
 {
-    enum class CubemapTextureFace : int
+    enum class CubemapTextureFace : uint8_t
     {
         Right = 0,
         Left,

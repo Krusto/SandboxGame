@@ -6,7 +6,7 @@ namespace Engine
 {
 #endif
 
-    typedef struct CStringView {
+    typedef struct {
         const char* data;
         size_t length;
     } CStringView;
