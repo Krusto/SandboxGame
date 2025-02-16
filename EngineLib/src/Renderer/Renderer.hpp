@@ -300,43 +300,43 @@ namespace Engine
         GUIContextEnd_T GUIContextEnd;
 
         //RebdererAPI
-        typedef void (*RendererAPIInit_T)(void** data, void* rendererSpec, void* applicationSpec);
+        typedef void (*RendererAPIInit_T)(RendererAPIData** data, void* rendererSpec, void* applicationSpec);
         RendererAPIInit_T RendererAPIInit;
 
-        typedef void (*RendererAPIDestroy_T)(void** data);
+        typedef void (*RendererAPIDestroy_T)(RendererAPIData** data);
         RendererAPIDestroy_T RendererAPIDestroy;
 
-        typedef void (*RendererAPISetClearColor_T)(void* data, float r, float g, float b, float a);
+        typedef void (*RendererAPISetClearColor_T)(RendererAPIData* data, float r, float g, float b, float a);
         RendererAPISetClearColor_T RendererAPISetClearColor;
 
-        typedef void (*RendererAPISwitchPolygonMode_T)(void* data, unsigned int mode);
+        typedef void (*RendererAPISwitchPolygonMode_T)(RendererAPIData* data, unsigned int mode);
         RendererAPISwitchPolygonMode_T RendererAPISwitchPolygonMode;
 
-        typedef void (*RendererAPISetViewport_T)(void* data, float width, float height);
+        typedef void (*RendererAPISetViewport_T)(RendererAPIData* data, float width, float height);
         RendererAPISetViewport_T RendererAPISetViewport;
 
-        typedef void (*RendererAPIBindDefaultFramebuffer_T)(void* data);
+        typedef void (*RendererAPIBindDefaultFramebuffer_T)(RendererAPIData* data);
         RendererAPIBindDefaultFramebuffer_T RendererAPIBindDefaultFramebuffer;
 
-        typedef void (*RendererAPIRenderIndexed_T)(void* data, unsigned int count);
+        typedef void (*RendererAPIRenderIndexed_T)(RendererAPIData* data, unsigned int count);
         RendererAPIRenderIndexed_T RendererAPIRenderIndexed;
 
-        typedef void (*RendererAPIChangeDepthFunc_T)(void* data, unsigned int func);
+        typedef void (*RendererAPIChangeDepthFunc_T)(RendererAPIData* data, unsigned int func);
         RendererAPIChangeDepthFunc_T RendererAPIChangeDepthFunc;
 
         // typedef void (*RendererAPIChangeBlendFunc_T)(void* data, unsigned int src, unsigned int dst);
         //   RendererAPIChangeBlendFunc_T RendererAPIChangeBlendFunc;
 
-        typedef void (*RendererAPIInitIMGUI_T)(void* renderer_instance, void* data, void* window);
+        typedef void (*RendererAPIInitIMGUI_T)(RendererAPIData* data, void* window);
         RendererAPIInitIMGUI_T RendererAPIInitIMGUI;
 
-        typedef void (*RendererAPIDestroyIMGUI_T)(void* data);
+        typedef void (*RendererAPIDestroyIMGUI_T)(RendererAPIData* data);
         RendererAPIDestroyIMGUI_T RendererAPIDestroyIMGUI;
 
-        typedef void (*RendererAPIIMGUIBegin_T)(void* data);
+        typedef void (*RendererAPIIMGUIBegin_T)(RendererAPIData* data);
         RendererAPIIMGUIBegin_T RendererAPIIMGUIBegin;
 
-        typedef void (*RendererAPIIMGUIEnd_T)(void* data, void* drawData);
+        typedef void (*RendererAPIIMGUIEnd_T)(RendererAPIData* data, void* drawData);
         RendererAPIIMGUIEnd_T RendererAPIIMGUIEnd;
 
         //Shader

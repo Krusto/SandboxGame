@@ -28,7 +28,7 @@ namespace Engine
     {
         if (data == nullptr) { return; }
         GUIContextDestroy((void**) &(*data)->guiContext);
-        Allocator::Deallocate(data);
+        Allocator::Deallocate(*data);
         *data = nullptr;
     };
 
@@ -82,7 +82,7 @@ namespace Engine
         }
     }
 
-    EXPORT_RENDERER void RendererAPIInitIMGUI(void* renderer_instance, RendererAPIData* data, void* window)
+    EXPORT_RENDERER void RendererAPIInitIMGUI(RendererAPIData* data, void* window)
     {
         GUIContextInit((void**) &data->guiContext, window);
     }

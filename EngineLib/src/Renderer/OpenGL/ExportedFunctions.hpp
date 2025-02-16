@@ -52,18 +52,18 @@ namespace Engine
     EXPORT_RENDERER uint32_t IndexBufferGetSize(void* data);
     EXPORT_RENDERER uint32_t IndexBufferGetLength(void* data);
 
-    EXPORT_RENDERER void RendererAPISetClearColor(void* data, float r, float g, float b, float a);
-    EXPORT_RENDERER void RendererAPIInit(void** data, void* rendererSpec, void* applicationSpec);
-    EXPORT_RENDERER void RendererAPIDestroy(void** data);
-    EXPORT_RENDERER void RendererAPISwitchPolygonMode(void* data, unsigned int mode);
-    EXPORT_RENDERER void RendererAPISetViewport(void* data, float width, float height);
+    EXPORT_RENDERER void RendererAPISetClearColor(RendererAPIData* data, float r, float g, float b, float a);
+    EXPORT_RENDERER void RendererAPIInit(RendererAPIData** data, void* rendererSpec, void* applicationSpec);
+    EXPORT_RENDERER void RendererAPIDestroy(RendererAPIData** data);
+    EXPORT_RENDERER void RendererAPISwitchPolygonMode(RendererAPIData* data, unsigned int mode);
+    EXPORT_RENDERER void RendererAPISetViewport(RendererAPIData* data, float width, float height);
     EXPORT_RENDERER void RendererAPIBindDefaultFramebuffer();
-    EXPORT_RENDERER void RendererAPIRenderIndexed(void* data, uint32_t indexCount);
-    EXPORT_RENDERER void RendererAPIChangeDepthFunc(void* data, unsigned int depthFunction);
-    EXPORT_RENDERER void RendererAPIInitIMGUI(void* renderer_instance, void* data, void* window);
-    EXPORT_RENDERER void RendererAPIDestroyIMGUI(void* data);
-    EXPORT_RENDERER void RendererAPIIMGUIBegin(void* data);
-    EXPORT_RENDERER void RendererAPIIMGUIEnd(void* data, void* drawData);
+    EXPORT_RENDERER void RendererAPIRenderIndexed(RendererAPIData* data, uint32_t indexCount);
+    EXPORT_RENDERER void RendererAPIChangeDepthFunc(RendererAPIData* data, unsigned int depthFunction);
+    EXPORT_RENDERER void RendererAPIInitIMGUI(RendererAPIData* data, void* window);
+    EXPORT_RENDERER void RendererAPIDestroyIMGUI(RendererAPIData* data);
+    EXPORT_RENDERER void RendererAPIIMGUIBegin(RendererAPIData* data);
+    EXPORT_RENDERER void RendererAPIIMGUIEnd(RendererAPIData* data, void* drawData);
 
     EXPORT_RENDERER void ShaderReload(void* data, int recompile);
     EXPORT_RENDERER void ShaderLoad(void** data, const char* path);
