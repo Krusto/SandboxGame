@@ -28,6 +28,7 @@ namespace Engine
         void Reload();
 
         uint8_t GetBlock(glm::ivec3 position) const;
+        void RemoveBlock(glm::ivec3 position);
 
     private:
         TerrainGenerationSettings m_Settings;

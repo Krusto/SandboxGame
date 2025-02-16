@@ -36,6 +36,8 @@ namespace Engine
 
         virtual void OnMouseMoveEvent(int width, int height) = 0;
 
+        virtual void OnMouseButtonEvent(int action, int button) = 0;
+
         virtual void OnKeyboardEvent(int action, int key) = 0;
 
         virtual void OnWindowResizeEvent(int width, int height) = 0;

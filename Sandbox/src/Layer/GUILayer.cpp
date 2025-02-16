@@ -22,7 +22,7 @@ void GUILayer::OnAttach() {}
 
 void GUILayer::OnDetach() {}
 
-void GUILayer::Destroy() { }
+void GUILayer::Destroy() {}
 
 void GUILayer::OnUpdate(double dt) { m_DeltaTime = dt; }
 
@@ -92,6 +92,8 @@ void GUILayer::OnImGuiEnd()
 }
 
 void GUILayer::OnMouseMoveEvent(int width, int height) {}
+
+void GUILayer::OnMouseButtonEvent(int action, int button) {}
 
 void GUILayer::OnMouseScrollEvent(double x, double y) {}
 

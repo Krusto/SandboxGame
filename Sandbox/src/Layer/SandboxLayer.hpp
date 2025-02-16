@@ -33,6 +33,8 @@ public:
 
     void OnMouseMoveEvent(int width, int height) override;
 
+    void OnMouseButtonEvent(int action, int button) override;
+
     void OnKeyboardEvent(int action, int key) override;
 
     void OnWindowResizeEvent(int width, int height) override;
@@ -95,6 +97,7 @@ private:
     bool m_ShowDepthBuffer{false};
     bool m_LockCamera{};
 
+    glm::ivec3 m_LookingAt;
     double velocity{};
     Hitbox* m_DebugCube;
 };

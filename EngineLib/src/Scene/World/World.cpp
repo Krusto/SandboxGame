@@ -15,7 +15,7 @@ namespace Engine
 
         for (auto& path: texturePaths) { path.second.insert(0, texturesDirectory.string() + "/"); }
 
-        m_BlockTextures = TextureArray::Create("BlockTextures",texturePaths);
+        m_BlockTextures = TextureArray::Create("BlockTextures", texturePaths);
 
         ChunkFactory::Init(settings);
     }
@@ -118,5 +118,26 @@ namespace Engine
             }
         }
         return 0;
+    }
+
+    void World::RemoveBlock(glm::ivec3 position)
+    {
+        uint8_t block = BlockType::AIR;
+
+        glm::ivec3 chunkPos = glm::ivec3(position.x / CHUNK_SIZE, position.y / CHUNK_SIZE, position.z / CHUNK_SIZE);
+        for (auto& [pos, chunk]: m_Chunks)
+        {
+            if (pos == chunkPos)
+            {
+                glm::ivec3 localPos = position - glm::ivec3(chunkPos.x * CHUNK_SIZE, chunkPos.y * CHUNK_SIZE,
+                                                            chunkPos.z * CHUNK_SIZE);
+                if (chunk.blockData->GetBlock(localPos) == BlockType::AIR) { return; }
+                chunk.blockData->SetBlock(localPos, BlockType::AIR);
+                m_ChunkFactory.DestroyChunkMesh(chunk.mesh);
+                chunk.mesh = m_ChunkFactory.GenerateChunkMesh(chunk.blockData);
+                ChunkMesh::UploadData(chunk.mesh);
+                return;
+            }
+        }
     }
 }// namespace Engine
