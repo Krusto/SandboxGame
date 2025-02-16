@@ -12,10 +12,10 @@ namespace Engine
 
     void RendererAPI::Init(RendererSpec rendererSpec, ApplicationSpec applicationSpec)
     {
-        Renderer::GetInstance()->RendererAPIInit((void**) &m_Data, &rendererSpec, &applicationSpec);
+        Renderer::GetInstance()->RendererAPIInit( &m_Data, &rendererSpec, &applicationSpec);
     }
 
-    void RendererAPI::Shutdown() { Renderer::GetInstance()->RendererAPIDestroy((void**) &m_Data); }
+    void RendererAPI::Shutdown() {Renderer::GetInstance()->RendererAPIDestroy( &m_Data); }
 
     void RendererAPI::BeginFrame() {}
 
@@ -41,7 +41,7 @@ namespace Engine
         Renderer::GetInstance()->RendererAPIChangeDepthFunc(m_Data, depthFunction);
     }
 
-    void RendererAPI::InitImGUI(GLFWwindow* window) { Renderer::GetInstance()->RendererAPIInitIMGUI(Renderer::GetInstance(),m_Data, window); }
+    void RendererAPI::InitImGUI(GLFWwindow* window) { Renderer::GetInstance()->RendererAPIInitIMGUI(m_Data, window); }
 
     void RendererAPI::DestroyImGUI() { Renderer::GetInstance()->RendererAPIDestroyIMGUI(m_Data); }
 
