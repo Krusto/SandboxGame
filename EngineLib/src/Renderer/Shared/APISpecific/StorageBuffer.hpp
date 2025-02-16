@@ -10,6 +10,7 @@ namespace Engine
     {
     public:
         StorageBuffer() = default;
+        StorageBuffer(uint8_t* data, size_t size, StorageBufferType type);
         ~StorageBuffer() = default;
 
     public:

@@ -15,8 +15,7 @@ namespace Engine
 
         for (auto& path: texturePaths) { path.second.insert(0, texturesDirectory.string() + "/"); }
 
-        m_BlockTextures = TextureArray::Create();
-        m_BlockTextures.Load("BlockTextures", texturePaths);
+        m_BlockTextures = TextureArray::Create("BlockTextures",texturePaths);
 
         ChunkFactory::Init(settings);
     }

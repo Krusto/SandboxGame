@@ -11,7 +11,9 @@ namespace Engine
     {
     public:
         VertexBuffer() = default;
+        VertexBuffer(VertexArray* va, const VertexLayout& layout, float* data, uint32_t length);
         ~VertexBuffer() = default;
+
         static VertexBuffer Create(VertexArray* va, const VertexLayout& layout, float* data, uint32_t length);
 
     public:

@@ -14,8 +14,7 @@
 
 namespace Engine
 {
-    EXPORT_RENDERER TextureArrayData* TextureArrayLoad(const char* textureName, char** paths,
-                                          unsigned int count)
+    EXPORT_RENDERER TextureArrayData* TextureArrayLoad(const char* textureName, char** paths, unsigned int count)
     {
         TextureArrayData* data = Allocator::Allocate<TextureArrayData>();
 
@@ -69,8 +68,8 @@ namespace Engine
 
             if (first)
             {
-                glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, internalFormat, data->width, data->height, count, 0,
-                             dataFormat, GL_UNSIGNED_BYTE, nullptr);
+                glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, internalFormat, data->width, data->height, count, 0, dataFormat,
+                             GL_UNSIGNED_BYTE, nullptr);
                 first = false;
             }
 
@@ -91,7 +90,6 @@ namespace Engine
 
     EXPORT_RENDERER void TextureArrayBind(TextureArrayData* data, uint32_t slot)
     {
-        //TextureArrayData* m_Data = (TextureArrayData*) data;
         glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D_ARRAY, data->id);
     }
@@ -100,7 +98,6 @@ namespace Engine
     {
         if (*data)
         {
-            //TextureArrayData* m_Data = *((TextureArrayData**) data);
             glDeleteTextures(1, &(*data)->id);
             if ((*data)->name && strlen((*data)->name) > 0) { free((*data)->name); }
             Allocator::Deallocate(*data);
@@ -108,39 +105,15 @@ namespace Engine
         }
     }
 
-    EXPORT_RENDERER char* TextureArrayGetName(TextureArrayData* data)
-    {
-        //TextureArrayData* m_Data = (TextureArrayData*) data;
-        return data->name;
-    }
+    EXPORT_RENDERER char* TextureArrayGetName(TextureArrayData* data) { return data->name; }
 
-    EXPORT_RENDERER uint32_t TextureArrayGetID(TextureArrayData* data)
-    {
-        //TextureArrayData* m_Data = (TextureArrayData*) data;
-        return data->id;
-    };
+    EXPORT_RENDERER uint32_t TextureArrayGetID(TextureArrayData* data) { return data->id; };
 
-    EXPORT_RENDERER uint32_t TextureArrayGetWidth(TextureArrayData* data)
-    {
-        //TextureArrayData* m_Data = (TextureArrayData*) data;
-        return data->width;
-    }
+    EXPORT_RENDERER uint32_t TextureArrayGetWidth(TextureArrayData* data) { return data->width; }
 
-    EXPORT_RENDERER uint32_t TextureArrayGetHeight(TextureArrayData* data)
-    {
-        //TextureArrayData* m_Data = (TextureArrayData*) data;
-        return data->height;
-    }
+    EXPORT_RENDERER uint32_t TextureArrayGetHeight(TextureArrayData* data) { return data->height; }
 
-    EXPORT_RENDERER uint32_t TextureArrayGetChannels(TextureArrayData* data)
-    {
-        //TextureArrayData* m_Data = (TextureArrayData*) data;
-        return data->channels;
-    }
+    EXPORT_RENDERER uint32_t TextureArrayGetChannels(TextureArrayData* data) { return data->channels; }
 
-    EXPORT_RENDERER uint32_t TextureArrayGetCount(TextureArrayData* data)
-    {
-        //TextureArrayData* m_Data = (TextureArrayData*) data;
-        return data->count;
-    }
+    EXPORT_RENDERER uint32_t TextureArrayGetCount(TextureArrayData* data) { return data->count; }
 }// namespace Engine

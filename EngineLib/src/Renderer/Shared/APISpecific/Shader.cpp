@@ -1,14 +1,11 @@
 ﻿#include "Shader.hpp"
 #include "Renderer/Renderer.hpp"
+
 namespace Engine
 {
+    Shader::Shader(const std::string& path) { Load(path); }
 
-    Shader Shader::Create(const std::string& path)
-    {
-        Shader ptr;
-        ptr.Load(path);
-        return ptr;
-    }
+    Shader Shader::Create(const std::string& path) { return Shader(path); }
 
     void Shader::Load(const std::string& path) { Renderer::GetInstance()->ShaderLoad((void**) &m_Data, path.c_str()); }
 

@@ -9,6 +9,11 @@ namespace Engine
     class IndexBuffer
     {
     public:
+        IndexBuffer() = default;
+        IndexBuffer(VertexArray* va, const uint32_t* data, uint32_t length);
+        ~IndexBuffer() = default;
+
+    public:
         static IndexBuffer Create(VertexArray* va, const uint32_t* data, uint32_t length);
 
     public:
