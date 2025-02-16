@@ -30,6 +30,8 @@ public:
 
     void OnMouseMoveEvent(int width, int height) override;
 
+    void OnMouseButtonEvent(int action, int button) override;
+
     void OnKeyboardEvent(int action, int key) override;
 
     void OnWindowResizeEvent(int width, int height) override;

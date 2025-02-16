@@ -65,6 +65,7 @@ namespace Engine
         static void _WindowMouseMoveCallback(GLFWwindow* window, double x, double y);
         static void _WindowMouseScrollCallback(GLFWwindow* window, double x, double y);
         static void _ErrorCallback(int code, const char* err_str);
+        static void _WindowMouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 
     private:
         WindowSpec m_WindowSpec{};

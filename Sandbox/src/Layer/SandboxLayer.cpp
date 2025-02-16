@@ -317,7 +317,11 @@ void SandboxLayer::OnUpdate(double dt)
                 if (normal.z > 0) { axis = 5; }
             }
         }
-        if (outPosition != (glm::ivec3) m_DebugCube->position) { m_DebugCube->position = outPosition; }
+        if (outPosition != (glm::ivec3) m_DebugCube->position)
+        {
+            m_LookingAt = outPosition;
+            m_DebugCube->position = outPosition;
+        }
 
         //Render debug cube object
         Engine::Renderer::Submit(m_HitboxShader.BindCommand());
@@ -376,6 +380,16 @@ void SandboxLayer::OnImGuiEnd() {}
 void SandboxLayer::OnMouseMoveEvent(int width, int height)
 {
     if (m_LockCamera == false) { m_Camera.ProcessMouseMovement(width, height, 0.1f, true); }
+}
+
+void SandboxLayer::OnMouseButtonEvent(int action, int button)
+{
+    switch (button)
+    {
+        case GLFW_MOUSE_BUTTON_LEFT:
+            if (action == GLFW_PRESS) { m_World.RemoveBlock(m_LookingAt); }
+            break;
+    }
 }
 
 void SandboxLayer::OnMouseScrollEvent(double x, double y)

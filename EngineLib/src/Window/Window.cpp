@@ -63,6 +63,7 @@ namespace Engine
         glfwSetKeyCallback(s_WindowPtr, _WindowKeyCallback);
         glfwSetCursorPosCallback(s_WindowPtr, _WindowMouseMoveCallback);
         glfwSetScrollCallback(s_WindowPtr, _WindowMouseScrollCallback);
+        glfwSetMouseButtonCallback(s_WindowPtr, _WindowMouseButtonCallback);
         glfwSwapInterval(1);
     }
 
@@ -143,4 +144,8 @@ namespace Engine
             LOG_ERROR("%i GLFW Error: %s", code, err_str);
     }
 
+    void Window::_WindowMouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+    {
+        for (auto& layer: LayerStack::data()) { layer->OnMouseButtonEvent(action, button); }
+    }
 }// namespace Engine
