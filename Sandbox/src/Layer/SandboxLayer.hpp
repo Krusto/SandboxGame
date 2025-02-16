@@ -75,7 +75,7 @@ private:
 
     LightObject* m_Light;
 
-    std::unique_ptr<Engine::World> m_World;
+    Engine::World m_World;
     bool shouldReloadWorld{};
 
     Engine::Camera m_Camera;

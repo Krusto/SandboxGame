@@ -55,12 +55,10 @@ void SandboxLayer::Init(Engine::Window* window)
         m_Skybox = Engine::Skybox::Create(skyboxName, skyboxShaderPath, &faces);
     }
 
-    m_World = std::make_unique<Engine::World>();
-
     Engine::TerrainGenerationSettings settings = {.Seed = 0,
                                                   .AssetsDirectory = m_AssetsDirectory,
                                                   .GenerationDistance = 3};
-    m_World->Init(settings, m_TexturesDirectory);
+    m_World.Init(settings, m_TexturesDirectory);
 
     m_Camera.Init(Engine::CameraSpec({m_AppSpec.width, m_AppSpec.height}, 45.0f, 0.1f, 1000.0f));
 
@@ -130,7 +128,7 @@ void SandboxLayer::OnDetach() {}
 
 void SandboxLayer::Destroy()
 {
-    m_World->Destroy();
+    m_World.Destroy();
     m_Shader.Destroy();
     m_DepthBufferShader.Destroy();
     m_CubeShader.Destroy();
@@ -174,7 +172,7 @@ void SandboxLayer::RenderWorld()
     Renderer::Submit(m_Light->UploadLight(&m_Shader));
     Renderer::Submit(RendererCommand([=]() { m_Shader.SetUniform("light.shininess", (float) m_WorldShininess); }));
 
-    Renderer::Submit(m_World->RenderWorldCommand(&m_Shader, m_Camera.GetPosition()));
+    Renderer::Submit(m_World.RenderWorldCommand(&m_Shader, m_Camera.GetPosition()));
 
     // Render light debug object
     Renderer::Submit(m_LightShader.BindCommand());
@@ -200,7 +198,7 @@ void SandboxLayer::RenderDepthWorld()
         m_DepthBufferShader.SetUniform("lightSpaceMatrix", lightMatrix);
     }));
 
-    Engine::Renderer::Submit(m_World->RenderWorldCommand(&m_DepthBufferShader, m_Light->position));
+    Engine::Renderer::Submit(m_World.RenderWorldCommand(&m_DepthBufferShader, m_Light->position));
 
     Engine::Renderer::Submit(Engine::RendererCommand([=]() { m_DebugFramebuffer.Bind(); }));
     Engine::Renderer::SetViewport({m_DebugFramebuffer.width(), m_DebugFramebuffer.height()});
@@ -219,13 +217,13 @@ void SandboxLayer::OnUpdate(double dt)
     m_DeltaTime = dt;
     m_PassedTime += 0.01;
     if (m_PassedTime > 100.0) { m_PassedTime = 0; }
-    m_World->OnUpdate(dt);
+    m_World.OnUpdate(dt);
 
     if (!m_DisableGravity)
     {
-        if (m_World->GetBlock(m_Camera.GetPosition() - glm::vec3(0, 1.75, 0)) == Engine::BlockType::AIR)
+        if (m_World.GetBlock(m_Camera.GetPosition() - glm::vec3(0, 1.75, 0)) == Engine::BlockType::AIR)
         {
-            if (m_World->GetBlock(m_Camera.GetPosition() - glm::vec3(0, 1.75, 0) - glm::vec3(0, 1 / velocity, 0)) ==
+            if (m_World.GetBlock(m_Camera.GetPosition() - glm::vec3(0, 1.75, 0) - glm::vec3(0, 1 / velocity, 0)) ==
                 Engine::BlockType::AIR)
             {
                 m_Camera.Move(glm::vec3(0, -velocity, 0));
@@ -280,7 +278,7 @@ void SandboxLayer::OnUpdate(double dt)
         glm::ivec3 outNormal{};
         while ((count++) < maxDistance)
         {
-            uint8_t currentBlock = m_World->GetBlock(pos);
+            uint8_t currentBlock = m_World.GetBlock(pos);
             if (currentBlock != Engine::BlockType::AIR)
             {
                 outPosition = pos;
@@ -335,7 +333,7 @@ void SandboxLayer::OnUpdate(double dt)
     if (shouldReloadWorld)
     {
         shouldReloadWorld = false;
-        m_World->Reload();
+        m_World.Reload();
     }
 }
 

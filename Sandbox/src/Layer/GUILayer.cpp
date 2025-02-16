@@ -22,7 +22,7 @@ void GUILayer::OnAttach() {}
 
 void GUILayer::OnDetach() {}
 
-void GUILayer::Destroy() { Engine::Renderer::DestroyImGUI(); }
+void GUILayer::Destroy() { }
 
 void GUILayer::OnUpdate(double dt) { m_DeltaTime = dt; }
 

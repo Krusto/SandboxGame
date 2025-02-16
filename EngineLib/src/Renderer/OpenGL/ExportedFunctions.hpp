@@ -93,15 +93,15 @@ namespace Engine
     EXPORT_RENDERER void StorageBufferDestroy(void** data);
     EXPORT_RENDERER uint32_t StorageBufferGetID(void* data);
 
-    EXPORT_RENDERER void TextureArrayLoad(void** data, const char* textureName, char** paths, unsigned int count);
-    EXPORT_RENDERER void TextureArrayBind(void* data, uint32_t slot);
-    EXPORT_RENDERER void TextureArrayDestroy(void** data);
-    EXPORT_RENDERER char* TextureArrayGetName(void* data);
-    EXPORT_RENDERER uint32_t TextureArrayGetID(void* data);
-    EXPORT_RENDERER uint32_t TextureArrayGetWidth(void* data);
-    EXPORT_RENDERER uint32_t TextureArrayGetHeight(void* data);
-    EXPORT_RENDERER uint32_t TextureArrayGetChannels(void* data);
-    EXPORT_RENDERER uint32_t TextureArrayGetCount(void* data);
+    EXPORT_RENDERER TextureArrayData* TextureArrayLoad(const char* textureName, char** paths, unsigned int count);
+    EXPORT_RENDERER void TextureArrayBind(TextureArrayData* data, uint32_t slot);
+    EXPORT_RENDERER void TextureArrayDestroy(TextureArrayData** data);
+    EXPORT_RENDERER char* TextureArrayGetName(TextureArrayData* data);
+    EXPORT_RENDERER uint32_t TextureArrayGetID(TextureArrayData* data);
+    EXPORT_RENDERER uint32_t TextureArrayGetWidth(TextureArrayData* data);
+    EXPORT_RENDERER uint32_t TextureArrayGetHeight(TextureArrayData* data);
+    EXPORT_RENDERER uint32_t TextureArrayGetChannels(TextureArrayData* data);
+    EXPORT_RENDERER uint32_t TextureArrayGetCount(TextureArrayData* data);
 
     EXPORT_RENDERER VertexArrayData* VertexArrayInit(uint32_t indexCount);
     EXPORT_RENDERER void VertexArrayBind(VertexArrayData* data);

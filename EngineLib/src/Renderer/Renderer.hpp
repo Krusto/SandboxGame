@@ -242,31 +242,32 @@ namespace Engine
         IndexBufferGetID_T IndexBufferGetID;
 
         //Texture Array
-        typedef void (*TextureArrayLoad_T)(void** data, const char* textureName, char** paths, unsigned int count);
+        typedef TextureArrayData* (*TextureArrayLoad_T)(const char* textureName, char** paths,
+                                                              unsigned int count);
         TextureArrayLoad_T TextureArrayLoad;
 
-        typedef void (*TextureArrayDestroy_T)(void** data);
+        typedef void (*TextureArrayDestroy_T)(TextureArrayData** data);
         TextureArrayDestroy_T TextureArrayDestroy;
 
-        typedef void (*TextureArrayBind_T)(void* data, unsigned int index);
+        typedef void (*TextureArrayBind_T)(TextureArrayData* data, unsigned int index);
         TextureArrayBind_T TextureArrayBind;
 
-        typedef const char* (*TextureArrayGetName_T)(void* data);
+        typedef const char* (*TextureArrayGetName_T)(TextureArrayData* data);
         TextureArrayGetName_T TextureArrayGetName;
 
-        typedef unsigned int (*TextureArrayGetID_T)(void* data);
+        typedef unsigned int (*TextureArrayGetID_T)(TextureArrayData* data);
         TextureArrayGetID_T TextureArrayGetID;
 
-        typedef unsigned int (*TextureArrayGetCount_T)(void* data);
+        typedef unsigned int (*TextureArrayGetCount_T)(TextureArrayData* data);
         TextureArrayGetCount_T TextureArrayGetCount;
 
-        typedef unsigned int (*TextureArrayGetWidth_T)(void* data);
+        typedef unsigned int (*TextureArrayGetWidth_T)(TextureArrayData* data);
         TextureArrayGetWidth_T TextureArrayGetWidth;
 
-        typedef unsigned int (*TextureArrayGetHeight_T)(void* data);
+        typedef unsigned int (*TextureArrayGetHeight_T)(TextureArrayData* data);
         TextureArrayGetHeight_T TextureArrayGetHeight;
 
-        typedef unsigned int (*TextureArrayGetChannels_T)(void* data);
+        typedef unsigned int (*TextureArrayGetChannels_T)(TextureArrayData* data);
         TextureArrayGetChannels_T TextureArrayGetChannels;
 
         //Storage Buffer

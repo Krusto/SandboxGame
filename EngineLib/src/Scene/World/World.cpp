@@ -24,7 +24,6 @@ namespace Engine
     void World::Destroy()
     {
         for (auto& [pos, chunk]: m_Chunks) { m_ChunkFactory.DestroyChunk(chunk); }
-        m_Chunks.clear();
         BlockRegistry::Destroy();
         m_BlockTextures.Destroy();
     }
@@ -38,6 +37,10 @@ namespace Engine
         {
             auto& generatedChunks = ChunkFactory::GetGeneratedChunks();
             m_Chunks.merge(generatedChunks);
+            for (auto& generatedChunk: generatedChunks)
+            {
+                m_Chunks.try_emplace(generatedChunk.first, generatedChunk.second);
+            }
             if (generatedChunks.size() > 0)
             {
                 for (auto& [pos, chunk]: generatedChunks) { ChunkFactory::DestroyChunk(chunk); }
@@ -69,7 +72,7 @@ namespace Engine
                     shader->SetUniform("model", model);
                     shader->SetUniform("offset", glm::vec3{pos.x * CHUNK_SIZE, pos.y * CHUNK_SIZE, pos.z * CHUNK_SIZE});
                     mesh->GetVertexArray().Bind();
-                    Engine::Renderer::RenderIndexed(mesh->GetVertexArray(),mesh->GetVertexArray().IndexCount());
+                    Engine::Renderer::RenderIndexed(mesh->GetVertexArray(), mesh->GetVertexArray().IndexCount());
                     mesh->GetVertexArray().Unbind();
                 }
             }
