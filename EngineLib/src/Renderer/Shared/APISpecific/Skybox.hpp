@@ -12,6 +12,12 @@ namespace Engine
     class Skybox
     {
     public:
+        Skybox() = default;
+        Skybox(std::string_view cubemapName, const std::string& shaderPath,
+               const Vector<Pair<CubemapTextureFace, const char*>>* Path);
+        ~Skybox() = default;
+
+    public:
         static Skybox Create(std::string_view cubemapName, const std::string& shaderPath,
                              const Vector<Pair<CubemapTextureFace, const char*>>* Path);
 

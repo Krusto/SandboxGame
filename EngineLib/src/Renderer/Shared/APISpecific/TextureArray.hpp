@@ -12,11 +12,15 @@ namespace Engine
     {
     public:
         TextureArray() = default;
+        explicit TextureArray(std::string_view arrayName, std::initializer_list<std::string> Path);
+        explicit TextureArray(std::string_view arrayName, const std::unordered_map<uint32_t, std::string>& Path);
         ~TextureArray() = default;
 
     public:
-        static TextureArray Create();
+        static TextureArray Create(std::string_view arrayName, std::initializer_list<std::string> Path);
+        static TextureArray Create(std::string_view arrayName, const std::unordered_map<uint32_t, std::string>& Path);
 
+    public:
         void Load(std::string_view arrayName, std::initializer_list<std::string> Path);
         void Load(std::string_view arrayName, const std::unordered_map<uint32_t, std::string>& Path);
         void Bind(uint32_t slot = 0) const;

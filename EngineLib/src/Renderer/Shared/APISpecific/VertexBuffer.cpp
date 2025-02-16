@@ -3,12 +3,14 @@
 
 namespace Engine
 {
+    VertexBuffer::VertexBuffer(VertexArray* va, const VertexLayout& layout, float* data, uint32_t length)
+    {
+        Init(va, layout, data, length);
+    }
 
     VertexBuffer VertexBuffer::Create(VertexArray* va, const VertexLayout& layout, float* data, uint32_t length)
     {
-        VertexBuffer ptr;
-        ptr.Init(va, layout, data, length);
-        return ptr;
+        return VertexBuffer(va, layout, data, length);
     }
 
     void VertexBuffer::Init(VertexArray* va, const VertexLayout& layout, float* data, uint32_t length)

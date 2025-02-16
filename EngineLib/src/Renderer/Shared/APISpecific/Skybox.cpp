@@ -21,12 +21,16 @@ namespace Engine
         glm::vec3 m_Rotation{};
     };
 
+    Skybox::Skybox(std::string_view cubemapName, const std::string& shaderPath,
+                   const Vector<Pair<CubemapTextureFace, const char*>>* Path)
+    {
+        Load(cubemapName, shaderPath, Path);
+    }
+
     Skybox Skybox::Create(std::string_view cubemapName, const std::string& shaderPath,
                           const Vector<Pair<CubemapTextureFace, const char*>>* Path)
     {
-        Skybox ptr;
-        ptr.Load(cubemapName, shaderPath, Path);
-        return ptr;
+        return Skybox(cubemapName, shaderPath, Path);
     }
 
     void Skybox::Load(std::string_view cubemapName, const std::string& shaderPath,

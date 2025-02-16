@@ -11,6 +11,7 @@ namespace Engine
         static VertexArray Create(uint32_t indexCount);
 
         VertexArray() = default;
+        VertexArray(uint32_t indexCount);
         ~VertexArray() = default;
 
     public:

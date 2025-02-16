@@ -3,12 +3,11 @@
 
 namespace Engine
 {
+    StorageBuffer::StorageBuffer(uint8_t* data, size_t size, StorageBufferType type) { Init(data, size, type); }
 
     StorageBuffer StorageBuffer::Create(uint8_t* data, size_t size, StorageBufferType type)
     {
-        StorageBuffer ptr;
-        ptr.Init(data, size, type);
-        return ptr;
+        return StorageBuffer(data, size, type);
     }
 
     void StorageBuffer::Init(uint8_t* data, size_t size, StorageBufferType type)

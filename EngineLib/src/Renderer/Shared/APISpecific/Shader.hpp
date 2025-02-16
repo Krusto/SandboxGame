@@ -20,7 +20,10 @@ namespace Engine
     {
     public:
         Shader() = default;
+        Shader(const std::string& path);
         ~Shader() = default;
+
+    public:
         static Shader Create(const std::string& path);
 
     public:

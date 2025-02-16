@@ -4,12 +4,11 @@
 
 namespace Engine
 {
+    IndexBuffer::IndexBuffer(VertexArray* va, const uint32_t* data, uint32_t length) { Init(va, data, length); }
 
     IndexBuffer IndexBuffer::Create(VertexArray* va, const uint32_t* data, uint32_t length)
     {
-        IndexBuffer ptr;
-        ptr.Init(va, data, length);
-        return ptr;
+        return IndexBuffer(va, data, length);
     }
 
     void IndexBuffer::Init(VertexArray* va, const uint32_t* data, uint32_t length)

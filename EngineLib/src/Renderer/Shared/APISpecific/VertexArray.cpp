@@ -3,13 +3,9 @@
 
 namespace Engine
 {
+    VertexArray::VertexArray(uint32_t indexCount) { Init(indexCount); }
 
-    VertexArray VertexArray::Create(uint32_t indexCount)
-    {
-        VertexArray ptr;
-        ptr.Init(indexCount);
-        return ptr;
-    }
+    VertexArray VertexArray::Create(uint32_t indexCount) { return VertexArray(indexCount); }
 
     void VertexArray::Init(uint32_t indexCount) { m_Data = Renderer::GetInstance()->VertexArrayInit(indexCount); }
 
