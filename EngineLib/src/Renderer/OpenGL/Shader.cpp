@@ -1,5 +1,6 @@
 #include <Util/File.hpp>
 #include <Core/Allocator.hpp>
+#include <Core/STL/CFilesystem.h>
 #include <Renderer/Shared/ShaderUniform.h>
 #include <Renderer/OpenGL/StructDefinitions.hpp>
 #include <Renderer/Predefines.hpp>
@@ -160,6 +161,10 @@ namespace Engine
             extensions[ShaderType::Compute] = ".comp.glsl";
 
             path = filepath + extensions[shaderType];
+
+            if (!FileExists(path.c_str())) { 
+                LOG_ERROR("%s Does not exist!\n", path.c_str());
+            }
 
             auto resultStatus = file_read_string((const int8_t*) path.c_str(), &bufferLen, &buffer);
             if (resultStatus != false) { result = buffer; }

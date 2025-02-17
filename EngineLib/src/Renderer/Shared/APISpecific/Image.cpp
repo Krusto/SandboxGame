@@ -3,16 +3,19 @@
 
 namespace Engine
 {
-    Image Image::Create(uint8_t* data, size_t width, size_t height, ImageType type)
+    Image::Image(uint8_t* data, size_t width, size_t height, ImageColorFormat format, ImageType type)
     {
-        Image image;
-        image.Init(data, width, height, type);
-        return image;
+        Init(data, width, height, format, type);
     }
 
-    void Image::Init(uint8_t* data, size_t width, size_t height, ImageType type)
+    Image Image::Create(uint8_t* data, size_t width, size_t height, ImageColorFormat format, ImageType type)
     {
-        Renderer::GetInstance()->ImageInit((void**) &m_Data, data, width, height, (uint8_t) type);
+        return Image(data, width, height, format, type);
+    }
+
+    void Image::Init(uint8_t* data, size_t width, size_t height, ImageColorFormat format, ImageType type)
+    {
+        Renderer::GetInstance()->ImageInit((void**) &m_Data, data, width, height, (uint8_t) format, (uint8_t) type);
     }
 
     void Image::Bind(size_t location) const { Renderer::GetInstance()->ImageBind((void*) m_Data, location); }

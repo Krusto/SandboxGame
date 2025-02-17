@@ -39,8 +39,9 @@ namespace Engine
     EXPORT_RENDERER void GUIContextBegin(void* data);
     EXPORT_RENDERER void GUIContextEnd(void* data, void* drawData);
 
-    EXPORT_RENDERER void ImageInit(void** data, uint8_t* imageData, size_t width, size_t height, uint8_t type);
-    EXPORT_RENDERER void ImageBind(void* data, size_t location);
+    EXPORT_RENDERER void ImageInit(void** data, uint8_t* imageData, size_t width, size_t height, uint8_t format,
+                                   uint8_t type);
+    EXPORT_RENDERER void ImageBind(ImageData* data, size_t location);
     EXPORT_RENDERER void ImageDestroy(void** data);
     EXPORT_RENDERER uint32_t ImageGetID(void* data);
 

@@ -26,7 +26,7 @@ namespace Engine
         void Init(uint32_t width, uint32_t height, bool isDepthMap = false);
         void Destroy();
         uint32_t GetID();
-        uint32_t GetColorAttachmentID();
+        uint32_t GetColorAttachmentID() const;
         uint32_t GetDepthAttachmentID();
         void Resize(uint32_t width, uint32_t height);
         void Bind() const;

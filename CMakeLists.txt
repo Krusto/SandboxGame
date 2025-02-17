@@ -289,7 +289,12 @@ function(add_game_project name)
     target_include_directories(${name} PUBLIC "${CMAKE_SOURCE_DIR}/EngineLib/src")
     target_include_directories(${name} PUBLIC "${CMAKE_SOURCE_DIR}/${name}/src")
     target_link_libraries(${name} SandboxWorld)
+
+    add_custom_command(TARGET ${name} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory  ${CMAKE_SOURCE_DIR}/Assets $<TARGET_FILE_DIR:${name}>/Assets DEPENDS EngineLib)
+  
 endfunction(add_game_project name)
 
 add_game_project(Sandbox)
+add_game_project(TerrainGenerationTool)
 add_game_project(TestLayer)

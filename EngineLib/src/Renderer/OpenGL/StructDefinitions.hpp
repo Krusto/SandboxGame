@@ -8,6 +8,8 @@ namespace Engine
 
     struct ImageData {
         uint32_t id;
+        uint8_t format;
+        uint8_t type;
     };
 
     struct FramebufferData {

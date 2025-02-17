@@ -127,7 +127,8 @@ namespace Engine
         CubemapTextureBind_T CubemapTextureBind;
 
         //Image
-        typedef void (*ImageInit_T)(void** data, uint8_t* imageData, size_t width, size_t height, uint8_t type);
+        typedef void (*ImageInit_T)(void** data, uint8_t* imageData, size_t width, size_t height, uint8_t format,
+                                    uint8_t type);
         ImageInit_T ImageInit;
 
         typedef void (*ImageDestroy_T)(void** data);
@@ -242,8 +243,7 @@ namespace Engine
         IndexBufferGetID_T IndexBufferGetID;
 
         //Texture Array
-        typedef TextureArrayData* (*TextureArrayLoad_T)(const char* textureName, char** paths,
-                                                              unsigned int count);
+        typedef TextureArrayData* (*TextureArrayLoad_T)(const char* textureName, char** paths, unsigned int count);
         TextureArrayLoad_T TextureArrayLoad;
 
         typedef void (*TextureArrayDestroy_T)(TextureArrayData** data);

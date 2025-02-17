@@ -17,7 +17,6 @@ EXPORT_RENDERER void RendererContextCreate(void* handle, void* window)
         LOG_ERROR("Failed to initalize OpenGL context\n");
         exit(-1);
     }
-    glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // Enables the Depth Buffer
@@ -30,6 +29,7 @@ EXPORT_RENDERER void RendererContextCreate(void* handle, void* window)
     // glCullFace(GL_BACK);
     // Uses counter clock-wise standard
     glFrontFace(GL_CCW);
+
 
     const char* version = (const char*) glGetString(GL_VERSION);
     LOG("OPENGL VERSION %s!\n", version);

@@ -45,7 +45,7 @@ namespace Engine
 
     uint32_t Framebuffer::GetID() { return Renderer::GetInstance()->FramebufferGetID(m_Data); }
 
-    uint32_t Framebuffer::GetColorAttachmentID()
+    uint32_t Framebuffer::GetColorAttachmentID() const
     {
         return Renderer::GetInstance()->FramebufferGetColorTextureID(m_Data);
     }

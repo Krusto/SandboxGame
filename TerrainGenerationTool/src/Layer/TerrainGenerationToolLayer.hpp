@@ -2,12 +2,12 @@
 #include <memory>
 #include <Engine.hpp>
 
-class TestLayer: public Engine::Layer
+class TerrainGenerationToolLayer: public Engine::Layer
 {
 public:
-    TestLayer() = default;
-    explicit TestLayer(const Engine::ApplicationSpec& spec);
-    ~TestLayer() = default;
+    TerrainGenerationToolLayer() = default;
+    explicit TerrainGenerationToolLayer(const Engine::ApplicationSpec& spec);
+    ~TerrainGenerationToolLayer() = default;
 
 public:
     void Init(Engine::Window* window) override;
@@ -52,8 +52,6 @@ public:
 
     void SetShouldExit(bool value) override { m_ShouldExit = value; }
 
-    void RenderWorld();
-
 private:
     std::string m_Name;
     bool m_ShouldExit = false;
@@ -76,6 +74,8 @@ private:
 
     Engine::Shader m_Shader;
     Engine::VertexArray m_VA;
+
+    std::vector<Engine::Image> m_Textures;
 
     bool m_LockCamera{};
 };
