@@ -3,12 +3,19 @@
 
 namespace Engine
 {
-    enum ImageType : uint8_t
+    enum ImageColorFormat : uint8_t
     {
-        RGBA,
+        RGBA = 0,
         RGB,
         RG,
+        R,
         Depth
+    };
+
+    enum ImageType : uint8_t
+    {
+        STATIC = 0,
+        DYNAMIC
     };
 
 }// namespace Engine

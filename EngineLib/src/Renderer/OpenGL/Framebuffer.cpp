@@ -18,35 +18,27 @@ namespace Engine
         m_Data->width = width;
         m_Data->height = height;
 
-        glGenFramebuffers(1, &m_Data->fbo);
-        glBindFramebuffer(GL_FRAMEBUFFER, m_Data->fbo);
-
+        glCreateFramebuffers(1, &m_Data->fbo);
         if (!isDepthMap)
         {
-            ImageInit((void**) &m_Data->color_attachment_data, nullptr, width, height, (uint8_t) ImageType::RGB);
+            ImageInit((void**) &m_Data->color_attachment_data, nullptr, width, height, (uint8_t) ImageColorFormat::RGB,
+                      (uint8_t) ImageType::DYNAMIC);
+            glNamedFramebufferTexture(m_Data->fbo, GL_COLOR_ATTACHMENT0, m_Data->color_attachment_data->id, 0);
 
-
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-                                   ImageGetID(m_Data->color_attachment_data), 0);
-
-            ImageInit((void**) &m_Data->depth_attachment_data, nullptr, width, height, (uint8_t) ImageType::Depth);
-
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
-                                   ImageGetID(m_Data->depth_attachment_data), 0);
+            ImageInit((void**) &m_Data->depth_attachment_data, nullptr, width, height,
+                      (uint8_t) ImageColorFormat::Depth, (uint8_t) ImageType::DYNAMIC);
+            glNamedFramebufferTexture(m_Data->fbo, GL_DEPTH_ATTACHMENT, m_Data->depth_attachment_data->id, 0);
         }
         else
         {
-
-            ImageInit((void**) &m_Data->depth_attachment_data, nullptr, width, height, (uint8_t) ImageType::Depth);
-
-
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
-                                   ImageGetID(m_Data->depth_attachment_data), 0);
-
-            glDrawBuffer(GL_NONE);
-            glReadBuffer(GL_NONE);
+            ImageInit((void**) &m_Data->depth_attachment_data, nullptr, width, height,
+                      (uint8_t) ImageColorFormat::Depth, (uint8_t) ImageType::DYNAMIC);
+            glNamedFramebufferTexture(m_Data->fbo, GL_DEPTH_ATTACHMENT, m_Data->depth_attachment_data->id, 0);
         }
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        if (glCheckNamedFramebufferStatus(m_Data->fbo, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        {
+            LOG_ERROR("Framebuffer not complete!\n");
+        }
     }
 
     EXPORT_RENDERER int FramebufferGetID(void* data) { return asTPtr(data, FramebufferData)->fbo; }

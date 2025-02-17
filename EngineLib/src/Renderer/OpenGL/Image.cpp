@@ -9,45 +9,79 @@
 namespace Engine
 {
 
-    EXPORT_RENDERER GLint ImageTypeToGL(uint8_t type)
+    inline static GLint GLImageFormat(uint8_t format)
     {
-        switch (type)
+        switch (format)
         {
-            case ImageType::Depth:
-                return GL_DEPTH_COMPONENT;
-            case ImageType::RGBA:
+            case ImageColorFormat::Depth:
+                return GL_DEPTH_STENCIL;
+            case ImageColorFormat::RGBA:
                 return GL_RGBA;
-            case ImageType::RGB:
+            case ImageColorFormat::RGB:
                 return GL_RGB;
-            case ImageType::RG:
+            case ImageColorFormat::RG:
                 return GL_RG;
+            case ImageColorFormat::R:
+                return GL_RED;
             default:
                 return GL_NONE;
         }
     }
 
-    EXPORT_RENDERER void ImageInit(void** data, uint8_t* imageData, size_t width, size_t height, uint8_t type)
+    inline static GLint GLComponentType(GLint colorFormat)
     {
-        if (*data == nullptr) { *data = (void*)Engine::Allocator::Allocate<ImageData>(); }
+        switch (colorFormat)
+        {
+            case ImageColorFormat::RGBA:
+            case ImageColorFormat::RGB:
+            case ImageColorFormat::RG:
+            case ImageColorFormat::R:
+                return GL_FLOAT;
+            case ImageColorFormat::Depth:
+                return GL_UNSIGNED_INT;
+            default:
+                return GL_NONE;
+        }
+    }
+
+    inline static GLint GLStorageFormat(uint8_t colorFormat)
+    {
+        switch (colorFormat)
+        {
+            case ImageColorFormat::Depth:
+                return GL_DEPTH_COMPONENT24;
+            case ImageColorFormat::RGBA:
+                return GL_RGBA8;
+            case ImageColorFormat::RGB:
+                return GL_RGB8;
+            case ImageColorFormat::RG:
+                return GL_RG8;
+            case ImageColorFormat::R:
+                return GL_R8;
+            default:
+                return GL_NONE;
+        }
+    }
+
+    EXPORT_RENDERER void ImageInit(void** data, uint8_t* imageData, size_t width, size_t height, uint8_t format,
+                                   uint8_t type)
+    {
+        if (*data == nullptr) { *data = (void*) Engine::Allocator::Allocate<ImageData>(); }
         ImageData* m_ImageData = (ImageData*) *data;
-        glGenTextures(1, &asTPtr(m_ImageData, ImageData)->id);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, asTPtr(m_ImageData, ImageData)->id);
-
-        glTexImage2D(GL_TEXTURE_2D, 0, ImageTypeToGL(type), (GLsizei) width, (GLsizei) height, 0, ImageTypeToGL(type),
-                     GL_FLOAT, imageData);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glCreateTextures(GL_TEXTURE_2D, 1, &m_ImageData->id);
+        glTextureStorage2D(m_ImageData->id, 1, GLStorageFormat(format), (GLsizei) width, (GLsizei) height);
+        if (imageData)
+        {
+            glTextureSubImage2D(m_ImageData->id, 0, 0, 0, (GLsizei) width, (GLsizei) height, GLImageFormat(format),
+                                GLComponentType(format), imageData);
+        }
+        glTextureParameteri(m_ImageData->id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTextureParameteri(m_ImageData->id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTextureParameteri(m_ImageData->id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTextureParameteri(m_ImageData->id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
 
-    EXPORT_RENDERER void ImageBind(void* data, size_t location)
-    {
-        glActiveTexture(GL_TEXTURE0 + location);
-        glBindTexture(GL_TEXTURE_2D, asTPtr(data, ImageData)->id);
-    }
+    EXPORT_RENDERER void ImageBind(ImageData* data, size_t location) { glBindTextureUnit(location, data->id); }
 
     EXPORT_RENDERER void ImageDestroy(void** data)
     {

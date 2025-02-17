@@ -12,7 +12,7 @@ SandboxLayer::SandboxLayer(const Engine::ApplicationSpec& spec)
     m_AppSpec = spec;
     m_AppSpec.WorkingDirectory = std::filesystem::absolute(spec.WorkingDirectory);
     m_AssetsDirectory = m_AppSpec.WorkingDirectory.append("Assets");
-    m_ShadersDirectory = (m_AssetsDirectory.string() + "/Shaders");
+    m_ShadersDirectory = (m_AssetsDirectory.string() + "/Shaders/Sandbox");
     m_TexturesDirectory = (m_AssetsDirectory.string() + "/Textures/Tiles");
     m_SkyboxDirectory = (m_AssetsDirectory.string() + "/Textures/Skybox");
     m_ViewportSize = {spec.width, spec.height};
@@ -28,8 +28,6 @@ void SandboxLayer::Init(Engine::Window* window)
     std::string hitboxShaderPath = m_ShadersDirectory.string() + "/Hitbox";
 
     m_Framebuffer = Engine::Framebuffer::Create(window->GetSpec()->width, window->GetSpec()->height);
-    m_DepthFramebuffer = Engine::Framebuffer::Create(3000, 3000, true);
-    m_DebugFramebuffer = Engine::Framebuffer::Create(3000, 3000);
 
     m_Shader = Engine::Shader::Create(worldShaderPath);
     m_DepthBufferShader = Engine::Shader::Create(depthShaderPath);
@@ -57,7 +55,7 @@ void SandboxLayer::Init(Engine::Window* window)
 
     Engine::TerrainGenerationSettings settings = {.Seed = 0,
                                                   .AssetsDirectory = m_AssetsDirectory,
-                                                  .GenerationDistance = 50};
+                                                  .GenerationDistance = 3};
     m_World.Init(settings, m_TexturesDirectory);
 
     m_Camera.Init(Engine::CameraSpec({m_AppSpec.width, m_AppSpec.height}, 45.0f, 0.1f, 10000.0f));
@@ -142,8 +140,6 @@ void SandboxLayer::Destroy()
     m_Light = nullptr;
 
     m_Framebuffer.Destroy();
-    m_DepthFramebuffer.Destroy();
-    m_DebugFramebuffer.Destroy();
 
     m_DepthBufferVA.Destroy();
 

@@ -40,6 +40,7 @@ namespace Engine
         static void Init(TerrainGenerationSettings settings);
 
         static void ScheduleChunkForGeneration(glm::ivec3 chunkPosition);
+        //static void ScheduleChunkMeshForGeneration(glm::ivec3 chunkPosition);
 
         static void RunWorkers();
 
