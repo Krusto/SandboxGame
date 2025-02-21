@@ -5,6 +5,16 @@
 #include <imgui.h>
 #include <GLFW/glfw3.h>
 #include <Core/STL/Containers.hpp>
+#include <Util/Log.hpp>
+
+void FlushLog()
+{
+    while (true)
+    {
+        LOG_FLUSH();
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+}
 
 SandboxLayer::SandboxLayer(const Engine::ApplicationSpec& spec)
 {
@@ -20,6 +30,7 @@ SandboxLayer::SandboxLayer(const Engine::ApplicationSpec& spec)
 
 void SandboxLayer::Init(Engine::Window* window)
 {
+    m_Thread = std::thread(FlushLog);
     m_Window = window;
     std::string worldShaderPath = m_ShadersDirectory.string() + "/World";
     std::string skyboxShaderPath = m_ShadersDirectory.string() + "/Skybox";
@@ -146,6 +157,7 @@ void SandboxLayer::Destroy()
     m_DebugCube->Destroy();
     Engine::Allocator::Deallocate(m_DebugCube);
     m_DebugCube = nullptr;
+    m_Thread.detach();
 }
 
 void SandboxLayer::RenderWorld()
