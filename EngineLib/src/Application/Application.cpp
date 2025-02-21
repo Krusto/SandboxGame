@@ -18,6 +18,15 @@ inline static double GetTime()
 
 Engine::Application& Engine::Application::Get() { return *s_Application; }
 
+void Engine::Application::LoggerFlushThreadCallback()
+{
+    while (Application::s_ThreadStopFlag.load() == false)
+    {
+        LOG_FLUSH();
+        std::this_thread::sleep_for(std::chrono::milliseconds(150));
+    }
+}
+
 void Engine::Application::Run()
 {
     double dt = 0, before, after;
@@ -45,6 +54,7 @@ void Engine::Application::Run()
 void Engine::Application::Init(const Engine::ApplicationSpec& spec)
 {
     LOG_INIT();
+    StartLoggerFlushThread();
     LOG_INFO("Application Init");
 
     m_ApplicationSpec = spec;
@@ -73,5 +83,18 @@ void Engine::Application::Destroy()
     m_Window->Close();
     m_Window->Destroy();
     Engine::Allocator::Deallocate(m_Window);
+    StopLoggerFlushThread();
     LOG_DESTROY();
+}
+
+void Engine::Application::StartLoggerFlushThread()
+{
+    Application::s_ThreadStopFlag.store(false);
+    m_LoggerFlushThread = std::thread(Application::LoggerFlushThreadCallback);
+}
+void Engine::Application::StopLoggerFlushThread() 
+{ 
+
+    Application::s_ThreadStopFlag.store(true);
+    m_LoggerFlushThread.join();
 }

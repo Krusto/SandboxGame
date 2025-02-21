@@ -35,6 +35,15 @@ namespace Engine
 
         void Destroy();
 
+    private:
+        void StartLoggerFlushThread();
+        void StopLoggerFlushThread();
+
+    private:
+        static void LoggerFlushThreadCallback();
+        inline static std::atomic<bool> s_ThreadStopFlag{};
+    private:
+        std::thread m_LoggerFlushThread;
     protected:
         Window* m_Window{};
         ApplicationSpec m_ApplicationSpec{};
