@@ -4,5 +4,5 @@
 
 struct RendererSpec {
     ViewportSize SurfaceSize;
-    std::vector<const char*> extensions;
+    const char* extensions[20];
 };

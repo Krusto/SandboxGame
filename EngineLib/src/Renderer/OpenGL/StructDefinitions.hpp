@@ -2,9 +2,10 @@
 #include <cstdint>
 #include <Renderer/Shared/StorageBufferType.hpp>
 #include <Renderer/Shared/CubemapTextureSpec.hpp>
-
+#ifdef __cplusplus
 namespace Engine
 {
+#endif
 
     struct ImageData {
         uint32_t id;
@@ -32,10 +33,10 @@ namespace Engine
     };
 
     struct VertexArrayData {
+        uint32_t id{};
         uint32_t indexCount{};
         VertexBufferData* vertexBufferData{};
         IndexBufferData* indexBufferData{};
-        uint32_t id{};
     };
 
     struct TextureArrayData {
@@ -78,5 +79,6 @@ namespace Engine
         CubemapTextureSpec spec{};
         uint32_t id{};
     };
-
+#ifdef __cplusplus
 }// namespace Engine
+#endif

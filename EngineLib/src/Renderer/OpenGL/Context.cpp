@@ -32,7 +32,7 @@ EXPORT_RENDERER void RendererContextCreate(void* handle, void* window)
 
 
     const char* version = (const char*) glGetString(GL_VERSION);
-    LOG("OPENGL VERSION %s!\n", version);
+    LOG_INFO("OPENGL VERSION %s!\n", version);
 }
 
 EXPORT_RENDERER void RendererContextSwapBuffers(void* window)
@@ -98,7 +98,7 @@ EXPORT_RENDERER void _MessageCallback(GLenum source, GLenum type, GLuint id, GLe
         }
         return "";
     }();
-    LOG("%s, %s, %s, %u: %s\n", src_str, type_str, severity_str, id, message);
+    LOG_INFO("%s, %s, %s, %u: %s\n", src_str, type_str, severity_str, id, message);
 }
 
 EXPORT_RENDERER void RendererContextAddDebugMessanger(void* window)

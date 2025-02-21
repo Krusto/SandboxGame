@@ -35,7 +35,7 @@ namespace Engine
 
     private:
         bool m_Opened{};
-        FileFormat m_FileFormat;
+        FileFormat m_FileFormat{};
         std::string m_Path{};
     };
 }// namespace Engine

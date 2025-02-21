@@ -44,6 +44,9 @@ void Engine::Application::Run()
 
 void Engine::Application::Init(const Engine::ApplicationSpec& spec)
 {
+    LOG_INIT();
+    LOG_INFO("Application Init");
+
     m_ApplicationSpec = spec;
     m_ApplicationSpec.WorkingDirectory = std::filesystem::absolute(spec.WorkingDirectory);
     RendererSharedLoader::Load((m_ApplicationSpec.WorkingDirectory.string()).c_str());
@@ -70,4 +73,5 @@ void Engine::Application::Destroy()
     m_Window->Close();
     m_Window->Destroy();
     Engine::Allocator::Deallocate(m_Window);
+    LOG_DESTROY();
 }

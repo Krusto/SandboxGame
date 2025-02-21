@@ -6,6 +6,7 @@
 #include "File.hpp"
 #include <Core/Log.hpp>
 #include <Core/Core.hpp>
+#include <Core/Allocator.hpp>
 
 namespace Engine
 {
@@ -33,12 +34,15 @@ namespace Engine
             file.seekg(0, std::ios::end);
             size_t length = file.tellg();
             file.seekg(0, std::ios::beg);
-            std::vector<uint8_t> buffer(length);
-            file.read((char*) buffer.data(), length);
+            uint8_t* buffer = (uint8_t*) malloc(length);
+            // std::vector<uint8_t> buffer(length);
+            // file.read((char*) buffer.data(), length);
+            file.read((char*) buffer, length);
             file.close();
             m_Opened = false;
 
-            return buffer;
+            // return buffer;
+            return {};
         }
         return {};
     }
@@ -57,12 +61,14 @@ namespace Engine
             file.seekg(0, std::ios::end);
             size_t length = file.tellg();
             file.seekg(0, std::ios::beg);
-            std::string buffer;
-            buffer.resize(length);
-            file.read(&buffer[0], length);
+            // std::string buffer;
+            // buffer.resize(length);
+            int8_t* buffer = Allocator::AllocateArray<int8_t>(length);
+            file.read((char*) buffer, length);
+            // file.read(&buffer[0], length);
             file.close();
             m_Opened = false;
-            return buffer;
+            return std::string((const char* const) buffer);
         }
         return std::string();
     }

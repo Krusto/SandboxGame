@@ -4,6 +4,7 @@
 #include "LightObject.hpp"
 #include "DebugCube.hpp"
 #include "Hitbox.hpp"
+#include <thread>
 
 class SandboxLayer: public Engine::Layer
 {
@@ -100,4 +101,5 @@ private:
     glm::ivec3 m_LookingAt;
     double velocity{};
     Hitbox* m_DebugCube;
+    std::thread m_Thread;
 };

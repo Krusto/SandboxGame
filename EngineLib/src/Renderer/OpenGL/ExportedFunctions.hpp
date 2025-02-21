@@ -6,6 +6,7 @@
 #ifdef __cplusplus
 namespace Engine
 {
+
 #endif
     EXPORT_RENDERER void RendererContextInit(void* handle);
     EXPORT_RENDERER void RendererContextDestroy(void* handle);

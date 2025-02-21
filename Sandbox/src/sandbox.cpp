@@ -5,7 +5,6 @@
 #include <Layer/SandboxLayer.hpp>
 #include <Layer/GUILayer.hpp>
 
-
 using namespace Engine;
 
 class Sandbox: public Engine::Application
