@@ -67,7 +67,7 @@ namespace Engine
                 }
                 else if (instance->sink == LOG_SINK_BUFFER)
                 {
-                    memcpy_s(instance->flushBuffer, instance->offset, instance->buffer, instance->offset);
+                    memcpy_s(instance->flushBuffer, instance->length, instance->buffer, instance->length);
                     instance->offset = 0;
                 }
             }
@@ -102,6 +102,10 @@ namespace Engine
         UnlockLoggerResource(GetCriticalSection());
     }
 
+    void LockLoggerBuffer() { LockLoggerResource(GetCriticalSection()); }
+
+    void UnlockLoggerBuffer() { UnlockLoggerResource(GetCriticalSection()); }
+
     LoggerT* LoggerGetInstance()
     {
         LockLoggerResource(GetCriticalSection());
@@ -126,7 +130,7 @@ namespace Engine
         LoggerT* logger = LoggerGetInstance();
         if (logger)
         {
-            if (logger->data.buffer) free(logger->data.buffer);
+            if (logger->data.buffer && logger->data.sink == LogSinkEnumT::LOG_SINK_STDOUT) free(logger->data.buffer);
             free(logger);
             logger = nullptr;
             DeleteCriticalSection(GetCriticalSection());

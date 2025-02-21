@@ -7,15 +7,6 @@
 #include <Core/STL/Containers.hpp>
 #include <Util/Log.hpp>
 
-void FlushLog()
-{
-    while (true)
-    {
-        LOG_FLUSH();
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    }
-}
-
 SandboxLayer::SandboxLayer(const Engine::ApplicationSpec& spec)
 {
     m_Name = "Sandbox Layer";
@@ -30,7 +21,7 @@ SandboxLayer::SandboxLayer(const Engine::ApplicationSpec& spec)
 
 void SandboxLayer::Init(Engine::Window* window)
 {
-    m_Thread = std::thread(FlushLog);
+    Engine::LoggerChangeDstToBuffer(m_LogBuffer, 1024);
     m_Window = window;
     std::string worldShaderPath = m_ShadersDirectory.string() + "/World";
     std::string skyboxShaderPath = m_ShadersDirectory.string() + "/Skybox";
@@ -131,7 +122,7 @@ void SandboxLayer::Init(Engine::Window* window)
     m_DebugCube->Init();
 }
 
-void SandboxLayer::OnAttach() {}
+void SandboxLayer::OnAttach() {  }
 
 void SandboxLayer::OnDetach() {}
 
@@ -157,7 +148,6 @@ void SandboxLayer::Destroy()
     m_DebugCube->Destroy();
     Engine::Allocator::Deallocate(m_DebugCube);
     m_DebugCube = nullptr;
-    m_Thread.detach();
 }
 
 void SandboxLayer::RenderWorld()
@@ -186,6 +176,7 @@ void SandboxLayer::RenderWorld()
     Renderer::Submit(m_LightShader.BindCommand());
     Renderer::Submit(m_Camera.UploadCommand(&m_LightShader));
     Renderer::Submit(m_Light->Render(&m_LightShader));
+    LOG_INFO("%lf", m_PassedTime);
 }
 
 void SandboxLayer::RenderDepthWorld()
@@ -380,6 +371,12 @@ void SandboxLayer::OnImGuiDraw()
         ImGui::Image((void*) m_Framebuffer.GetColorAttachmentID(),
                      {(float) m_Framebuffer.width(), (float) m_Framebuffer.height()}, {0, 1}, {1, 0});
     }
+    ImGui::End();
+
+    ImGui::Begin("Console");
+    Engine::LockLoggerBuffer();
+    ImGui::TextUnformatted(m_LogBuffer, m_LogBuffer + 1024);
+    Engine::UnlockLoggerBuffer();
     ImGui::End();
 }
 

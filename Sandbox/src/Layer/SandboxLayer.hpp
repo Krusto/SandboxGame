@@ -101,5 +101,6 @@ private:
     glm::ivec3 m_LookingAt;
     double velocity{};
     Hitbox* m_DebugCube;
-    std::thread m_Thread;
+
+    char m_LogBuffer[2048];
 };

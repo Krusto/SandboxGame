@@ -36,7 +36,8 @@ namespace Engine
     EXPORT_UTILS void LoggerCreate();
     EXPORT_UTILS void LoggerChangeDstToSTDOUT();
     EXPORT_UTILS void LoggerChangeDstToBuffer(char* buffer, size_t length);
-
+    EXPORT_UTILS void LockLoggerBuffer();
+    EXPORT_UTILS void UnlockLoggerBuffer();
 
 #ifdef __cplusplus
 }// namespace Engine
@@ -75,9 +76,9 @@ namespace Engine
     }
 #endif
 #else
-    inline static void LOG_INIT() { Engine::LoggerCreate(); }
+inline static void LOG_INIT() { Engine::LoggerCreate(); }
 
-    inline static void LOG_DESTROY() { Engine::LoggerDestroy(); }
+inline static void LOG_DESTROY() { Engine::LoggerDestroy(); }
 
 inline static void LOG_FLUSH() { Engine::LoggerGetInstance()->Flush(); }
 
@@ -86,6 +87,7 @@ inline static void LOG_INFO(const char* format, Args... args)
 {
     Engine::LoggerGetInstance()->Log("%s", "[INFO]");
     Engine::LoggerGetInstance()->Log(format, std::forward<Args>(args)...);
+    Engine::LoggerGetInstance()->Log("%s", "\n");
 }
 
 
@@ -94,6 +96,7 @@ inline static void LOG_INFO(const T* format)
 {
     Engine::LoggerGetInstance()->Log("%s", "[INFO]");
     Engine::LoggerGetInstance()->Log("%s", format);
+    Engine::LoggerGetInstance()->Log("%s", "\n");
 }
 
 #define ENGINE_ENABLE_DEBUG_LOG
@@ -104,6 +107,7 @@ inline static void LOG_DEBUG(const char* format, Args... args)
 #ifdef ENGINE_ENABLE_DEBUG_LOG
     Engine::LoggerGetInstance()->Log("%s", "[DEBUG]");
     Engine::LoggerGetInstance()->Log(format, std::forward<Args>(args)...);
+    Engine::LoggerGetInstance()->Log("%s", "\n");
 #endif
 }
 
@@ -112,6 +116,7 @@ inline static void LOG_DEBUG(const char* format)
 #ifdef ENGINE_ENABLE_DEBUG_LOG
     Engine::LoggerGetInstance()->Log("%s", "[DEBUG]");
     Engine::LoggerGetInstance()->Log("%s",format);
+    Engine::LoggerGetInstance()->Log("%s", "\n");
 #endif
 }
 
@@ -120,18 +125,21 @@ inline static void LOG_ERROR(const char* format, Args... args)
 {
     Engine::LoggerGetInstance()->Log("%s", "[ERROR]");
     Engine::LoggerGetInstance()->Log(format, std::forward<Args>(args)...);
+    Engine::LoggerGetInstance()->Log("%s", "\n");
 }
 
 inline static void LOG_ERROR(std::string_view format)
 {
     Engine::LoggerGetInstance()->Log("%s", "[ERROR]");
     Engine::LoggerGetInstance()->Log("%s", format.data());
+    Engine::LoggerGetInstance()->Log("%s", "\n");
 }
 
 inline static void LOG_ERROR(const std::string& format)
 {
     Engine::LoggerGetInstance()->Log("%s", "[ERROR]");
     Engine::LoggerGetInstance()->Log("%s", format.c_str());
+    Engine::LoggerGetInstance()->Log("%s", "\n");
 }
 
 template <typename... Args>
