@@ -7,3 +7,6 @@
 [submodule "Vendor/LibraryLoader"]
 	path = Vendor/LibraryLoader
 	url = https://github.com/Krusto/LibraryLoader
+[submodule "Vendor/CLog"]
+	path = Vendor/CLog
+	url = https://github.com/Krusto/CLog
