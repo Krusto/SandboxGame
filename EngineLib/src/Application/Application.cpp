@@ -53,7 +53,8 @@ void Engine::Application::Run()
 
 void Engine::Application::Init(const Engine::ApplicationSpec& spec)
 {
-    LOG_INIT();
+    LoggerCreate();
+    LoggerAttachTerminalHandler(LogPolicy::OVERWRITE_POLICY);
     StartLoggerFlushThread();
     LOG_INFO("Application Init");
 
@@ -84,7 +85,7 @@ void Engine::Application::Destroy()
     m_Window->Destroy();
     Engine::Allocator::Deallocate(m_Window);
     StopLoggerFlushThread();
-    LOG_DESTROY();
+    LoggerDestroy();
 }
 
 void Engine::Application::StartLoggerFlushThread()
