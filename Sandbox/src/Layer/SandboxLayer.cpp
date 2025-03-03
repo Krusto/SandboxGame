@@ -122,7 +122,7 @@ void SandboxLayer::Init(Engine::Window* window)
     m_DebugCube->Init();
 }
 
-void SandboxLayer::OnAttach() {  }
+void SandboxLayer::OnAttach() {}
 
 void SandboxLayer::OnDetach() {}
 
@@ -176,7 +176,6 @@ void SandboxLayer::RenderWorld()
     Renderer::Submit(m_LightShader.BindCommand());
     Renderer::Submit(m_Camera.UploadCommand(&m_LightShader));
     Renderer::Submit(m_Light->Render(&m_LightShader));
-    LOG_INFO("%lf", m_PassedTime);
 }
 
 void SandboxLayer::RenderDepthWorld()
@@ -238,8 +237,6 @@ void SandboxLayer::OnUpdate(double dt)
     Engine::Renderer::BeginFrame();
 
     RenderWorld();
-
-
     {
         //m_Cube.position = m_Camera.GetPosition();
 

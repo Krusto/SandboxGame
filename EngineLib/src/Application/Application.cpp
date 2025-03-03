@@ -22,7 +22,7 @@ void Engine::Application::LoggerFlushThreadCallback()
 {
     while (Application::s_ThreadStopFlag.load() == false)
     {
-        LOG_FLUSH();
+        // LOG_FLUSH();
         std::this_thread::sleep_for(std::chrono::milliseconds(150));
     }
 }
@@ -92,8 +92,9 @@ void Engine::Application::StartLoggerFlushThread()
     Application::s_ThreadStopFlag.store(false);
     m_LoggerFlushThread = std::thread(Application::LoggerFlushThreadCallback);
 }
-void Engine::Application::StopLoggerFlushThread() 
-{ 
+
+void Engine::Application::StopLoggerFlushThread()
+{
 
     Application::s_ThreadStopFlag.store(true);
     m_LoggerFlushThread.join();
