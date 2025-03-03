@@ -88,6 +88,7 @@ set(CUTILS_INCLDUE_DIR         "./Vendor/CUtils/include")
 set(PERLIN_INCLUDE_DIR         "./Vendor/PerlinNoise")
 set(FASTNOISE_INCLUDE_DIR         "./Vendor/FastNoise/include")
 set(LIBRARY_LOADER_INCLUDE_DIR "./Vendor/LibraryLoader/include")
+set(CLOG_INCLUDE_DIR "./Vendor/CLog/src")
 
 message(STATUS "${PROJECT_NAME}: Creating imgui lib")
 add_library(imgui ${BUILD_LIB_FLAG} ${IMGUI_SOURCE_FILES} ${IMGUI_HEADER_FILES})
@@ -109,6 +110,9 @@ add_library(SandboxWorld STATIC ${SANDBOX_WORLD_SOURCE_FILES} ${SANDBOX_WORLD_HE
 
 add_library(CUtils INTERFACE)
 target_include_directories(CUtils INTERFACE ${CUTILS_INCLDUE_DIR})
+
+add_library(CLog STATIC "./Vendor/CLog/src/CLog.c")
+target_compile_definitions(CLog PRIVATE CLOG_IMPLEMENT )
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_compile_options(EngineLib PUBLIC -static-libstdc++)
@@ -133,13 +137,15 @@ target_compile_definitions(EngineUtils
     PUBLIC
     $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:LINK_SHARED>
     $<$<STREQUAL:${BUILD_LIB_FLAG},SHARED>:EngineUtils_EXPORTS>
+    # CLOG_BUILD_SHARED
     $<$<CONFIG:Debug>:ENGINE_ENABLE_VERBOSE_LOG>
     $<$<CONFIG:Debug>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
     $<$<CONFIG:Release>:ENGINE_ENABLE_MEMORY_DEBUG_LOG>
     $<$<CONFIG:Release>:_RELEASE>
     $<$<CONFIG:RelWithDebInfo>:_DEBUG>
     $<$<CONFIG:MinSizeRel>:_RELEASE>
-)
+    )
+
 
 target_compile_definitions(EngineLib
     PUBLIC
@@ -232,6 +238,7 @@ ${GLAD_INCLDUE_DIR}
  ${PERLIN_INCLUDE_DIR}
  ${FASTNOISE_INCLUDE_DIR}
  ${LIBRARY_LOADER_INCLUDE_DIR}
+ ${CLOG_INCLUDE_DIR}
  )
 
 target_include_directories(EngineUtils PUBLIC "./EngineLib/src")
@@ -261,7 +268,9 @@ message(STATUS "${PROJECT_NAME}: Linking libraries")
 
 target_link_libraries(imgui PUBLIC glfw glad)
 
-target_link_libraries(EngineInterfaceLibrary INTERFACE EngineUtils glfw imgui glad CUtils FastNoise )
+target_link_libraries(EngineUtils PUBLIC CLog)
+
+target_link_libraries(EngineInterfaceLibrary INTERFACE EngineUtils glfw imgui glad CUtils FastNoise CLog )
 
 target_link_libraries(RendererOpenGL PUBLIC glad imgui EngineInterfaceLibrary)
 target_link_libraries(RendererVulkan PUBLIC imgui EngineInterfaceLibrary)

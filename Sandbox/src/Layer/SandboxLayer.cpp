@@ -21,7 +21,6 @@ SandboxLayer::SandboxLayer(const Engine::ApplicationSpec& spec)
 
 void SandboxLayer::Init(Engine::Window* window)
 {
-    Engine::LoggerChangeDstToBuffer(m_LogBuffer, 1024);
     m_Window = window;
     std::string worldShaderPath = m_ShadersDirectory.string() + "/World";
     std::string skyboxShaderPath = m_ShadersDirectory.string() + "/Skybox";
@@ -371,9 +370,6 @@ void SandboxLayer::OnImGuiDraw()
     ImGui::End();
 
     ImGui::Begin("Console");
-    Engine::LockLoggerBuffer();
-    ImGui::TextUnformatted(m_LogBuffer, m_LogBuffer + 1024);
-    Engine::UnlockLoggerBuffer();
     ImGui::End();
 }
 

@@ -20,11 +20,11 @@ uint32_t RefCounted::GetRefCount() const { return m_RefCount.load(); }
 void RefCounted::IncTotalRefCount()
 {
     RefCounted::s_TotalRefCount++;
-    LOG_MEMORY_ALLOC("Total RefCount: %i\n", RefCounted::s_TotalRefCount);
+    //LOG_MEMORY_ALLOC("Total RefCount: %i\n", RefCounted::s_TotalRefCount);
 }
 
 void RefCounted::DecTotalRefCount()
 {
     RefCounted::s_TotalRefCount--;
-    LOG_MEMORY_ALLOC("Total RefCount: %i\n", RefCounted::s_TotalRefCount);
+    //LOG_MEMORY_ALLOC("Total RefCount: %i\n", RefCounted::s_TotalRefCount);
 }

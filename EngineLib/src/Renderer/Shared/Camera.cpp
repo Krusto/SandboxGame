@@ -71,7 +71,7 @@ namespace Engine
             m_Position.y += m_MoveDownUp * dt;
             m_Position.z += mZ * dt;
 
-            LOG_INFO("Position: %f %f %f\n", m_Position.x, m_Position.y, m_Position.z);
+            LOG_INFO("Position: %.2f %.2f %.2f", m_Position.x, m_Position.y, m_Position.z);
         }
 
         m_View = glm::mat4(1.0);
