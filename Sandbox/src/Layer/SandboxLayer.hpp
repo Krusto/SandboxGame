@@ -102,5 +102,6 @@ private:
     double velocity{};
     Hitbox* m_DebugCube;
 
-    char m_LogBuffer[2048];
+    char m_LogBuffer[1024 * 16];
+    std::string m_ConsoleLog;
 };

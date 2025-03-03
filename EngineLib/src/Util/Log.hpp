@@ -18,16 +18,17 @@ namespace Engine
     }LogSinkEnumT;
 
     typedef struct {
-        char* buffer;
-        char* flushBuffer;
         size_t length;
         size_t offset;
+        char* buffer;
+        char* flushBuffer;
         LogSinkEnumT sink;
     } LoggerDataT;
 
     typedef struct {
         void (*Log)(const char* format, ...);
         void (*Flush)();
+        int (*GetMessageLength)();
         LoggerDataT data;
     } LoggerT;
 

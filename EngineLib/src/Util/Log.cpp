@@ -22,9 +22,9 @@ namespace Engine
     static CRITICAL_SECTION* cs = NULL;
     static CRITICAL_SECTION* cs_flush = NULL;
 
-    static CRITICAL_SECTION* GetCriticalSection() { return cs; }
+    inline static CRITICAL_SECTION* GetCriticalSection() { return cs; }
 
-    static CRITICAL_SECTION* GetCriticalSectionFlushing() { return cs_flush; }
+    inline static CRITICAL_SECTION* GetCriticalSectionFlushing() { return cs_flush; }
 
     inline static void LockLoggerResource(CRITICAL_SECTION* section_mutex)
     {
@@ -83,7 +83,6 @@ namespace Engine
         if (logger == NULL) return;
         if (logger->Log == NULL) return;
         if (logger->Flush == NULL) return;
-
         LoggerDataT* instance = &LoggerGetInstance()->data;
         va_list args;
         va_start(args, format);
@@ -102,6 +101,17 @@ namespace Engine
         UnlockLoggerResource(GetCriticalSection());
     }
 
+    static int GetMessageLength()
+    {
+        int length = -1;
+        LockLoggerResource(GetCriticalSection());
+        LoggerT* logger = LoggerGetInstance();
+        if (logger == NULL) return length;
+        length = logger->data.offset;
+        UnlockLoggerResource(GetCriticalSection());
+        return length;
+    }
+
     void LockLoggerBuffer() { LockLoggerResource(GetCriticalSection()); }
 
     void UnlockLoggerBuffer() { UnlockLoggerResource(GetCriticalSection()); }
@@ -114,12 +124,13 @@ namespace Engine
             globalLoggerInstance = (LoggerT*) malloc(sizeof(LoggerT));
             if (globalLoggerInstance == NULL) return NULL;
 
-            globalLoggerInstance->data.length = 1024;
+            globalLoggerInstance->data.length = 1024 * 16;
             globalLoggerInstance->data.buffer = (char*) malloc(globalLoggerInstance->data.length);
             globalLoggerInstance->data.offset = 0;
             globalLoggerInstance->data.sink = LogSinkEnumT::LOG_SINK_STDOUT;
             globalLoggerInstance->Log = Log;
             globalLoggerInstance->Flush = FlushLogger;
+            globalLoggerInstance->GetMessageLength = GetMessageLength;
         }
         UnlockLoggerResource(GetCriticalSection());
         return globalLoggerInstance;
