@@ -1,10 +1,12 @@
 ﻿#pragma once
 #include <memory>
+#include <thread>
 #include <Engine.hpp>
+#include <SandboxSky.hpp>
+#include <Console.hpp>
 #include "LightObject.hpp"
 #include "DebugCube.hpp"
 #include "Hitbox.hpp"
-#include <thread>
 
 class SandboxLayer: public Engine::Layer
 {
@@ -74,7 +76,8 @@ private:
     Engine::Framebuffer m_DebugFramebuffer;
     Engine::Framebuffer m_DepthFramebuffer;
     Engine::VertexArray m_DepthBufferVA;
-    Engine::Skybox m_Skybox{};
+
+    SandboxSky m_SandboxSky;
 
     LightObject* m_Light;
 
@@ -91,7 +94,6 @@ private:
     std::filesystem::path m_AssetsDirectory;
     std::filesystem::path m_ShadersDirectory;
     std::filesystem::path m_TexturesDirectory;
-    std::filesystem::path m_SkyboxDirectory;
 
     int m_WorldShininess{30};
     bool m_DisableGravity{true};
@@ -102,6 +104,5 @@ private:
     double velocity{};
     Hitbox* m_DebugCube;
 
-    char m_LogBuffer[1024 * 16];
-    std::string m_ConsoleLog;
+    Console m_Console;
 };

@@ -15,15 +15,15 @@ SandboxLayer::SandboxLayer(const Engine::ApplicationSpec& spec)
     m_AssetsDirectory = m_AppSpec.WorkingDirectory.append("Assets");
     m_ShadersDirectory = (m_AssetsDirectory.string() + "/Shaders/Sandbox");
     m_TexturesDirectory = (m_AssetsDirectory.string() + "/Textures/Tiles");
-    m_SkyboxDirectory = (m_AssetsDirectory.string() + "/Textures/Skybox");
     m_ViewportSize = {spec.width, spec.height};
 }
 
 void SandboxLayer::Init(Engine::Window* window)
 {
     m_Window = window;
+    m_Console.Create();
+
     std::string worldShaderPath = m_ShadersDirectory.string() + "/World";
-    std::string skyboxShaderPath = m_ShadersDirectory.string() + "/Skybox";
     std::string lightShaderPath = m_ShadersDirectory.string() + "/Light";
     std::string depthShaderPath = m_ShadersDirectory.string() + "/WorldDepth";
     std::string hitboxShaderPath = m_ShadersDirectory.string() + "/Hitbox";
@@ -32,27 +32,9 @@ void SandboxLayer::Init(Engine::Window* window)
 
     m_Shader = Engine::Shader::Create(worldShaderPath);
     m_DepthBufferShader = Engine::Shader::Create(depthShaderPath);
-    {
-        std::string skyboxName = "skybox_day";
-        std::string skyboxPath = m_SkyboxDirectory.string() + "/" + skyboxName;
-        std::string skyboxPath_right = skyboxPath + "_right.png";
-        std::string skyboxPath_left = skyboxPath + "_left.png";
-        std::string skyboxPath_top = skyboxPath + "_top.png";
-        std::string skyboxPath_bottom = skyboxPath + "_bottom.png";
-        std::string skyboxPath_front = skyboxPath + "_front.png";
-        std::string skyboxPath_back = skyboxPath + "_back.png";
-        using Engine::CubemapTextureFace;
-        using Engine::Pair;
-        using Engine::Vector;
-        Vector<Pair<CubemapTextureFace, const char*>> faces(
-                {Pair<CubemapTextureFace, const char*>(CubemapTextureFace::Right, skyboxPath_right.c_str()),
-                 Pair<CubemapTextureFace, const char*>(CubemapTextureFace::Left, skyboxPath_left.c_str()),
-                 Pair<CubemapTextureFace, const char*>(CubemapTextureFace::Top, skyboxPath_top.c_str()),
-                 Pair<CubemapTextureFace, const char*>(CubemapTextureFace::Bottom, skyboxPath_bottom.c_str()),
-                 Pair<CubemapTextureFace, const char*>(CubemapTextureFace::Front, skyboxPath_front.c_str()),
-                 Pair<CubemapTextureFace, const char*>(CubemapTextureFace::Back, skyboxPath_back.c_str())});
-        m_Skybox = Engine::Skybox::Create(skyboxName, skyboxShaderPath, &faces);
-    }
+
+    m_SandboxSky.Create(m_ShadersDirectory.string() + "/Skybox", m_AssetsDirectory.string() + "/Textures/Skybox",
+                        "skybox_day");
 
     Engine::TerrainGenerationSettings settings = {.Seed = 0,
                                                   .AssetsDirectory = m_AssetsDirectory,
@@ -135,7 +117,7 @@ void SandboxLayer::Destroy()
     m_DebugShader.Destroy();
     m_HitboxShader.Destroy();
 
-    m_Skybox.Destroy();
+    m_SandboxSky.Destroy();
 
     Engine::Allocator::Deallocate(m_Light);
     m_Light = nullptr;
@@ -158,11 +140,11 @@ void SandboxLayer::RenderWorld()
     Renderer::Submit(m_Framebuffer.ClearColorCommand(glm::vec4{0.0, 0.0, 0.0, 1.0}));
 
     //Render Skybox
-    Renderer::Submit(m_Skybox.RenderCommand(&m_Camera));
+    m_SandboxSky.Render(&m_Camera);
 
     //Render World
     Renderer::Submit(m_Shader.BindCommand());
-    Renderer::Submit(m_Skybox.BindTexture(1));
+    m_SandboxSky.BindTexture(1);
 
     Renderer::Submit(m_Camera.UploadCommand(&m_Shader));
 
@@ -231,14 +213,9 @@ void SandboxLayer::OnUpdate(double dt)
         }
     }
     m_Camera.Update(dt, 30.0f, 10.0f);
-    m_Skybox.Update(dt);
-
-    Engine::Renderer::BeginFrame();
-
-    RenderWorld();
+    m_SandboxSky.Update(dt);
+    uint32_t axis{};
     {
-        //m_Cube.position = m_Camera.GetPosition();
-
         float maxDistance = 40.0f;
 
         glm::vec3 rot = glm::radians(m_Camera.GetRotation());
@@ -246,27 +223,25 @@ void SandboxLayer::OnUpdate(double dt)
         glm::vec3 dir =
                 glm::vec3(glm::cos(rot.x) * (-glm::cos(rot.y)), -glm::sin(rot.x), glm::cos(rot.x) * (-glm::sin(rot.y)));
 
-        glm::vec3 _pos1 = m_Camera.GetPosition() + glm::vec3(0.5, 1.5, 0.5);
-        glm::vec3 _pos2 = _pos1 + dir * glm::vec1{maxDistance};
-        glm::ivec3 pos = _pos1;
-        glm::ivec3 end = _pos2;
+        glm::vec3 startPosition = m_Camera.GetPosition() + glm::vec3(0.5, 1.5, 0.5);
+        glm::vec3 end = startPosition + dir * glm::vec1{maxDistance};
+        glm::ivec3 pos = startPosition;
 
-        glm::ivec3 d = glm::ivec3(((_pos1.x < _pos2.x) ? 1 : ((_pos1.x > _pos2.x) ? -1 : 0)),
-                                  ((_pos1.y < _pos2.y) ? 1 : ((_pos1.y > _pos2.y) ? -1 : 0)),
-                                  ((_pos1.z < _pos2.z) ? 1 : ((_pos1.z > _pos2.z) ? -1 : 0)));
+        glm::ivec3 d = glm::ivec3(((startPosition.x < end.x) ? 1 : ((startPosition.x > end.x) ? -1 : 0)),
+                                  ((startPosition.y < end.y) ? 1 : ((startPosition.y > end.y) ? -1 : 0)),
+                                  ((startPosition.z < end.z) ? 1 : ((startPosition.z > end.z) ? -1 : 0)));
 
-        glm::vec3 deltat = glm::vec3(1.0f / glm::abs(_pos2.x - _pos1.x), 1.0f / glm::abs(_pos2.y - _pos1.y),
-                                     1.0f / glm::abs(_pos2.z - _pos1.z));
+        glm::vec3 deltat = glm::vec3(1.0f / glm::abs(end.x - startPosition.x), 1.0f / glm::abs(end.y - startPosition.y),
+                                     1.0f / glm::abs(end.z - startPosition.z));
 
         glm::vec3 min = pos;
         glm::vec3 max = min + glm::vec3(1.f, 1.f, 1.f);
 
-        glm::vec3 t = glm::vec3(((_pos1.x > _pos2.x) ? (_pos1.x - min.x) : (max.x - _pos1.x)) * deltat.x,
-                                ((_pos1.y > _pos2.y) ? (_pos1.y - min.y) : (max.y - _pos1.y)) * deltat.y,
-                                ((_pos1.z > _pos2.z) ? (_pos1.z - min.z) : (max.z - _pos1.z)) * deltat.z);
+        dir = glm::vec3(((startPosition.x > end.x) ? (startPosition.x - min.x) : (max.x - startPosition.x)) * deltat.x,
+                        ((startPosition.y > end.y) ? (startPosition.y - min.y) : (max.y - startPosition.y)) * deltat.y,
+                        ((startPosition.z > end.z) ? (startPosition.z - min.z) : (max.z - startPosition.z)) * deltat.z);
 
         glm::ivec3 normal = glm::ivec3(0, 0, 0);
-        uint32_t axis{};
         double count = 0;
         glm::ivec3 outPosition{};
         uint8_t outBlock{};
@@ -279,24 +254,21 @@ void SandboxLayer::OnUpdate(double dt)
                 outPosition = pos;
                 outBlock = currentBlock;
                 outNormal = normal;
-                //LOG("BlockPos: %d %d %d  Block: %d  Axis %d Normal: %d %d %d\n", outPosition.x, outPosition.y,
-                //outPosition.z, outBlock, axis, outNormal.x, outNormal.y, outNormal.z);
                 break;
             }
-
-            if (t.y <= t.z)
+            if (dir.y <= dir.z)
             {
                 if (pos.y == end.y) break;
-                t.y += deltat.y;
+                dir.y += deltat.y;
                 pos.y += d.y;
                 axis = 0;
                 normal = glm::ivec3(0, -d.y, 0);
                 if (normal.y > 0) { axis = 1; }
             }
-            else if (t.x <= t.y && t.x <= t.z)
+            else if (dir.x <= dir.y && dir.x <= dir.z)
             {
                 if (pos.x == end.x) break;
-                t.x += deltat.x;
+                dir.x += deltat.x;
                 pos.x += d.x;
                 axis = 2;
                 normal = glm::ivec3(-d.x, 0, 0);
@@ -305,7 +277,7 @@ void SandboxLayer::OnUpdate(double dt)
             else
             {
                 if (pos.z == end.z) { break; };
-                t.z += deltat.z;
+                dir.z += deltat.z;
                 pos.z += d.z;
                 axis = 4;
                 normal = glm::ivec3(0, 0, -d.z);
@@ -317,12 +289,15 @@ void SandboxLayer::OnUpdate(double dt)
             m_LookingAt = outPosition;
             m_DebugCube->position = outPosition;
         }
-
-        //Render debug cube object
-        Engine::Renderer::Submit(m_HitboxShader.BindCommand());
-        Engine::Renderer::Submit(m_Camera.UploadCommand(&m_HitboxShader));
-        Engine::Renderer::Submit(m_DebugCube->Render(&m_HitboxShader, m_PassedTime, axis));
     }
+
+    Engine::Renderer::BeginFrame();
+    RenderWorld();
+
+    //Render debug cube object
+    Engine::Renderer::Submit(m_HitboxShader.BindCommand());
+    Engine::Renderer::Submit(m_Camera.UploadCommand(&m_HitboxShader));
+    Engine::Renderer::Submit(m_DebugCube->Render(&m_HitboxShader, m_PassedTime, axis));
 
     Engine::Renderer::BindDefaultFramebuffer();
 
@@ -369,8 +344,7 @@ void SandboxLayer::OnImGuiDraw()
     }
     ImGui::End();
 
-    ImGui::Begin("Console");
-    ImGui::End();
+    m_Console.Draw();
 }
 
 void SandboxLayer::OnImGuiEnd() {}
@@ -405,7 +379,7 @@ void SandboxLayer::OnKeyboardEvent(int action, int key)
         m_Shader.Reload();
         m_DepthBufferShader.Reload();
         m_CubeShader.Reload();
-        m_Skybox.Reload();
+        m_SandboxSky.Reload();
         m_LightShader.Reload();
         m_DebugShader.Reload();
         m_HitboxShader.Reload();
