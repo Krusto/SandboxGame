@@ -21,8 +21,8 @@ namespace Engine
         glCreateFramebuffers(1, &m_Data->fbo);
         if (!isDepthMap)
         {
-            ImageInit((void**) &m_Data->color_attachment_data, nullptr, width, height, (uint8_t) ImageColorFormat::RGB,
-                      (uint8_t) ImageType::DYNAMIC);
+            HDRImageInit((void**) &m_Data->color_attachment_data, nullptr, width, height,
+                         (uint8_t) ImageColorFormat::RGB, (uint8_t) ImageType::DYNAMIC);
             glNamedFramebufferTexture(m_Data->fbo, GL_COLOR_ATTACHMENT0, m_Data->color_attachment_data->id, 0);
 
             ImageInit((void**) &m_Data->depth_attachment_data, nullptr, width, height,

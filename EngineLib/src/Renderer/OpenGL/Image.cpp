@@ -63,13 +63,42 @@ namespace Engine
         }
     }
 
-    EXPORT_RENDERER void ImageInit(void** data, uint8_t* imageData, size_t width, size_t height, uint8_t format,
-                                   uint8_t type)
+    inline static GLint GLHDRStorageFormat(uint8_t colorFormat)
     {
+        switch (colorFormat)
+        {
+            case ImageColorFormat::Depth:
+                return GL_DEPTH_COMPONENT24;
+            case ImageColorFormat::RGBA:
+                return GL_RGBA16F;
+            case ImageColorFormat::RGB:
+                return GL_RGB16F;
+            case ImageColorFormat::RG:
+                return GL_RG16F;
+            case ImageColorFormat::R:
+                return GL_R16F;
+            default:
+                return GL_NONE;
+        }
+    }
+
+    inline static void CreateImage(void** data, uint8_t* imageData, size_t width, size_t height, uint8_t format,
+                                   uint8_t type, int isHDR)
+    {
+
         if (*data == nullptr) { *data = (void*) Engine::Allocator::Allocate<ImageData>(); }
         ImageData* m_ImageData = (ImageData*) *data;
         glCreateTextures(GL_TEXTURE_2D, 1, &m_ImageData->id);
-        glTextureStorage2D(m_ImageData->id, 1, GLStorageFormat(format), (GLsizei) width, (GLsizei) height);
+
+        switch (isHDR)
+        {
+            case 1:
+                glTextureStorage2D(m_ImageData->id, 1, GLHDRStorageFormat(format), (GLsizei) width, (GLsizei) height);
+                break;
+            default:
+                glTextureStorage2D(m_ImageData->id, 1, GLStorageFormat(format), (GLsizei) width, (GLsizei) height);
+                break;
+        }
         if (imageData)
         {
             glTextureSubImage2D(m_ImageData->id, 0, 0, 0, (GLsizei) width, (GLsizei) height, GLImageFormat(format),
@@ -79,6 +108,18 @@ namespace Engine
         glTextureParameteri(m_ImageData->id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTextureParameteri(m_ImageData->id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTextureParameteri(m_ImageData->id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    }
+
+    EXPORT_RENDERER void ImageInit(void** data, uint8_t* imageData, size_t width, size_t height, uint8_t format,
+                                   uint8_t type)
+    {
+        CreateImage(data, imageData, width, height, format, type, 0);
+    }
+
+    EXPORT_RENDERER void HDRImageInit(void** data, uint8_t* imageData, size_t width, size_t height, uint8_t format,
+                                      uint8_t type)
+    {
+        CreateImage(data, imageData, width, height, format, type, 1);
     }
 
     EXPORT_RENDERER void ImageBind(ImageData* data, size_t location) { glBindTextureUnit(location, data->id); }
