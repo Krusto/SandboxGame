@@ -131,6 +131,10 @@ namespace Engine
                                     uint8_t type);
         ImageInit_T ImageInit;
 
+        typedef void (*HDRImageInit_T)(void** data, uint8_t* imageData, size_t width, size_t height, uint8_t format,
+                                       uint8_t type);
+        HDRImageInit_T HDRImageInit;
+
         typedef void (*ImageDestroy_T)(void** data);
         ImageDestroy_T ImageDestroy;
 

@@ -29,7 +29,7 @@ EXPORT_RENDERER void RendererContextCreate(void* handle, void* window)
     // glCullFace(GL_BACK);
     // Uses counter clock-wise standard
     glFrontFace(GL_CCW);
-
+    glEnable(GL_FRAMEBUFFER_SRGB);
 
     const char* version = (const char*) glGetString(GL_VERSION);
     LOG_INFO("OPENGL VERSION %s!\n", version);

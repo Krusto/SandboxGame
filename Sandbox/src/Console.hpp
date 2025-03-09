@@ -13,5 +13,6 @@ public:
     void Draw();
 
 private:
-    //static void Log(LogEvent* event, void* param);
+    static void FormatEvent(LogEvent* event);
+    static void Log(LogEvent* event, void* param);
 };
