@@ -2,6 +2,7 @@
 #include <array>
 #include <string>
 #include <string_view>
+#include <cstdint>
 #include <unordered_map>
 
 namespace Engine
@@ -33,9 +34,9 @@ namespace Engine
     }// namespace TextureType
 
     struct BlockTextures {
-        size_t numTextures = 0;
-        size_t flags = 0;
-        size_t textureIDs[6] = {0, 0, 0, 0, 0, 0};
+        std::size_t numTextures = 0;
+        std::size_t flags = 0;
+        std::size_t textureIDs[6] = {0, 0, 0, 0, 0, 0};
     };
 
     struct BlockInfo {

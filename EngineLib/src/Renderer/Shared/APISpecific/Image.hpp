@@ -23,14 +23,14 @@ namespace Engine
     {
     public:
         Image() = default;
-        Image(uint8_t* data, size_t width, size_t height, ImageColorFormat format, ImageType type);
+        Image(uint8_t* data, std::size_t width, std::size_t height, ImageColorFormat format, ImageType type);
         ~Image() = default;
 
-        static Image Create(uint8_t* data, size_t width, size_t height, ImageColorFormat format, ImageType type);
+        static Image Create(uint8_t* data, std::size_t width,std::size_t height, ImageColorFormat format, ImageType type);
 
     public:
-        void Init(uint8_t* data, size_t width, size_t height, ImageColorFormat format, ImageType type);
-        void Bind(size_t location) const;
+        void Init(uint8_t* data,std::size_t width,std::size_t height, ImageColorFormat format, ImageType type);
+        void Bind(std::size_t location) const;
         void Destroy();
         uint32_t GetID() const;
 

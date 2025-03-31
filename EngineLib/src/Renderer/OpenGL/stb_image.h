@@ -1196,7 +1196,6 @@ STBIDEF void stbi_set_flip_vertically_on_load_thread( int flag_true_if_should_fl
                                          ? stbi__vertically_flip_on_load_local  \
                                          : stbi__vertically_flip_on_load_global)
 #endif // STBI_THREAD_LOCAL
-
 static void* stbi__load_main( stbi__context* s, int* x, int* y, int* comp, int req_comp, stbi__result_info* ri, int bpc )
 {
     memset( ri, 0, sizeof( *ri ) ); // make sure it's initialized if we add new fields

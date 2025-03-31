@@ -4,7 +4,7 @@
 #ifdef _WIN32
 #include <Windows.h>
 #else
-#error Add file lib include for Linux
+#include <sys/stat.h>
 #endif
 
 #include <stdio.h>
@@ -20,6 +20,8 @@ namespace Engine
 
 #ifdef _WIN32
     static bool FileExistsWin32(const char* path);
+#else
+    static bool FileExistsLinux(const char* path);
 #endif
 
     inline static bool FileExists(const char* path)
@@ -27,7 +29,7 @@ namespace Engine
 #ifdef _WIN32
         return FileExistsWin32(path);
 #else
-#error Add FileExists for Linux
+    return FileExistsLinux(path);
 #endif
     }
 
@@ -40,6 +42,12 @@ namespace Engine
         if (fp == nullptr) { return false; }
         fclose(fp);
         return true;
+    }
+#else 
+    inline static bool FileExistsLinux(const char* path)
+    {
+        struct stat buffer;
+        return (stat(path, &buffer) == 0);
     }
 #endif
 

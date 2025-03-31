@@ -35,6 +35,9 @@ namespace Engine
 
         void Destroy();
 
+    public:
+        static std::filesystem::path GetExectuablePath() { return std::filesystem::current_path(); }
+
     protected:
         Window* m_Window{};
         ApplicationSpec m_ApplicationSpec{};
