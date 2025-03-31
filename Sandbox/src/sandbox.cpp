@@ -10,8 +10,9 @@ using namespace Engine;
 class Sandbox: public Engine::Application
 {
 public:
-    Sandbox(const ApplicationSpec& spec)
+    Sandbox(ApplicationSpec& spec)
     {
+        if (spec.WorkingDirectory.empty()) { spec.WorkingDirectory = Engine::Application::GetExectuablePath(); }
         Engine::LayerStack::ConstructAndPushLayer<GUILayer>(spec);
         Engine::LayerStack::ConstructAndPushLayer<SandboxLayer>(spec);
     }
@@ -21,7 +22,7 @@ public:
 
 int main()
 {
-    auto spec = Engine::ApplicationSpec{"Sandbox", "E:/Projects/SandboxGame", Engine::Version{1, 0, 0}, 1280, 720};
+    auto spec = Engine::ApplicationSpec{"Sandbox", {}, Engine::Version{1, 0, 0}, 1280, 720};
     {
         Sandbox sandbox(spec);
         sandbox.Init(spec);

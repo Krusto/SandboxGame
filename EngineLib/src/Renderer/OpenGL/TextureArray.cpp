@@ -1,13 +1,16 @@
+
+//TODO: remove
+#define STB_IMAGE_IMPLEMENTATION
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include "stb_image.h"
+#include <glad/glad.h>
 #include <Renderer/Predefines.hpp>
 #include <Renderer/OpenGL/ExportedFunctions.hpp>
 #include <Renderer/OpenGL/StructDefinitions.hpp>
 #include <Core/Log.hpp>
 #include <Core/Allocator.hpp>
-
-//TODO: remove
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-#include <glad/glad.h>
 
 #include <algorithm>
 #include <filesystem>
