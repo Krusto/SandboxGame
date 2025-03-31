@@ -10,15 +10,15 @@ namespace Engine
     {
     public:
         StorageBuffer() = default;
-        StorageBuffer(uint8_t* data, size_t size, StorageBufferType type);
+        StorageBuffer(uint8_t* data,std::size_t size, StorageBufferType type);
         ~StorageBuffer() = default;
 
     public:
-        static StorageBuffer Create(uint8_t* data, size_t size, StorageBufferType type);
+        static StorageBuffer Create(uint8_t* data,std::size_t size, StorageBufferType type);
 
     public:
-        void Init(uint8_t* data, size_t size, StorageBufferType type);
-        void Bind(size_t location) const;
+        void Init(uint8_t* data,std::size_t size, StorageBufferType type);
+        void Bind(std::size_t location) const;
         void Unbind() const;
         void Destroy();
         uint32_t id() const;
