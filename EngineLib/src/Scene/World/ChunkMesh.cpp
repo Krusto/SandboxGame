@@ -205,7 +205,7 @@ namespace Engine
         {
             ScopedTimer timer("Vertex Data Generation");
             uint32_t* face_layers = Engine::Allocator::AllocateArray<uint32_t>(CHUNK_SIZE_SQUARE * 3);
-            std::memset(face_layers, 0, (size_t) CHUNK_SIZE_SQUARE * 3 * 4);
+            std::fill(face_layers, face_layers + CHUNK_SIZE_SQUARE * 3, 0);
             GenerateFaceLayer(blockData, 0, face_layers);
 
             std::vector<uint32_t> col_face_map[6];

@@ -3,24 +3,19 @@
 
 namespace Engine
 {
-    StorageBuffer::StorageBuffer(uint8_t* data, size_t size, StorageBufferType type) { Init(data, size, type); }
+    StorageBuffer::StorageBuffer(uint8_t* data, std::size_t size, StorageBufferType type) { Init(data, size, type); }
 
-    StorageBuffer StorageBuffer::Create(uint8_t* data, size_t size, StorageBufferType type)
+    StorageBuffer StorageBuffer::Create(uint8_t* data, std::size_t size, StorageBufferType type)
     {
         return StorageBuffer(data, size, type);
     }
 
-    void StorageBuffer::Init(uint8_t* data, size_t size, StorageBufferType type)
+    void StorageBuffer::Init(uint8_t* data, std::size_t size, StorageBufferType type)
     {
         Renderer::GetInstance()->StorageBufferInit((void**) &m_Data, nullptr, (char*) data, size, (int) type);
     }
 
-    void StorageBuffer::Upload(uint8_t* data, size_t size, size_t offset) const
-    {
-        Renderer::GetInstance()->StorageBufferUpload((void*) m_Data, (char*) data, size, offset);
-    }
-
-    void StorageBuffer::Bind(size_t location) const
+    void StorageBuffer::Bind(std::size_t location) const
     {
         Renderer::GetInstance()->StorageBufferBind((void*) m_Data, location);
     }

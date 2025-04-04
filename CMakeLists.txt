@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-set (CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-
 project(SandboxGame)
-
 set(BUILD_SHARED_LIBS ON CACHE BOOL "Build engine shared library" FORCE)
 set(FASTNOISE2_NOISETOOL OFF CACHE BOOL "Build noise tool" FORCE)
 set(FASTNOISE2_TESTS OFF CACHE BOOL "Build noise tests" FORCE)
@@ -16,19 +13,35 @@ message(STATUS "${PROJECT_NAME}: Build engine static library")
 set(BUILD_LIB_FLAG "STATIC")
 endif()
 
+if (WIN32)
+    set(GLFW_BUILD_WIN32 ON)
+else()
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+    execute_process(
+        COMMAND bash -c "echo $XDG_SESSION_TYPE"
+        OUTPUT_VARIABLE SESSION_TYPE
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    message(STATUS "${PROJECT_NAME}: Session type: ${SESSION_TYPE}")
+    if(SESSION_TYPE STREQUAL "x11")
+        message(STATUS "${PROJECT_NAME}: X11 detected")
+        set(GLFW_BUILD_X11 ON CACHE BOOL "Build X11 backend" FORCE)
+        set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "Build Wayland backend" FORCE)
+    elseif(SESSION_TYPE STREQUAL "wayland")
+        message(STATUS "${PROJECT_NAME}: Wayland detected")
+        set(GLFW_BUILD_X11 OFF CACHE BOOL "Build X11 backend" FORCE)
+        set(GLFW_BUILD_WAYLAND ON CACHE BOOL "Build Wayland backend" FORCE)
+    else()
+        message(STATUS "${PROJECT_NAME}: Unknown session type: ${SESSION_TYPE}")
+    endif()
+endif()
+
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 set(CMAKE_CXX_STANDARD 23)
 message("Compiler Version: ${CMAKE_CXX_COMPILER_VERSION}")
-
-# string(REGEX REPLACE "/RTC(su|[1su])" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-# message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}\n")
-# add_compile_options(-fsanitize=address)
-
-message(STATUS "${PROJECT_NAME}: Finding VulkanSDK...")
-find_package(Vulkan REQUIRED)
 
 message(STATUS "${PROJECT_NAME}: Finding python...")
 find_package(Python COMPONENTS Interpreter REQUIRED)
@@ -79,6 +92,7 @@ set(ENGINE_APPLICATION_HEADER_FILES ./EngineLib/src/Application/Application.hpp 
 
 add_compile_definitions(GLM_ENABLE_EXPERIMENTAL)
 
+set(GLFW_INCLUDE_DIR             "./Vendor/glfw-3.4/include")
 set(GLAD_INCLDUE_DIR           "./Vendor/glad/include")
 set(GLM_INCLDUE_DIR            "./Vendor/glm")
 set(STB_INCLDUE_DIR            "./Vendor/stb")
@@ -299,8 +313,8 @@ function(add_game_project name)
     target_include_directories(${name} PUBLIC "${CMAKE_SOURCE_DIR}/${name}/src")
     target_link_libraries(${name} SandboxWorld)
 
-    add_custom_command(TARGET ${name} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory  ${CMAKE_SOURCE_DIR}/Assets $<TARGET_FILE_DIR:${name}>/Assets DEPENDS EngineLib)
+    # add_custom_command(TARGET ${name} POST_BUILD
+    # COMMAND ${CMAKE_COMMAND} -E copy_directory  ${CMAKE_SOURCE_DIR}/Assets $<TARGET_FILE_DIR:${name}>/Assets DEPENDS EngineLib)
   
 endfunction(add_game_project name)
 
