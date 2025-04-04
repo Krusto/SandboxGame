@@ -36,13 +36,27 @@ namespace Engine
 #ifdef LOG_ERROR
 #undef LOG_ERROR
 #endif
+#ifdef _MSC_VER
 #define LOG_DEBUG(...) Engine::LogMessage(LogLevel::DEBUG_LEVEL, __VA_ARGS__)
-#define LOG_INFO(format, ...) Engine::LogMessage(LogLevel::INFO_LEVEL, format __VA_OPT__(, ) __VA_ARGS__)
+#define LOG_INFO(...) Engine::LogMessage(LogLevel::INFO_LEVEL, __VA_ARGS__)
 #define LOG_WARNING(...) Engine::LogMessage(LogLevel::WARNING_LEVEL, __VA_ARGS__)
 #define LOG_ERROR(...) Engine::LogMessage(LogLevel::ERROR_LEVEL, __VA_ARGS__)
 #else
+#define LOG_DEBUG(format, ...) Engine::LogMessage(LogLevel::DEBUG_LEVEL, format __VA_OPT__(, ) __VA_ARGS__)
+#define LOG_INFO(format, ...) Engine::LogMessage(LogLevel::INFO_LEVEL, format __VA_OPT__(, ) __VA_ARGS__)
+#define LOG_WARNING(format, ...) Engine::LogMessage(LogLevel::WARNING_LEVEL, format __VA_OPT__(, ) __VA_ARGS__)
+#define LOG_ERROR(format, ...) Engine::LogMessage(LogLevel::ERROR_LEVEL, format __VA_OPT__(, ) __VA_ARGS__)
+#endif
+#else
+#ifdef _MSC_VER
 #define LOG_DEBUG(...) LogMessage(LogLevel::DEBUG_LEVEL, __VA_ARGS__)
 #define LOG_INFO(...) LogMessage(LogLevel::INFO_LEVEL, __VA_ARGS__)
 #define LOG_WARNING(...) LogMessage(LogLevel::WARNING_LEVEL, __VA_ARGS__)
 #define LOG_ERROR(...) LogMessage(LogLevel::ERROR_LEVEL, __VA_ARGS__)
+#else
+#define LOG_DEBUG(format, ...) LogMessage(LogLevel::DEBUG_LEVEL, format __VA_OPT__(, ) __VA_ARGS__)
+#define LOG_INFO(format, ...) LogMessage(LogLevel::INFO_LEVEL, format __VA_OPT__(, ) __VA_ARGS__)
+#define LOG_WARNING(format, ...) LogMessage(LogLevel::WARNING_LEVEL, format __VA_OPT__(, ) __VA_ARGS__)
+#define LOG_ERROR(format, ...) LogMessage(LogLevel::ERROR_LEVEL, format __VA_OPT__(, ) __VA_ARGS__)
+#endif
 #endif
