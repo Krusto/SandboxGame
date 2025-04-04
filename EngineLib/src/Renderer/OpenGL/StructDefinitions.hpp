@@ -1,5 +1,5 @@
 #pragma once
-#include <cstdint>
+#include <Core/Types.hpp>
 #include <Renderer/Shared/StorageBufferType.hpp>
 #include <Renderer/Shared/CubemapTextureSpec.hpp>
 #ifdef __cplusplus

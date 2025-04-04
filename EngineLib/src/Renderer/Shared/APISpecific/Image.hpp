@@ -1,5 +1,5 @@
 #pragma once
-#include <cstdint>
+#include <Core/Types.hpp>
 
 namespace Engine
 {
@@ -26,10 +26,11 @@ namespace Engine
         Image(uint8_t* data, std::size_t width, std::size_t height, ImageColorFormat format, ImageType type);
         ~Image() = default;
 
-        static Image Create(uint8_t* data, std::size_t width,std::size_t height, ImageColorFormat format, ImageType type);
+        static Image Create(uint8_t* data, std::size_t width, std::size_t height, ImageColorFormat format,
+                            ImageType type);
 
     public:
-        void Init(uint8_t* data,std::size_t width,std::size_t height, ImageColorFormat format, ImageType type);
+        void Init(uint8_t* data, std::size_t width, std::size_t height, ImageColorFormat format, ImageType type);
         void Bind(std::size_t location) const;
         void Destroy();
         uint32_t GetID() const;

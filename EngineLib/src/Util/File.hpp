@@ -3,7 +3,7 @@
 //
 #include <vector>
 #include <string>
-#include <cstdint>
+#include <Core/Types.hpp>
 #include "Predefines.hpp"
 
 namespace Engine

@@ -1,6 +1,6 @@
 #pragma once
 #include <string_view>
-#include <cstdint>
+#include <Core/Types.hpp>
 
 namespace Engine
 {

@@ -2,8 +2,9 @@
 #include <string_view>
 #include <string>
 #include <filesystem>
-#include <cstdint>
+#include <Core/Types.hpp>
 #include <Util/Version.hpp>
+
 namespace Engine
 {
     struct ApplicationSpec {
@@ -13,4 +14,4 @@ namespace Engine
         uint32_t width;
         uint32_t height;
     };
-}
+}// namespace Engine

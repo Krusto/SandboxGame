@@ -1,5 +1,5 @@
 #pragma once
-#include <cstdint>
+#include <Core/Types.hpp>
 #include <string_view>
 
 #include <glm/ext/matrix_float4x4.hpp>

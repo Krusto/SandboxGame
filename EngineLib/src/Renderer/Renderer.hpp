@@ -128,12 +128,12 @@ namespace Engine
         CubemapTextureBind_T CubemapTextureBind;
 
         //Image
-        typedef void (*ImageInit_T)(void** data, uint8_t* imageData, size_t width, size_t height, uint8_t format,
-                                    uint8_t type);
+        typedef void (*ImageInit_T)(void** data, uint8_t* imageData, std::size_t width, std::size_t height,
+                                    uint8_t format, uint8_t type);
         ImageInit_T ImageInit;
 
-        typedef void (*HDRImageInit_T)(void** data, uint8_t* imageData, size_t width, size_t height, uint8_t format,
-                                       uint8_t type);
+        typedef void (*HDRImageInit_T)(void** data, uint8_t* imageData, std::size_t width, std::size_t height,
+                                       uint8_t format, uint8_t type);
         HDRImageInit_T HDRImageInit;
 
         typedef void (*ImageDestroy_T)(void** data);
@@ -205,7 +205,7 @@ namespace Engine
         typedef void (*VertexArrayAddIndexBuffer_T)(void* data, unsigned int* indexData, unsigned int length);
         VertexArrayAddIndexBuffer_T VertexArrayAddIndexBuffer;
 
-        typedef size_t (*VertexArrayGetIndexCount_T)(void* data);
+        typedefstd::size_t (*VertexArrayGetIndexCount_T)(void* data);
         VertexArrayGetIndexCount_T VertexArrayGetIndexCount;
 
         typedef unsigned int (*VertexArrayGetID_T)(void* data);
@@ -222,7 +222,7 @@ namespace Engine
         typedef void (*VertexBufferBind_T)(void* data);
         VertexBufferBind_T VertexBufferBind;
 
-        typedef size_t (*VertexBufferGetSize_T)(void* data);
+        typedefstd::size_t (*VertexBufferGetSize_T)(void* data);
         VertexBufferGetSize_T VertexBufferGetSize;
 
         typedef unsigned int (*VertexBufferGetID_T)(void* data);
@@ -238,10 +238,10 @@ namespace Engine
         typedef void (*IndexBufferBind_T)(void* data);
         IndexBufferBind_T IndexBufferBind;
 
-        typedef size_t (*IndexBufferGetSize_T)(void* data);
+        typedefstd::size_t (*IndexBufferGetSize_T)(void* data);
         IndexBufferGetSize_T IndexBufferGetSize;
 
-        typedef size_t (*IndexBufferGetLength_T)(void* data);
+        typedefstd::size_t (*IndexBufferGetLength_T)(void* data);
         IndexBufferGetLength_T IndexBufferGetLength;
 
         typedef unsigned int (*IndexBufferGetID_T)(void* data);
@@ -283,7 +283,7 @@ namespace Engine
         typedef void (*StorageBufferDestroy_T)(void** data);
         StorageBufferDestroy_T StorageBufferDestroy;
 
-        typedef void (*StorageBufferUpload_T)(void* data, void* storageData, size_t size, size_t offset);
+        typedef void (*StorageBufferUpload_T)(void* data, void* storageData, std::size_t size, std::size_t offset);
         StorageBufferUpload_T StorageBufferUpload;
 
         typedef void (*StorageBufferBind_T)(void* data, unsigned int location);
@@ -403,19 +403,19 @@ namespace Engine
         typedef void (*ShaderSetUniform4I_T)(void* data, const char* name, int x, int y, int z, int w);
         ShaderSetUniform4I_T ShaderSetUniform4I;
 
-        typedef void (*DrawIndirectBufferInit_T)(DrawIndirectBufferData** data, int8_t* storageData, size_t size,
+        typedef void (*DrawIndirectBufferInit_T)(DrawIndirectBufferData** data, int8_t* storageData, std::size_t size,
                                                  StorageBufferType type);
         DrawIndirectBufferInit_T DrawIndirectBufferInit;
 
-        typedef void (*DrawIndirectBufferBind_T)(DrawIndirectBufferData* data, size_t location);
+        typedef void (*DrawIndirectBufferBind_T)(DrawIndirectBufferData* data, std::size_t location);
         DrawIndirectBufferBind_T DrawIndirectBufferBind;
 
-        typedef void (*DrawIndirectBufferUpload_T)(DrawIndirectBufferData* data, int8_t* storageData, size_t size,
-                                                   size_t offset);
+        typedef void (*DrawIndirectBufferUpload_T)(DrawIndirectBufferData* data, int8_t* storageData, std::size_t size,
+                                                   std::size_t offset);
         DrawIndirectBufferUpload_T DrawIndirectBufferUpload;
 
-        typedef void (*DrawIndirectBufferDraw_T)(DrawIndirectBufferData* data, size_t count, size_t stride,
-                                                 size_t offset);
+        typedef void (*DrawIndirectBufferDraw_T)(DrawIndirectBufferData* data, std::size_t count, std::size_t stride,
+                                                 std::size_t offset);
         DrawIndirectBufferDraw_T DrawIndirectBufferDraw;
 
         typedef void (*DrawIndirectBufferUnbind_T)(DrawIndirectBufferData* data);

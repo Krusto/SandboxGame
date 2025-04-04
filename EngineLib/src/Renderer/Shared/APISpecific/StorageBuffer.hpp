@@ -1,5 +1,5 @@
 #pragma once
-#include <cstdint>
+#include <Core/Types.hpp>
 #include <Renderer/Shared/StorageBufferType.hpp>
 
 namespace Engine

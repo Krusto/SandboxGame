@@ -38,7 +38,7 @@ namespace Engine
         glNamedBufferStorage(m_Data->id, size, storageData, GL_DYNAMIC_STORAGE_BIT);
     }
 
-    EXPORT_RENDERER void StorageBufferUpload(void* data, char* storageData, size_t size, size_t offset)
+    EXPORT_RENDERER void StorageBufferUpload(void* data, char* storageData, std::size_t size, std::size_t offset)
     {
         StorageBufferData* m_Data = static_cast<StorageBufferData*>(data);
         glNamedBufferSubData(m_Data->id, offset, size, storageData);

@@ -6,7 +6,7 @@ namespace Engine
 {
     void ChunkRenderer::Init()
     {
-        size_t numIndices = CHUNK_SIZE_CUBIC * 6;
+        std::size_t numIndices = CHUNK_SIZE_CUBIC * 6;
         m_VertexArray.Create(numIndices);
         m_StorageBuffer.Init(nullptr, BUFFER_SIZE, Engine::StorageBufferType::DynamicStorage);
         std::vector<uint32_t> indices(numIndices);
@@ -111,7 +111,7 @@ namespace Engine
 
     void ChunkRenderer::Render()
     {
-        size_t numCommands = m_DrawCommands.size();
+        std::size_t numCommands = m_DrawCommands.size();
         if (numCommands == 0) return;
 
         m_IndirectBuffer.Upload((uint8_t*) m_DrawCommands.data(), sizeof(DrawElementsIndirectCommand) * numCommands, 0);

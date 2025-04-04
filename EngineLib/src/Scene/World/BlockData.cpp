@@ -61,5 +61,5 @@ namespace Engine
 
     const uint8_t* BlockData::RawData() const { return m_Data; }
 
-    const size_t BlockData::Size() const { return CHUNK_SIZE_CUBIC; }
+    conststd::size_t BlockData::Size() const { return CHUNK_SIZE_CUBIC; }
 }// namespace Engine

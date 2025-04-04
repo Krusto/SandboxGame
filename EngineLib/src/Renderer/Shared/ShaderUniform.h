@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <string>
-#include <cstdint>
+#include <Core/Types.hpp>
 #include <vector>
 #include <string_view>
 

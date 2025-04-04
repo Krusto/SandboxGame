@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <unordered_map>
-#include <cstdint>
+#include <Core/Types.hpp>
 #include <vector>
 
 #include <glm/glm.hpp>

@@ -67,7 +67,7 @@ namespace Engine
     {
         std::unordered_map<uint32_t, std::string> textureIndices;
 
-        size_t currentIndex = 0;
+        std::size_t currentIndex = 0;
         for (auto& blockInfo: s_BlockInfos)
         {
             if (blockInfo.Name != "Null" && blockInfo.Name != "Air" && blockInfo.Textures.numTextures > 0)

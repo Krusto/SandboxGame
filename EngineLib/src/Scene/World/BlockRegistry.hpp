@@ -2,7 +2,7 @@
 #include <array>
 #include <string>
 #include <string_view>
-#include <cstdint>
+#include <Core/Types.hpp>
 #include <unordered_map>
 
 namespace Engine

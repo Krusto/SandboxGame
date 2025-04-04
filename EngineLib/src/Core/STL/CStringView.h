@@ -1,6 +1,6 @@
 #ifndef CSTRING_VIEW_H
 #define CSTRING_VIEW_H
-
+#include <Core/CTypes.h>
 #ifdef __cplusplus
 namespace Engine
 {
