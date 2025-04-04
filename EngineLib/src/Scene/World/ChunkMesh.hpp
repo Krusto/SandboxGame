@@ -18,6 +18,10 @@ namespace Engine
         std::vector<VoxelVertex> vertices;
         std::vector<uint32_t> indices;
         std::vector<uint8_t> blocks;
+        uint64_t* opaqueMask;
+        uint64_t* faceMasks;
+        uint8_t* forwardMerged;
+        uint8_t* rightMerged;
     };
 
     class ChunkMesh
@@ -41,6 +45,9 @@ namespace Engine
     private:
         void GenerateVertexData(const BlockData* blockData, std::vector<uint8_t>& blocks,
                                 std::vector<VoxelVertex>& vertices, std::vector<uint32_t>& indices);
+
+        void GenerateVertexData2(const BlockData* blockData, std::vector<uint8_t>& blocks,
+                                 std::vector<VoxelVertex>& vertices, std::vector<uint32_t>& indices);
 
         static std::vector<Quad> BinaryGreedyMesherPlane(uint32_t* faceData, uint32_t axis);
 

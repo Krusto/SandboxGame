@@ -96,6 +96,7 @@ namespace Engine
             //Storage Buffer
             _LoadSymbol(StorageBufferInit);
             _LoadSymbol(StorageBufferDestroy);
+            _LoadSymbol(StorageBufferUpload);
             _LoadSymbol(StorageBufferBind);
             _LoadSymbol(StorageBufferGetID);
             _LoadSymbol(StorageBufferUnbind);
@@ -139,6 +140,14 @@ namespace Engine
             _LoadSymbol(ShaderSetUniform2I);
             _LoadSymbol(ShaderSetUniform3I);
             _LoadSymbol(ShaderSetUniform4I);
+
+            //DrawIndirectBuffer
+            _LoadSymbol(DrawIndirectBufferInit);
+            _LoadSymbol(DrawIndirectBufferDestroy);
+            _LoadSymbol(DrawIndirectBufferBind);
+            _LoadSymbol(DrawIndirectBufferUpload);
+            _LoadSymbol(DrawIndirectBufferUnbind);
+            _LoadSymbol(DrawIndirectBufferGetID);
         }
 
         inline static void Unload() { s_Loader.Unload(); }

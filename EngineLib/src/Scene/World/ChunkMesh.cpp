@@ -1,8 +1,10 @@
 #include "ChunkMesh.hpp"
 #include "BlockVertexData.hpp"
+#include "ChunkRenderer.hpp"
 
 #include <algorithm>
 #include <bitset>
+#include <bit>
 #include <future>
 #include <unordered_map>
 #include <Core/Timer.hpp>
@@ -11,6 +13,16 @@
 
 namespace Engine
 {
+
+    static inline const int getAxisIndex(const int axis, const int a, const int b, const int c)
+    {
+        if (axis == 0) return b + (a * CHUNK_SIZE_PADDED) + (c * CHUNK_SIZE_SQUARE_PADDED);
+        else if (axis == 1)
+            return b + (c * CHUNK_SIZE_PADDED) + (a * CHUNK_SIZE_SQUARE_PADDED);
+        else
+            return c + (a * CHUNK_SIZE_PADDED) + (b * CHUNK_SIZE_SQUARE_PADDED);
+    }
+
     void ChunkMesh::Generate(const BlockData* blockData)
     {
         GenerateVertexData(blockData, m_Mesh.blocks, m_Mesh.vertices, m_Mesh.indices);
@@ -27,8 +39,6 @@ namespace Engine
         {
             mesh->m_VertexArray = Engine::VertexArray::Create(mesh->m_Mesh.indices.size());
             mesh->m_VertexArray.Bind();
-            // mesh->m_VertexArray.AddVertexBuffer(VoxelVertex::GetLayout(), (float*) mesh->m_Mesh.vertices.data(),
-            //                                      mesh->m_Mesh.vertices.size());
 
             mesh->m_VertexArray.AddIndexBuffer(mesh->m_Mesh.indices.data(), mesh->m_Mesh.indices.size());
 
@@ -57,6 +67,136 @@ namespace Engine
                 }
             }
         }
+    }
+
+    void ChunkMesh::GenerateVertexData2(const BlockData* blockData, std::vector<uint8_t>& blocks,
+                                        std::vector<VoxelVertex>& vertices, std::vector<uint32_t>& indices)
+    {
+        constexpr uint64_t P_MASK = ~(1ull << 63 | 1);
+
+        m_Mesh.opaqueMask = Engine::Allocator::AllocateArray<uint64_t>(CHUNK_SIZE_SQUARE_PADDED);
+        m_Mesh.faceMasks = Engine::Allocator::AllocateArray<uint64_t>(CHUNK_SIZE_SQUARE * 6);
+        m_Mesh.forwardMerged = Engine::Allocator::AllocateArray<uint8_t>(CHUNK_SIZE_SQUARE);
+        m_Mesh.rightMerged = Engine::Allocator::AllocateArray<uint8_t>(CHUNK_SIZE);
+
+        memset(m_Mesh.opaqueMask, 0, CHUNK_SIZE_SQUARE_PADDED * sizeof(uint64_t));
+        memset(m_Mesh.faceMasks, 0, (CHUNK_SIZE_SQUARE + 6) * sizeof(uint64_t));
+        memset(m_Mesh.forwardMerged, 0, CHUNK_SIZE_SQUARE * sizeof(uint8_t));
+        memset(m_Mesh.rightMerged, 0, CHUNK_SIZE * sizeof(uint8_t));
+
+        uint64_t* opaqueMask = m_Mesh.opaqueMask;
+        uint64_t* faceMasks = m_Mesh.faceMasks;
+        uint8_t* forwardMerged = m_Mesh.forwardMerged;
+        uint8_t* rightMerged = m_Mesh.rightMerged;
+
+        for (int a = 1; a < CHUNK_SIZE_PADDED - 1; a++)
+        {
+            const int aCHUNK_SIZE_PADDED = a * CHUNK_SIZE_PADDED;
+            for (int b = 1; b < CHUNK_SIZE_PADDED; b++)
+            {
+                const uint64_t columnBits = opaqueMask[(a * CHUNK_SIZE_PADDED) + b] & P_MASK;
+                const int baIndex = (b - 1) + (a - 1) * CHUNK_SIZE;
+                const int abIndex = (a - 1) + (b - 1) * CHUNK_SIZE;
+
+                faceMasks[baIndex + 0 * CHUNK_SIZE_SQUARE] =
+                        (columnBits & ~opaqueMask[aCHUNK_SIZE_PADDED + CHUNK_SIZE_PADDED + b]) >> 1;
+                faceMasks[baIndex + 1 * CHUNK_SIZE_SQUARE] =
+                        (columnBits & ~opaqueMask[aCHUNK_SIZE_PADDED - CHUNK_SIZE_PADDED + b]) >> 1;
+
+                faceMasks[abIndex + 2 * CHUNK_SIZE_SQUARE] =
+                        (columnBits & ~opaqueMask[aCHUNK_SIZE_PADDED + (b + 1)]) >> 1;
+                faceMasks[abIndex + 3 * CHUNK_SIZE_SQUARE] =
+                        (columnBits & ~opaqueMask[aCHUNK_SIZE_PADDED + (b - 1)]) >> 1;
+
+                faceMasks[baIndex + 4 * CHUNK_SIZE_SQUARE] = (columnBits & ~(opaqueMask[aCHUNK_SIZE_PADDED + b] >> 1));
+                faceMasks[baIndex + 5 * CHUNK_SIZE_SQUARE] = (columnBits & ~(opaqueMask[aCHUNK_SIZE_PADDED + b] << 1));
+            }
+        }
+
+        int vertexI = {};
+        //Greedy messhing faces 0-3
+        for (int face = 0; face < 4; face++)
+        {
+            const int axis = face / 2;
+            const int faceVertexBegin = vertexI;
+            for (int layer = 0; layer < CHUNK_SIZE; layer++)
+            {
+                const int bitsLocation = layer * CHUNK_SIZE + face * CHUNK_SIZE_SQUARE;
+
+                for (int forward = 0; forward < CHUNK_SIZE; forward++)
+                {
+                    uint64_t bitsHere = faceMasks[forward + bitsLocation];
+                    if (bitsHere == 0) continue;
+
+                    const uint64_t bitsNext = forward + 1 < CHUNK_SIZE ? faceMasks[(forward + 1) + bitsLocation] : 0;
+
+                    uint8_t rightMerged = 1;
+                    while (bitsHere)
+                    {
+                        unsigned long bitPos = std::countr_zero(bitsHere);
+                        const uint8_t type =
+                                blockData->RawData()[getAxisIndex(axis, forward + 1, bitPos + 1, layer + 1)];
+                        uint8_t& forwardMergedRef = forwardMerged[bitPos];
+                        if ((bitsNext >> bitPos & 1) &&
+                            type == blockData->RawData()[getAxisIndex(axis, forward + 2, bitPos + 1, layer + 1)])
+                        {
+                            forwardMergedRef++;
+                            bitsHere &= ~(1ull << bitPos);
+                            continue;
+                        }
+                        for (int right = bitPos + 1; right < CHUNK_SIZE; right++)
+                        {
+                            if (!(bitsHere >> right & 1) || forwardMergedRef != forwardMerged[right] ||
+                                type != blockData->RawData()[getAxisIndex(axis, forward + 1, right + 1, layer + 1)])
+                                break;
+                            forwardMerged[right] = 0;
+                            rightMerged++;
+                        }
+                        bitsHere &= ~((1ull << (bitPos + rightMerged)) - 1);
+
+                        const uint8_t meshFront = forward - forwardMergedRef;
+                        const uint8_t meshLeft = bitPos;
+                        const uint8_t meshUp = layer + (~face & 1);
+
+                        const uint8_t meshWidth = rightMerged;
+                        const uint8_t meshLength = forwardMergedRef + 1;
+
+                        forwardMergedRef = 0;
+                        rightMerged = 1;
+
+                        uint64_t quad;
+                        switch (face)
+                        {
+                            case 0:
+                            case 1:
+                                InsertFace(vertices, axis,
+                                           Quad{(uint64_t) meshFront + (face == 1 ? meshLength : 0), meshUp, meshLeft,
+                                                meshLength},
+                                           meshWidth);
+                                vertexI++;
+                                blocks.push_back(type);
+                                break;
+                            case 2:
+                            case 3:
+                                InsertFace(vertices, axis,
+                                           Quad{(uint64_t) meshUp, (uint64_t) meshFront + (face == 2 ? meshLength : 0),
+                                                meshLeft, meshLength},
+                                           meshWidth);
+                                vertexI++;
+                                blocks.push_back(type);
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        GenerateIndices(indices, vertices.size());
+
+        Engine::Allocator::Deallocate(m_Mesh.opaqueMask);
+        Engine::Allocator::Deallocate(m_Mesh.faceMasks);
+        Engine::Allocator::Deallocate(m_Mesh.forwardMerged);
+        Engine::Allocator::Deallocate(m_Mesh.rightMerged);
     }
 
     void ChunkMesh::GenerateVertexData(const BlockData* blockData, std::vector<uint8_t>& blocks,
@@ -139,7 +279,6 @@ namespace Engine
             Engine::Allocator::Deallocate(face_layers);
         }
         GenerateIndices(indices, vertices.size());
-
     }
 
     std::vector<Quad> ChunkMesh::BinaryGreedyMesherPlane(uint32_t* faceData, uint32_t axis)

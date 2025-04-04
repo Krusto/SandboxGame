@@ -31,6 +31,7 @@
 #include "Shared/APISpecific/StorageBuffer.hpp"
 #include "Shared/APISpecific/TextureArray.hpp"
 #include "Shared/APISpecific/VertexBuffer.hpp"
+#include "Shared/APISpecific/DrawIndirectBuffer.hpp"
 #include "Shared/APISpecific/VertexArray.hpp"
 
 typedef struct GLFWwindow GLFWwindow;
@@ -282,6 +283,9 @@ namespace Engine
         typedef void (*StorageBufferDestroy_T)(void** data);
         StorageBufferDestroy_T StorageBufferDestroy;
 
+        typedef void (*StorageBufferUpload_T)(void* data, void* storageData, size_t size, size_t offset);
+        StorageBufferUpload_T StorageBufferUpload;
+
         typedef void (*StorageBufferBind_T)(void* data, unsigned int location);
         StorageBufferBind_T StorageBufferBind;
 
@@ -398,6 +402,30 @@ namespace Engine
 
         typedef void (*ShaderSetUniform4I_T)(void* data, const char* name, int x, int y, int z, int w);
         ShaderSetUniform4I_T ShaderSetUniform4I;
+
+        typedef void (*DrawIndirectBufferInit_T)(DrawIndirectBufferData** data, int8_t* storageData, size_t size,
+                                                 StorageBufferType type);
+        DrawIndirectBufferInit_T DrawIndirectBufferInit;
+
+        typedef void (*DrawIndirectBufferBind_T)(DrawIndirectBufferData* data, size_t location);
+        DrawIndirectBufferBind_T DrawIndirectBufferBind;
+
+        typedef void (*DrawIndirectBufferUpload_T)(DrawIndirectBufferData* data, int8_t* storageData, size_t size,
+                                                   size_t offset);
+        DrawIndirectBufferUpload_T DrawIndirectBufferUpload;
+
+        typedef void (*DrawIndirectBufferDraw_T)(DrawIndirectBufferData* data, size_t count, size_t stride,
+                                                 size_t offset);
+        DrawIndirectBufferDraw_T DrawIndirectBufferDraw;
+
+        typedef void (*DrawIndirectBufferUnbind_T)(DrawIndirectBufferData* data);
+        DrawIndirectBufferUnbind_T DrawIndirectBufferUnbind;
+
+        typedef void (*DrawIndirectBufferDestroy_T)(DrawIndirectBufferData** data);
+        DrawIndirectBufferDestroy_T DrawIndirectBufferDestroy;
+
+        typedef uint32_t (*DrawIndirectBufferGetID_T)(DrawIndirectBufferData* data);
+        DrawIndirectBufferGetID_T DrawIndirectBufferGetID;
     };
 
 

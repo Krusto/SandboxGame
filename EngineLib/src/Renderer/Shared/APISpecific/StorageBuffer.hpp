@@ -19,6 +19,7 @@ namespace Engine
     public:
         void Init(uint8_t* data, size_t size, StorageBufferType type);
         void Bind(size_t location) const;
+        void Upload(uint8_t* data, size_t size, size_t offset = 0) const;
         void Unbind() const;
         void Destroy();
         uint32_t id() const;
