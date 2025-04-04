@@ -34,7 +34,7 @@ namespace Engine
 
         const uint8_t* RawData() const;
 
-        conststd::size_t Size() const;
+        const std::size_t Size() const;
 
     private:
         uint8_t* m_Data;

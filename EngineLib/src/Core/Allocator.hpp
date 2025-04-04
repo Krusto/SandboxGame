@@ -34,7 +34,7 @@ namespace Engine
     {
     public:
         inline static std::vector<Engine::PointerMetaData> s_Allocations;
-        inline staticstd::size_t s_AllocatedMemorySize;
+        inline static std::size_t s_AllocatedMemorySize;
         inline static std::recursive_mutex s_Mutex{};
 
         template <typename T, typename... Args>
@@ -349,7 +349,7 @@ namespace Engine
         }
 
         template <typename T, std::size_t TypeSize = sizeof(T), typename... Args>
-        static constexpr T* _AllocateArray(conststd::size_t count, Args&&... args) noexcept
+        static constexpr T* _AllocateArray(const std::size_t count, Args&&... args) noexcept
         {
             T* ptr{};
             ptr = (T*) std::malloc(count * TypeSize);
@@ -452,7 +452,7 @@ namespace Engine
     public:
         inline static std::recursive_mutex s_Mutex{};
         inline static std::unordered_map<void*, PointerMetaData> s_Allocations;
-        inline staticstd::size_t s_AllocatedMemorySize{};
+        inline static std::size_t s_AllocatedMemorySize{};
     };
 
     //#endif

@@ -205,7 +205,7 @@ namespace Engine
         typedef void (*VertexArrayAddIndexBuffer_T)(void* data, unsigned int* indexData, unsigned int length);
         VertexArrayAddIndexBuffer_T VertexArrayAddIndexBuffer;
 
-        typedefstd::size_t (*VertexArrayGetIndexCount_T)(void* data);
+        typedef std::size_t (*VertexArrayGetIndexCount_T)(void* data);
         VertexArrayGetIndexCount_T VertexArrayGetIndexCount;
 
         typedef unsigned int (*VertexArrayGetID_T)(void* data);
@@ -222,7 +222,7 @@ namespace Engine
         typedef void (*VertexBufferBind_T)(void* data);
         VertexBufferBind_T VertexBufferBind;
 
-        typedefstd::size_t (*VertexBufferGetSize_T)(void* data);
+        typedef std::size_t (*VertexBufferGetSize_T)(void* data);
         VertexBufferGetSize_T VertexBufferGetSize;
 
         typedef unsigned int (*VertexBufferGetID_T)(void* data);
@@ -238,10 +238,10 @@ namespace Engine
         typedef void (*IndexBufferBind_T)(void* data);
         IndexBufferBind_T IndexBufferBind;
 
-        typedefstd::size_t (*IndexBufferGetSize_T)(void* data);
+        typedef std::size_t (*IndexBufferGetSize_T)(void* data);
         IndexBufferGetSize_T IndexBufferGetSize;
 
-        typedefstd::size_t (*IndexBufferGetLength_T)(void* data);
+        typedef std::size_t (*IndexBufferGetLength_T)(void* data);
         IndexBufferGetLength_T IndexBufferGetLength;
 
         typedef unsigned int (*IndexBufferGetID_T)(void* data);

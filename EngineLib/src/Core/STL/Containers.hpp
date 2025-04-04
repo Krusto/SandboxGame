@@ -27,7 +27,7 @@ namespace Engine
         inline void Destroy() { cvector_destroy(m_Vector); }
 
     public:
-        inlinestd::size_t Length() const { return cvector_length(m_Vector); }
+        inline std::size_t Length() const { return cvector_length(m_Vector); }
 
         inline void Clear()
         {

@@ -120,7 +120,7 @@ namespace Engine
     EXPORT_RENDERER VertexBufferData* VertexBufferInit(VertexArrayData* vertexArray, VertexLayout* vertexLayout,
                                                        float* vertices, unsigned int length);
     EXPORT_RENDERER void VertexBufferBind(VertexBufferData* data);
-    EXPORT_RENDERERstd::size_t VertexBufferGetSize(VertexBufferData* data);
+    EXPORT_RENDERER std::size_t VertexBufferGetSize(VertexBufferData* data);
     EXPORT_RENDERER void VertexBufferDestroy(VertexBufferData** data);
     EXPORT_RENDERER uint32_t VertexBufferGetID(VertexBufferData* data);
 #ifdef __cplusplus
