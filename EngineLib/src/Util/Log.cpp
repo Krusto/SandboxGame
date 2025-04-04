@@ -1,4 +1,3 @@
-#pragma once
 #include "Log.hpp"
 // #define CLOG_IMPLEMENT
 #include <CLog.h>
@@ -8,11 +7,12 @@ namespace Engine
 {
 #endif
 
-    static void LoggerCreate(void) { CLogCreate(); }
+     void LoggerCreate(void) { CLogCreate(); }
 
-    static void LoggerDestroy(void) { CLogDestroy(); }
+     void LoggerDestroy(void) { CLogDestroy(); }
 
-    static void LogMessage(LogLevel level, const char* message, ...)
+     
+     void LogMessage(LogLevel level, const char* message, ...)
     {
         va_list list;
         va_start(list, message);
@@ -20,14 +20,14 @@ namespace Engine
         va_end(list);
     }
 
-    static void LoggerAttachFileHandler(const char* filename, LogPolicy policy)
+     void LoggerAttachFileHandler(const char* filename, LogPolicy policy)
     {
         CLogAttachFileHandler(filename, policy);
     }
 
-    static void LoggerAttachTerminalHandler(LogPolicy policy) { CLogAttachTerminalHandler(policy); }
+     void LoggerAttachTerminalHandler(LogPolicy policy) { CLogAttachTerminalHandler(policy); }
 
-    static void LoggerAttachHandler(void (*handler)(LogEvent*, void*), void* param, LogPolicy policy)
+     void LoggerAttachHandler(void (*handler)(LogEvent*, void*), void* param, LogPolicy policy)
     {
         CLogAttachHandler(handler, param, policy);
     }

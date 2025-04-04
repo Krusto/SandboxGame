@@ -2,7 +2,11 @@
 
 #ifdef LINK_SHARED
 #ifdef Renderer_EXPORTS
+#if defined(_MSC_VER)
 #define EXPORT_RENDERER extern "C" __declspec(dllexport)
+#else
+#define EXPORT_RENDERER extern "C" __attribute__((visibility("default")))
+#endif
 #else
 // #define EXPORT_RENDERER __declspec(dllimport)
 #endif

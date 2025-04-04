@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+using std::size_t;
 
 namespace Engine
 {

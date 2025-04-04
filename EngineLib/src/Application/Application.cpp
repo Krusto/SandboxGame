@@ -45,7 +45,7 @@ void Engine::Application::Run()
 void Engine::Application::Init(const Engine::ApplicationSpec& spec)
 {
     LoggerCreate();
-    // LoggerAttachTerminalHandler(LogPolicy::OVERWRITE_POLICY);
+    LoggerAttachTerminalHandler(LogPolicy::APPEND_POLICY);
     LOG_INFO("Application Init");
 
     m_ApplicationSpec = spec;
