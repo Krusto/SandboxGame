@@ -4,7 +4,6 @@
 
 namespace Engine
 {
-    usingstd::size_t = std::size_t;
     struct DrawIndirectBufferData;
 
     class DrawIndirectBuffer
