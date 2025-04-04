@@ -15,6 +15,11 @@ namespace Engine
         Renderer::GetInstance()->StorageBufferInit((void**) &m_Data, nullptr, (char*) data, size, (int) type);
     }
 
+    void StorageBuffer::Upload(uint8_t* data, size_t size, size_t offset) const
+    {
+        Renderer::GetInstance()->StorageBufferUpload((void*) m_Data, (char*) data, size, offset);
+    }
+
     void StorageBuffer::Bind(size_t location) const
     {
         Renderer::GetInstance()->StorageBufferBind((void*) m_Data, location);

@@ -9,6 +9,13 @@ namespace Engine
         return position.x + position.z * CHUNK_SIZE + position.y * CHUNK_SIZE_SQUARE;
     }
 
+    size_t ChunkPosition::GetIndexP(glm::vec3 position) { return GetIndexP((glm::ivec3) position); }
+
+    size_t ChunkPosition::GetIndexP(glm::ivec3 position)
+    {
+        return position.x + position.z * CHUNK_SIZE_PADDED + position.y * CHUNK_SIZE_SQUARE_PADDED;
+    }
+
     size_t ChunkPosition::GetRowIndex(glm::vec3 position) { return GetRowIndex((glm::ivec3) position); }
 
     size_t ChunkPosition::GetRowIndex(glm::ivec3 position) { return position.z + position.y * BLOCKS_PER_ROW; }

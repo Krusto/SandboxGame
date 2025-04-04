@@ -6,39 +6,42 @@
 
 namespace Engine
 {
+    inline static GLenum GetGLBufferUsage(StorageBufferType type)
+    {
+        switch ((StorageBufferType) type)
+        {
+            case StorageBufferType::DynamicStorage:
+                return GL_DYNAMIC_STORAGE_BIT;
+            case StorageBufferType::MapReadOnly:
+                return GL_MAP_READ_BIT;
+            case StorageBufferType::MapWriteOnly:
+                return GL_MAP_WRITE_BIT;
+            case StorageBufferType::MapPersistent:
+                return GL_MAP_PERSISTENT_BIT;
+            case StorageBufferType::MapCoherent:
+                return GL_MAP_COHERENT_BIT;
+            case StorageBufferType::ClientStorage:
+                return GL_CLIENT_STORAGE_BIT;
+            default:
+                return GL_INVALID_ENUM;
+        }
+    }
 
     EXPORT_RENDERER void StorageBufferInit(void** data, void* vertexArray, char* storageData, unsigned int size,
                                            int type)
     {
         if (*data == nullptr) { *data = Engine::Allocator::Allocate<StorageBufferData>(); }
         StorageBufferData* m_Data = static_cast<StorageBufferData*>(*data);
-        GLenum usage{};
-        switch ((StorageBufferType) type)
-        {
-            case StorageBufferType::DynamicStorage:
-                usage = GL_DYNAMIC_STORAGE_BIT;
-                break;
-            case StorageBufferType::MapReadOnly:
-                usage = GL_MAP_READ_BIT;
-                break;
-            case StorageBufferType::MapWriteOnly:
-                usage = GL_MAP_WRITE_BIT;
-                break;
-            case StorageBufferType::MapPersistent:
-                usage = GL_MAP_PERSISTENT_BIT;
-                break;
-            case StorageBufferType::MapCoherent:
-                usage = GL_MAP_COHERENT_BIT;
-                break;
-            case StorageBufferType::ClientStorage:
-                usage = GL_CLIENT_STORAGE_BIT;
-                break;
-            default:
-                break;
-        }
+        GLenum usage = GetGLBufferUsage((StorageBufferType) type);
 
         glCreateBuffers(1, &m_Data->id);
         glNamedBufferStorage(m_Data->id, size, storageData, GL_DYNAMIC_STORAGE_BIT);
+    }
+
+    EXPORT_RENDERER void StorageBufferUpload(void* data, char* storageData, size_t size, size_t offset)
+    {
+        StorageBufferData* m_Data = static_cast<StorageBufferData*>(data);
+        glNamedBufferSubData(m_Data->id, offset, size, storageData);
     }
 
     EXPORT_RENDERER void StorageBufferBind(void* data, unsigned int location)

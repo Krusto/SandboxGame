@@ -11,6 +11,9 @@ namespace Engine
         static size_t GetIndex(glm::vec3 position);
         static size_t GetIndex(glm::ivec3 position);
 
+        static size_t GetIndexP(glm::vec3 position);
+        static size_t GetIndexP(glm::ivec3 position);
+
         static size_t GetRowIndex(glm::ivec3 position);
         static size_t GetRowIndex(glm::vec3 position);
 

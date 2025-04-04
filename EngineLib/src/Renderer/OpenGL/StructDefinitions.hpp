@@ -55,6 +55,13 @@ namespace Engine
         StorageBufferType type{};
     };
 
+    struct DrawIndirectBufferData {
+        uint32_t id{};
+        uint32_t stride{};
+        uint32_t count{};
+        StorageBufferType type{};
+    };
+
     struct RendererAPIData {
         void* guiContext;
     };
