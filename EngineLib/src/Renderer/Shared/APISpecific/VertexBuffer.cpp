@@ -20,7 +20,7 @@ namespace Engine
 
     void VertexBuffer::Bind() const { Renderer::GetInstance()->VertexBufferBind(m_Data); }
 
-    size_t VertexBuffer::GetSize() const { return Renderer::GetInstance()->VertexBufferGetSize(m_Data); }
+   std::size_t VertexBuffer::GetSize() const { return Renderer::GetInstance()->VertexBufferGetSize(m_Data); }
 
     void VertexBuffer::Destroy() { Renderer::GetInstance()->VertexBufferDestroy((void**) &m_Data); }
 
