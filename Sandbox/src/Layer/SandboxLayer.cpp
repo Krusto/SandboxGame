@@ -26,7 +26,7 @@ void SandboxLayer::Init(Engine::Window* window)
     std::string worldShaderPath = m_ShadersDirectory.string() + "/World";
     std::string lightShaderPath = m_ShadersDirectory.string() + "/Light";
     std::string depthShaderPath = m_ShadersDirectory.string() + "/WorldDepth";
-    std::string hitboxShaderPath = m_ShadersDirectory.string() + "/Hitbox";
+    std::string hitboxShaderPath = m_ShadersDirectory.string() + "/HitBox";
 
     m_Framebuffer = Engine::Framebuffer::Create(window->GetSpec()->width, window->GetSpec()->height);
 

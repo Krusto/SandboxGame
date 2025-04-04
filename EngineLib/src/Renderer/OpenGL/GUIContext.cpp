@@ -1,6 +1,9 @@
 #include <glad/glad.h>
-#include <glfw/glfw3.h>
-#include <glfw/glfw3native.h>
+#include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>

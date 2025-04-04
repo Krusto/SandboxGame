@@ -8,11 +8,11 @@
 namespace Engine
 {
     RendererAPI* s_RendererAPI = nullptr;
-    inline void* s_Renderer;
+    inline Renderer* s_Renderer;
 
     const RendererAPI* Renderer::GetAPIInstance() { return s_RendererAPI; }
 
-    Renderer* Renderer::GetInstance() { return (Renderer*) s_Renderer; }
+    Renderer* Renderer::GetInstance() { return  s_Renderer; }
 
     Renderer* Renderer::Create()
     {

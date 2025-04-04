@@ -123,8 +123,16 @@ namespace ImGui
     void MyFunction(const char* name, const MyMatrix44& v);
 }
 */
+#if defined(_MSC_VER)
 #ifdef imgui_EXPORTS
 #define IMGUI_API __declspec(dllexport)
 #else
 #define IMGUI_API __declspec(dllimport)
+#endif
+#else
+#ifdef imgui_EXPORTS
+#define IMGUI_API __attribute__ ((visibility ("default")))
+#else
+#define IMGUI_API
+#endif
 #endif

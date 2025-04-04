@@ -15,7 +15,12 @@ namespace Engine
     public:
         inline static void Load(std::string_view working_directory)
         {
-            std::string path = std::string(working_directory.data()) + "/build/bin/Debug/RendererOpenGL.dll";
+#ifdef _WIN32
+            std::string filename = "RendererOpenGL.dll";
+#else
+            std::string filename = "libRendererOpenGL.so";
+#endif
+            std::string path = std::string(working_directory.data()) + "/" + filename;
             if (!s_Loader.Init(path)) { return; }
 
             Renderer::Create();

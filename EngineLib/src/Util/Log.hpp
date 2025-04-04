@@ -24,8 +24,20 @@ namespace Engine
 #ifdef __cplusplus
     }
 }// namespace Engine
+#ifdef LOG_DEBUG
+#undef LOG_DEBUG
+#endif
+#ifdef LOG_INFO
+#undef LOG_INFO
+#endif
+#ifdef LOG_WARNING
+#undef LOG_WARNING
+#endif
+#ifdef LOG_ERROR
+#undef LOG_ERROR
+#endif
 #define LOG_DEBUG(...) Engine::LogMessage(LogLevel::DEBUG_LEVEL, __VA_ARGS__)
-#define LOG_INFO(...) Engine::LogMessage(LogLevel::INFO_LEVEL, __VA_ARGS__)
+#define LOG_INFO(format, ...) Engine::LogMessage(LogLevel::INFO_LEVEL, format __VA_OPT__(, ) __VA_ARGS__)
 #define LOG_WARNING(...) Engine::LogMessage(LogLevel::WARNING_LEVEL, __VA_ARGS__)
 #define LOG_ERROR(...) Engine::LogMessage(LogLevel::ERROR_LEVEL, __VA_ARGS__)
 #else

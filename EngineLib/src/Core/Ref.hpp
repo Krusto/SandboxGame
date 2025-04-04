@@ -115,7 +115,7 @@ public:
     {
 
         bool flag{};
-        if (flag) { flag = AllocatorIsLive(m_Instance, T); }
+        // if (flag) { flag = AllocatorIsLive(m_Instance, T); }
 
         return flag;
     }
