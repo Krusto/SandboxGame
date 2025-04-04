@@ -36,11 +36,12 @@
  */
 
 #ifdef __cplusplus
-#include <cstdint>
+#include <Core/CTypes.h>
 namespace Engine
 {
 #else
 #include <stdint.h>
+#include <stddef.h>
 #endif
 #include <stdio.h>
 #include <stdlib.h>

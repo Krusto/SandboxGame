@@ -32,7 +32,7 @@ namespace Engine
                 return {};
             }
             file.seekg(0, std::ios::end);
-            size_t length = file.tellg();
+            std::size_t length = file.tellg();
             file.seekg(0, std::ios::beg);
             uint8_t* buffer = (uint8_t*) malloc(length);
             // std::vector<uint8_t> buffer(length);
@@ -59,7 +59,7 @@ namespace Engine
                 return std::string();
             }
             file.seekg(0, std::ios::end);
-            size_t length = file.tellg();
+            std::size_t length = file.tellg();
             file.seekg(0, std::ios::beg);
             // std::string buffer;
             // buffer.resize(length);

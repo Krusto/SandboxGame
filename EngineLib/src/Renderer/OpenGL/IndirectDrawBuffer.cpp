@@ -27,7 +27,7 @@ namespace Engine
         }
     }
 
-    EXPORT_RENDERER void DrawIndirectBufferInit(DrawIndirectBufferData** data, int8_t* storageData, size_t size,
+    EXPORT_RENDERER void DrawIndirectBufferInit(DrawIndirectBufferData** data, int8_t* storageData, std::size_t size,
                                                 StorageBufferType type)
     {
         if (*data == nullptr) { *data = Engine::Allocator::Allocate<DrawIndirectBufferData>(); }
@@ -45,19 +45,19 @@ namespace Engine
         glUnmapNamedBuffer(m_Data->id);
     }
 
-    EXPORT_RENDERER void DrawIndirectBufferUpload(DrawIndirectBufferData* data, int8_t* storageData, size_t size,
-                                                  size_t offset)
+    EXPORT_RENDERER void DrawIndirectBufferUpload(DrawIndirectBufferData* data, int8_t* storageData, std::size_t size,
+                                                  std::size_t offset)
     {
         glNamedBufferSubData(data->id, offset, size, storageData);
     }
 
-    EXPORT_RENDERER void DrawIndirectBufferDraw(DrawIndirectBufferData* data, size_t count, size_t stride,
-                                                size_t offset)
+    EXPORT_RENDERER void DrawIndirectBufferDraw(DrawIndirectBufferData* data, std::size_t count, std::size_t stride,
+                                                std::size_t offset)
     {
         glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, (void*) offset, count, stride);
     }
 
-    EXPORT_RENDERER void DrawIndirectBufferBind(DrawIndirectBufferData* data, size_t location)
+    EXPORT_RENDERER void DrawIndirectBufferBind(DrawIndirectBufferData* data, std::size_t location)
     {
         assert(data->id != 0);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, data->id);

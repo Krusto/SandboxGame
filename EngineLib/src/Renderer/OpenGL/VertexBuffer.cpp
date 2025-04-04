@@ -82,7 +82,7 @@ namespace Engine
         glBindBuffer(GL_ARRAY_BUFFER, data->id);
     }
 
-    EXPORT_RENDERER size_t VertexBufferGetSize(VertexBufferData* data) { return data->size; }
+    EXPORT_RENDERERstd::size_t VertexBufferGetSize(VertexBufferData* data) { return data->size; }
 
     EXPORT_RENDERER void VertexBufferDestroy(VertexBufferData** data)
     {

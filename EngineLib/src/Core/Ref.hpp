@@ -19,7 +19,7 @@ private:
 
     static void DecTotalRefCount();
 
-    inline static size_t s_TotalRefCount = 0;
+    inline staticstd::size_t s_TotalRefCount = 0;
     mutable std::atomic<uint32_t> m_RefCount = 0;
 };
 

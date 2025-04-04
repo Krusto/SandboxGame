@@ -50,7 +50,7 @@ namespace Engine
 
         static std::unordered_map<glm::ivec3, Chunk>& GetGeneratedChunks();
 
-        static size_t GeneratedChunksCount();
+        staticstd::size_t GeneratedChunksCount();
 
         static void UploadChunks();
 
@@ -76,7 +76,7 @@ namespace Engine
         inline static std::unordered_map<glm::ivec3, ChunkStatus> s_ScheduledChunks{};
         inline static std::unordered_map<glm::ivec3, ChunkStatus> s_ChunksToUpload{};
 
-        inline static size_t s_CurrentChunkGenerationCount = 0;
-        inline static constexpr size_t s_MaxChunksToGenerate = 200;
+        inline staticstd::size_t s_CurrentChunkGenerationCount = 0;
+        inline static constexprstd::size_t s_MaxChunksToGenerate = 200;
     };
 }// namespace Engine

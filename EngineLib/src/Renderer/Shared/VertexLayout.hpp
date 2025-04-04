@@ -36,7 +36,7 @@ namespace Engine
 
     struct VertexLayout {
         VertexAttributeList attributes;
-        size_t stride;
+        std::size_t stride;
     };
 
     //---------------------------------------------------------------------------------------------------

@@ -23,15 +23,15 @@ namespace Engine
     {
         TOKEN_TYPE tokenSequence[] = {TOKEN_TYPE::CLOSE_BRACKET, TOKEN_TYPE::UNIFORM};
 
-        size_t tokenSequenceCount = sizeof(tokenSequence) / sizeof(TOKEN_TYPE);
+        std::size_t tokenSequenceCount = sizeof(tokenSequence) / sizeof(TOKEN_TYPE);
 
-        size_t uniformStart = 0;
+        std::size_t uniformStart = 0;
         do {
             uniformStart = FindTokenSequence(tokenSequence, tokenSequenceCount, uniformStart);
 
             if (uniformStart != m_Tokens.size())
             {
-                size_t negativeOffset = 0;
+                std::size_t negativeOffset = 0;
 
                 do {
                     uniformStart -= 1;
@@ -44,7 +44,7 @@ namespace Engine
                 layout.Layout = GetUniformBlockMemoryLayout(uniformStart + 2);
                 m_UniformBlocks.push_back(layout);
 
-                size_t uniformLocation = uniformStart + negativeOffset + 4;
+                std::size_t uniformLocation = uniformStart + negativeOffset + 4;
 
                 do {
                     ShaderUniformDeclaration declaration;
@@ -66,7 +66,7 @@ namespace Engine
     {
         for (auto& block: m_UniformBlocks)
         {
-            size_t offset = 0;
+            std::size_t offset = 0;
             for (auto& uniform: block.Uniforms)
             {
                 uniform.Offset = offset;
@@ -104,7 +104,7 @@ namespace Engine
         return;
     }
 
-    GLSLReflection::TOKEN_TYPE GLSLReflection::GetNextToken(std::string& token, size_t& start) const
+    GLSLReflection::TOKEN_TYPE GLSLReflection::GetNextToken(std::string& token, std::size_t& start) const
     {
         SkipSpaceOrNewLine(start);
         token = {};
@@ -133,7 +133,7 @@ namespace Engine
         return TOKEN_TYPE::END;
     }
 
-    GLSLReflection::TOKEN_TYPE GLSLReflection::GetTokenType(const std::string& source, size_t start) const
+    GLSLReflection::TOKEN_TYPE GLSLReflection::GetTokenType(const std::string& source, std::size_t start) const
     {
         for (; start < source.length(); start++)
         {
@@ -196,7 +196,8 @@ namespace Engine
         return token.length() > 0;
     }
 
-    size_t GLSLReflection::FindTokenSequence(const GLSLReflection::TOKEN_TYPE* tokens, size_t count, size_t start) const
+    std::size_t GLSLReflection::FindTokenSequence(const GLSLReflection::TOKEN_TYPE* tokens, std::size_t count,
+                                                  std::size_t start) const
     {
         if (start >= m_Tokens.size()) { return m_Tokens.size(); }
         if (m_Tokens.size() <= count) { return m_Tokens.size(); }
@@ -204,7 +205,7 @@ namespace Engine
 
         for (size_t i = start; i <= m_Tokens.size() - count; i++)
         {
-            size_t j = 0;
+            std::size_t j = 0;
             for (j = 0; j < count; j++)
             {
                 TOKEN_TYPE currentType = m_Tokens[i + j].first;

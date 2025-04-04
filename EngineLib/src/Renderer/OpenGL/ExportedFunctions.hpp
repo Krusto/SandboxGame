@@ -40,11 +40,11 @@ namespace Engine
     EXPORT_RENDERER void GUIContextBegin(void* data);
     EXPORT_RENDERER void GUIContextEnd(void* data, void* drawData);
 
-    EXPORT_RENDERER void ImageInit(void** data, uint8_t* imageData, size_t width, size_t height, uint8_t format,
-                                   uint8_t type);
-    EXPORT_RENDERER void HDRImageInit(void** data, uint8_t* imageData, size_t width, size_t height, uint8_t format,
-                                      uint8_t type);
-    EXPORT_RENDERER void ImageBind(ImageData* data, size_t location);
+    EXPORT_RENDERER void ImageInit(void** data, uint8_t* imageData, std::size_t width, std::size_t height,
+                                   uint8_t format, uint8_t type);
+    EXPORT_RENDERER void HDRImageInit(void** data, uint8_t* imageData, std::size_t width, std::size_t height,
+                                      uint8_t format, uint8_t type);
+    EXPORT_RENDERER void ImageBind(ImageData* data, std::size_t location);
     EXPORT_RENDERER void ImageDestroy(void** data);
     EXPORT_RENDERER uint32_t ImageGetID(void* data);
 
@@ -120,7 +120,7 @@ namespace Engine
     EXPORT_RENDERER VertexBufferData* VertexBufferInit(VertexArrayData* vertexArray, VertexLayout* vertexLayout,
                                                        float* vertices, unsigned int length);
     EXPORT_RENDERER void VertexBufferBind(VertexBufferData* data);
-    EXPORT_RENDERER size_t VertexBufferGetSize(VertexBufferData* data);
+    EXPORT_RENDERERstd::size_t VertexBufferGetSize(VertexBufferData* data);
     EXPORT_RENDERER void VertexBufferDestroy(VertexBufferData** data);
     EXPORT_RENDERER uint32_t VertexBufferGetID(VertexBufferData* data);
 #ifdef __cplusplus

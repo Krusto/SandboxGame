@@ -125,7 +125,7 @@ namespace Engine
 
     EXPORT_RENDERER unsigned int ShaderGetID(void* data) { return asTPtr(data, ShaderData)->rendererID; }
 
-    inline static bool file_read_string(const int8_t* path, size_t* len, std::string* buffer)
+    inline static bool file_read_string(const int8_t* path, std::size_t* len, std::string* buffer)
     {
         std::ifstream f(std::string((const char*) path), std::ios::in);
         if (f)
@@ -152,7 +152,7 @@ namespace Engine
         try
         {
             std::string buffer;
-            size_t bufferLen;
+            std::size_t bufferLen;
             std::string path;
             std::unordered_map<ShaderType, std::string> extensions;
 
@@ -162,9 +162,7 @@ namespace Engine
 
             path = filepath + extensions[shaderType];
 
-            if (!FileExists(path.c_str())) { 
-                LOG_ERROR("%s Does not exist!\n", path.c_str());
-            }
+            if (!FileExists(path.c_str())) { LOG_ERROR("%s Does not exist!\n", path.c_str()); }
 
             auto resultStatus = file_read_string((const int8_t*) path.c_str(), &bufferLen, &buffer);
             if (resultStatus != false) { result = buffer; }

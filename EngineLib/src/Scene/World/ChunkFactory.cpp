@@ -22,7 +22,7 @@ namespace Engine
         return s_DoneChunks;
     }
 
-    size_t ChunkFactory::GeneratedChunksCount() { return s_DoneChunks.size(); }
+    std::size_t ChunkFactory::GeneratedChunksCount() { return s_DoneChunks.size(); }
 
     void ChunkFactory::UploadChunks()
     {

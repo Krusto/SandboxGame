@@ -2,7 +2,7 @@
 // Created by Stoyanov, Krusto (K.S.) on 6/3/2022.
 //
 #pragma once
-#include <cstdint>
+#include <Core/Types.hpp>
 
 namespace Engine
 {

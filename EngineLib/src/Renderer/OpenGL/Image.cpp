@@ -82,8 +82,8 @@ namespace Engine
         }
     }
 
-    inline static void CreateImage(void** data, uint8_t* imageData, size_t width, size_t height, uint8_t format,
-                                   uint8_t type, int isHDR)
+    inline static void CreateImage(void** data, uint8_t* imageData, std::size_t width, std::size_t height,
+                                   uint8_t format, uint8_t type, int isHDR)
     {
 
         if (*data == nullptr) { *data = (void*) Engine::Allocator::Allocate<ImageData>(); }
@@ -110,19 +110,19 @@ namespace Engine
         glTextureParameteri(m_ImageData->id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
 
-    EXPORT_RENDERER void ImageInit(void** data, uint8_t* imageData, size_t width, size_t height, uint8_t format,
-                                   uint8_t type)
+    EXPORT_RENDERER void ImageInit(void** data, uint8_t* imageData, std::size_t width, std::size_t height,
+                                   uint8_t format, uint8_t type)
     {
         CreateImage(data, imageData, width, height, format, type, 0);
     }
 
-    EXPORT_RENDERER void HDRImageInit(void** data, uint8_t* imageData, size_t width, size_t height, uint8_t format,
-                                      uint8_t type)
+    EXPORT_RENDERER void HDRImageInit(void** data, uint8_t* imageData, std::size_t width, std::size_t height,
+                                      uint8_t format, uint8_t type)
     {
         CreateImage(data, imageData, width, height, format, type, 1);
     }
 
-    EXPORT_RENDERER void ImageBind(ImageData* data, size_t location) { glBindTextureUnit(location, data->id); }
+    EXPORT_RENDERER void ImageBind(ImageData* data, std::size_t location) { glBindTextureUnit(location, data->id); }
 
     EXPORT_RENDERER void ImageDestroy(void** data)
     {
