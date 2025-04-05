@@ -139,7 +139,7 @@ namespace Engine
 
     RendererCommand Camera::UploadCommand(Shader* shader) const
     {
-        return RendererCommand([=]() { Upload(shader); });
+        return RendererCommand([camera = this, shader]() { camera->Upload(shader); });
     }
 
 }// namespace Engine

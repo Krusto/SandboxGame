@@ -45,12 +45,12 @@ void DebugCube::Destroy() { m_VertexArray.Destroy(); }
 
 Engine::RendererCommand DebugCube::Render(Engine::Shader* shader) const
 {
-    return Engine::RendererCommand([=]() {
+    return Engine::RendererCommand([debugCube = this, shader]() {
         shader->Bind();
-        m_VertexArray.Bind();
-        glm::mat4 model = glm::translate(glm::mat4(1.0f), position + glm::vec3(0.5, 0.5, 0.5));
+        debugCube->m_VertexArray.Bind();
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), debugCube->position + glm::vec3(0.5, 0.5, 0.5));
         model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
         shader->SetUniform("model", model);
-        Engine::Renderer::RenderIndexed(m_VertexArray);
+        Engine::Renderer::RenderIndexed(debugCube->m_VertexArray);
     });
 }

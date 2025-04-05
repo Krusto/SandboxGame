@@ -149,7 +149,9 @@ void SandboxLayer::RenderWorld()
     Renderer::Submit(m_Camera.UploadCommand(&m_Shader));
 
     Renderer::Submit(m_Light->UploadLight(&m_Shader));
-    Renderer::Submit(RendererCommand([=]() { m_Shader.SetUniform("light.shininess", (float) m_WorldShininess); }));
+    Renderer::Submit(RendererCommand([shader = m_Shader, shininess = m_WorldShininess]() {
+        shader.SetUniform("light.shininess", (float) shininess);
+    }));
 
     Renderer::Submit(m_World.RenderWorldCommand(&m_Shader, m_Camera.GetPosition()));
 
@@ -172,14 +174,14 @@ void SandboxLayer::RenderDepthWorld()
             glm::lookAt(m_Light->position, glm::radians(m_Camera.GetPosition()), glm::vec3(0.0f, 1.0f, 0.0f));
 
     glm::mat4 lightMatrix = lightProjection * lightView;
-    Engine::Renderer::Submit(Engine::RendererCommand([=]() {
-        m_DepthBufferShader.Bind();
-        m_DepthBufferShader.SetUniform("lightSpaceMatrix", lightMatrix);
+    Engine::Renderer::Submit(Engine::RendererCommand([shader = &m_DepthBufferShader, &lightMatrix]() {
+        shader->Bind();
+        shader->SetUniform("lightSpaceMatrix", lightMatrix);
     }));
 
     Engine::Renderer::Submit(m_World.RenderWorldCommand(&m_DepthBufferShader, m_Light->position));
 
-    Engine::Renderer::Submit(Engine::RendererCommand([=]() { m_DebugFramebuffer.Bind(); }));
+    Engine::Renderer::Submit(m_DebugFramebuffer.BindCommand());
     Engine::Renderer::SetViewport({m_DebugFramebuffer.width(), m_DebugFramebuffer.height()});
     Engine::Renderer::Submit(m_DebugFramebuffer.ClearDepthCommand());
     Engine::Renderer::Submit(m_DebugFramebuffer.ClearColorCommand(glm::vec4{0.0, 0.0, 0.0, 1.0}));
@@ -334,12 +336,12 @@ void SandboxLayer::OnImGuiDraw()
     ImGui::Begin("Framebuffer");
     if (m_ShowDepthBuffer)
     {
-        ImGui::Image((void*) m_DebugFramebuffer.GetColorAttachmentID(),
+        ImGui::Image((ImTextureID) (intptr_t) m_DebugFramebuffer.GetColorAttachmentID(),
                      {(float) m_DebugFramebuffer.width(), (float) m_DebugFramebuffer.height()}, {0, 1}, {1, 0});
     }
     else
     {
-        ImGui::Image((void*) m_Framebuffer.GetColorAttachmentID(),
+        ImGui::Image((ImTextureID) (intptr_t) m_Framebuffer.GetColorAttachmentID(),
                      {(float) m_Framebuffer.width(), (float) m_Framebuffer.height()}, {0, 1}, {1, 0});
     }
     ImGui::End();

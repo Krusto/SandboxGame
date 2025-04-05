@@ -29,8 +29,8 @@ namespace Engine
     public:
         void Load(const std::string& path);
         void Destroy();
-        const std::string& GetName() const;
-        const std::string& GetPath() const;
+        std::string GetName() const;
+        std::string GetPath() const;
         void Reload(bool forceCompile = true);
         void Bind();
         void Bind() const;
