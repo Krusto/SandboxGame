@@ -11,15 +11,9 @@ namespace Engine
 
     void Shader::Destroy() { Renderer::GetInstance()->ShaderDestroy((void**) &m_Data); }
 
-    const std::string& Shader::GetName() const
-    {
-        return std::string(Renderer::GetInstance()->ShaderGetName((void*) m_Data));
-    }
+    std::string Shader::GetName() const { return std::string(Renderer::GetInstance()->ShaderGetName((void*) m_Data)); }
 
-    const std::string& Shader::GetPath() const
-    {
-        return std::string(Renderer::GetInstance()->ShaderGetPath((void*) m_Data));
-    }
+    std::string Shader::GetPath() const { return std::string(Renderer::GetInstance()->ShaderGetPath((void*) m_Data)); }
 
     void Shader::Reload(bool forceCompile) { Renderer::GetInstance()->ShaderReload((void*) m_Data, forceCompile); }
 
@@ -88,6 +82,6 @@ namespace Engine
 
     RendererCommand Shader::BindCommand() const
     {
-        return RendererCommand([=]() { Bind(); });
+        return RendererCommand([shader = this]() { shader->Bind(); });
     }
 }// namespace Engine

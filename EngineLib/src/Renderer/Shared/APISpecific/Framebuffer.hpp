@@ -12,6 +12,7 @@ namespace Engine
     {
     public:
         Framebuffer() = default;
+        Framebuffer(uint32_t width, uint32_t height, bool isDepthMap = false);
         ~Framebuffer() = default;
         static Framebuffer Create(uint32_t width, uint32_t height, bool isDepthMap = false);
 

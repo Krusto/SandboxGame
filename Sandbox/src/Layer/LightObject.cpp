@@ -30,12 +30,9 @@ void LightObject::Init()
                               // Bottom face
                               0, 1, 4, 1, 5, 4};
 
-    Engine::VertexLayout layout=Engine::CreateVertexLayout(
-            Engine::VertexAttributeList{
-                    {
-                        Engine::VertexAttribute{"Position", (uint8_t) Engine::ShaderUniformType::Vec3}
-                    },
-                      1});
+    Engine::VertexLayout layout = Engine::CreateVertexLayout(Engine::VertexAttributeList{
+            {Engine::VertexAttribute{"Position", (uint8_t) Engine::ShaderUniformType::Vec3}},
+            1});
 
     m_VertexArray = Engine::VertexArray::Create(36);
     m_VertexArray.Bind();
@@ -47,16 +44,16 @@ void LightObject::Destroy() { m_VertexArray.Destroy(); }
 
 Engine::RendererCommand LightObject::Render(Engine::Shader* shader) const
 {
-    return Engine::RendererCommand([=]() {
+    return Engine::RendererCommand([light = this, shader]() {
         shader->Bind();
-        m_VertexArray.Bind();
-        glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
-        model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-        model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-        model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+        light->m_VertexArray.Bind();
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), light->position);
+        model = glm::rotate(model, glm::radians(light->rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::rotate(model, glm::radians(light->rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+        model = glm::rotate(model, glm::radians(light->rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
         model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
         shader->SetUniform("model", model);
-        Engine::Renderer::RenderIndexed(m_VertexArray, 36);
+        Engine::Renderer::RenderIndexed(light->m_VertexArray, 36);
     });
 }
 

@@ -47,6 +47,9 @@ void Console::Draw()
     std::lock_guard<std::mutex> lock(mEventsMutex);
     ImGui::Begin("Console");
     // for (auto& event: m_LogEvents) { ImGui::Text(event.message); }
-    for (auto i = m_LogEvents.rbegin(); i < m_LogEvents.rend(); ++i) { ImGui::Text(i->message); }
+    for (auto i = m_LogEvents.rbegin(); i < m_LogEvents.rend(); ++i)
+    {
+        ImGui::TextUnformatted(i->message, i->message + strlen(i->message));
+    }
     ImGui::End();
 }
